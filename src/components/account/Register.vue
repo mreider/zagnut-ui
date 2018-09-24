@@ -87,6 +87,7 @@ export default {
         if (!success) throw new Error(_get(response, 'data.message', 'Unable to create account'));
 
         this.$notify({group: 'app', type: 'success', text: 'Your account created, please check your inbo for confirmation email.'});
+        this.$router.push({ name: 'account' });
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
