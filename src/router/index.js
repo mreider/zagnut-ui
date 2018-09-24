@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 import Account from '@/components/account/Account';
-import ResetPassword from '@/components/account/ResetPassword';
+// import ResetPassword from '@/components/account/ResetPassword';
 import Home from '@/components/Home';
 import Initiatives from '@/components/Initiatives';
 import Ideas from '@/components/Ideas';
@@ -16,15 +16,15 @@ export default new Router({
   mode: 'history',
   routes: [
     {
-      path: '/account',
+      path: '/account/:action',
       name: 'account',
       component: Account
     },
-    {
-      path: '/reset',
-      name: 'reset',
-      component: ResetPassword
-    },
+    // {
+    //   path: '/account/reset',
+    //   name: 'reset',
+    //   component: ResetPassword
+    // },
     {
       path: '/',
       name: 'home',

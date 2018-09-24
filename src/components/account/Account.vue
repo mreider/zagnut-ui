@@ -5,27 +5,30 @@
     <forgot-password v-if="form === 'forgot'" :on-change-form="changeForm"/>
 
     <register v-if="form === 'register'" :on-change-form="changeForm"/>
+
+    <reset-password v-if="form === 'reset'" :on-change-form="changeForm" :token="token"/>
   </div>
 </template>
 
 <script>
+import _get from 'lodash/get';
 import Login from './Login';
 import ForgotPassword from './ForgotPassword';
 import Register from './Register';
+import ResetPassword from './ResetPassword';
 
 export default {
   name: '',
   data() {
     return {
-      form: 'login'
+      form: 'login',
+      token: null
     };
   },
 
   mounted() {
-    let action = this.$route.params.action;
-    if (!action) action = 'login';
-
-    this.form = action;
+    this.form = _get(this.$router, 'params.action', 'login');
+    this.token = this.$route.query.token;
   },
 
   methods: {
@@ -37,7 +40,14 @@ export default {
   components: {
     'login': Login,
     'forgot-password': ForgotPassword,
-    'register': Register
+    'register': Register,
+    'reset-password': ResetPassword
+  },
+
+  watch: {
+    '$route' (to, from) {
+      this.form = _get(to, 'params.action', 'login');
+    }
   }
 };
 </script>

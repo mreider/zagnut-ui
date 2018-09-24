@@ -1,39 +1,35 @@
 <template>
-  <div class="account">
-    <b-form @submit="submit" class="reset-password">
-      <h2 class="center">Set new password<br/>for</h2>
-      <h1 class="center">PM415</h1>
+  <b-form @submit="submit" class="reset-password">
+    <h2 class="center">Set new password<br/>for</h2>
+    <h1 class="center">PM415</h1>
 
-      <b-form-group>
-        <b-form-input type="password" v-model="form.password" required placeholder="Password">
-        </b-form-input>
-      </b-form-group>
+    <b-form-group>
+      <b-form-input type="password" v-model="form.password" required placeholder="Password">
+      </b-form-input>
+    </b-form-group>
 
-      <b-form-group>
-        <b-form-input type="password" v-model="form.confirmation" required placeholder="Confirmation">
-        </b-form-input>
-      </b-form-group>
+    <b-form-group>
+      <b-form-input type="password" v-model="form.confirmation" required placeholder="Confirmation">
+      </b-form-input>
+    </b-form-group>
 
-      <div class="button-box center">
-        <b-button type="submit" variant="primary">Set password</b-button>
-      </div>
-    </b-form>
-  </div>
+    <div class="button-box center">
+      <b-button type="submit" variant="primary">Set password</b-button>
+    </div>
+  </b-form>
 </template>
 
 <script>
-import queryString from 'query-string';
 import _get from 'lodash/get';
 
 export default {
   name: 'ResetPassword',
 
   mounted() {
-    const parsed = queryString.parse(location.search);
-    this.token = parsed.token;
-    console.log('TOKEN:', this.token);
-
-    if (!this.token && this.onChangeForm) this.$router.push({ name: 'account', params: { action: 'forgot' } });
+    if (!this.token) {
+      this.$notify({group: 'error', type: 'warn', text: 'Token invalid or missing'});
+      this.$router.push({ name: 'account', params: { action: 'forgot' } });
+    }
   },
 
   data() {
@@ -73,7 +69,8 @@ export default {
   },
 
   props: {
-    onChangeForm: Function
+    onChangeForm: Function,
+    token: String
   }
 };
 </script>
