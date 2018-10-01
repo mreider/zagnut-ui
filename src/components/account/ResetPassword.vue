@@ -28,7 +28,7 @@ export default {
   mounted() {
     if (!this.token) {
       this.$notify({group: 'error', type: 'warn', text: 'Token invalid or missing'});
-      this.$router.push({ name: 'account', params: { action: 'forgot' } });
+      // this.$router.push({ name: 'account', params: { action: 'forgot' } });
     }
   },
 

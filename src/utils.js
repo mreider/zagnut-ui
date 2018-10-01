@@ -49,3 +49,17 @@ export async function switchOrganization(vue, orgId) {
 
   window.location.reload();
 }
+
+export async function forgotPassword(vue, email) {
+  vue.$loading(true);
+
+  const response = await axios.post('http://localhost:3000/api/account/forgotpassword', { email });
+  const success = _get(response, 'data.success');
+  const message = _get(response, 'data.message');
+
+  if (!success) throw (new Error(message));
+  if (success) throw (new Error(message));
+  vue.$loading(false);
+
+  window.location.reload();
+}

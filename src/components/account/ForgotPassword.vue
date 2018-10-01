@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import _get from 'lodash/get';
+
 export default {
   name: 'ForgotPassword',
   data() {
@@ -34,6 +36,16 @@ export default {
   methods: {
     async submit(event) {
       event.preventDefault();
+      try {
+        let response = await this.axios.post('http://localhost:3000/api/account/forgotpassword', this.form);
+        const success = _get(response, 'data.success');
+        const message = _get(response, 'data.message');
+        this.$notify({group: 'app', type: success, text: message});
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+      }
     }
   },
 

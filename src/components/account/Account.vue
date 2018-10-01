@@ -6,7 +6,7 @@
 
     <register v-if="form === 'register'" :on-change-form="changeForm"/>
 
-    <reset-password v-if="form === 'reset'" :on-change-form="changeForm" :token="token"/>
+    <forgotpassword v-if="form === 'reset'" :on-change-form="changeForm" :token="token"/>
   </div>
 </template>
 
@@ -27,6 +27,7 @@ export default {
   },
 
   mounted() {
+    console.log(_get(this.$router, 'params.action', 'login'));
     this.form = _get(this.$router, 'params.action', 'login');
     this.token = this.$route.query.token;
   },
@@ -39,9 +40,9 @@ export default {
 
   components: {
     'login': Login,
-    'forgot-password': ForgotPassword,
+    'forgot': ForgotPassword,
     'register': Register,
-    'reset-password': ResetPassword
+    'reset': ResetPassword
   },
 
   watch: {
