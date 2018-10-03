@@ -1,7 +1,7 @@
 <template>
   <b-form @submit="submit" class="forgot">
     <h2 class="center">Restore password<br/>for</h2>
-    <h1 class="center">PM415</h1>
+    <h1 class="center">PM4151</h1>
 
     <b-form-group>
       <b-form-input type="email" v-model="form.email" required placeholder="Email address">
@@ -37,7 +37,7 @@ export default {
     async submit(event) {
       event.preventDefault();
       try {
-        let response = await this.axios.post('http://localhost:3000/api/account/forgotpassword', this.form);
+        let response = await this.axios.post('/api/account/forgotpassword', this.form);
         const success = _get(response, 'data.success');
         const message = _get(response, 'data.message');
         this.$notify({group: 'app', type: success, text: message});

@@ -54,7 +54,8 @@
 
       <b-tab title="Organization" >
         <div class="button-box right">
-          <b-button variant="success" size="" @click="handleOrganizationNew">➕ Add organization</b-button>
+          <input type="text" v-model="newOrgName">
+          <b-button variant="success" size="" @click="handleOrganizationNew(newOrgName)">➕ Add organization</b-button>
         </div>
 
         <b-table hover
@@ -90,6 +91,7 @@ export default {
       profileOrig: {},
       apikey: null,
       users: [],
+      newOrgName: '',
 
       saving: false
     };
@@ -121,7 +123,6 @@ export default {
           this.axios.get('/api/user').catch(() => { return null; }),
           this.axios.get('/api/user/apikey').catch(() => { return null; })
         ]);
-
         let success = _get(userResponse, 'data.success');
         if (!success) this.$errorMessage.show('Unable to load current user profile');
 
@@ -129,7 +130,7 @@ export default {
         if (!success) this.$errorMessage.show('Unable to load current user API key');
 
         this.profile = _get(userResponse, 'data.user');
-        this.apikey = _get(apiKeyResponse, 'data.apiKey');
+        this.apikey = _get(apiKeyResponse, 'data.apikey');
 
         this.profileOrig = JSON.parse(JSON.stringify(this.profile));
       } catch (error) {
@@ -173,7 +174,7 @@ export default {
 
       const data = {};
       let canSave = false;
-      const keys = ['firstName', 'lastName', 'email', 'password', 'confirmation'];
+      const keys = ['firstName', 'lastName', 'email', 'password', 'confirmation, id'];
 
       keys.forEach(key => {
         if (this.profile[key] !== this.profileOrig[key]) {
@@ -198,8 +199,10 @@ export default {
       this.saving = true;
 
       try {
-        const response = this.axios.put('/api/user', data);
-
+        data.email = this.profile.email;
+        console.log(data);
+        const response = await this.axios.put('/api/user', data);
+        console.log(response);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to save user profile.`);
 
@@ -216,12 +219,12 @@ export default {
       this.$loading(true);
 
       try {
-        const response = this.axios.post('/api/user/apikey');
-
+        const response = await this.axios.post('/api/user/apikey');
+        console.log(response);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to generate new api key.`);
 
-        this.apikey = _get(response, 'data.apiKey');
+        this.apikey = _get(response, 'data.apikey');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -230,7 +233,7 @@ export default {
     },
 
     handleOrganizationSelect(org) {
-      this.organizations.forEach(o => { o._rowVariant = ''; });
+      this.organizations.forEach(o => { o._rowVariant = ''; });// todo change in api
       org._rowVariant = 'active success';
     },
 
@@ -238,12 +241,42 @@ export default {
       console.log('Edit:', JSON.stringify(org));
     },
 
-    handleOrganizationDelete(org) {
-      console.log('Delete:', JSON.stringify(org));
+    async handleOrganizationDelete(org) {
+      if (!org || !this.profile.id) {
+        // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
+      }
+      try {
+        const response = await this.axios.post('/api/org/delete', { userid: String(this.profile.id), orgid: String(org.id) });
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to create new organization.`);
+
+        // this.apikey = _get(response, 'data.apikey');
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.loadOrganization();
+        this.$notify({group: 'app', type: 'success', text: 'Deleted'});
+      }
     },
 
-    handleOrganizationNew() {
-      console.log('New organization');
+    async handleOrganizationNew(data) {
+      // this.$loading(true);
+      if (!data) {
+        return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
+      }
+      try {
+        const response = await this.axios.post('/api/org/new', {name: data});
+        console.log(response);
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to create new organization.`);
+
+        // this.apikey = _get(response, 'data.apikey');
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.loadOrganization();
+        this.newOrgName = '';
+      }
     }
   },
 

@@ -3,6 +3,7 @@ import Router from 'vue-router';
 
 import Account from '@/components/account/Account';
 import ResetPassword from '@/components/account/ResetPassword';
+import ForgotPassword from '@/components/account/ForgotPassword';
 import Home from '@/components/Home';
 import Initiatives from '@/components/Initiatives';
 import Ideas from '@/components/Ideas';
@@ -21,8 +22,13 @@ export default new Router({
       component: Account
     },
     {
-      path: '/forgotpassword',
-      name: 'reset',
+      path: '/forgot-password',
+      name: 'ForgotPassword',
+      component: ForgotPassword
+    },
+    {
+      path: '/reset-password',
+      name: 'ResetPassword',
       component: ResetPassword
     },
     {
