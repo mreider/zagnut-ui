@@ -52,10 +52,19 @@
 
       </b-tab>
 
-      <b-tab title="Organization" >
+      <b-tab title="Organization">
         <div class="button-box right">
-          <input type="text" v-model="newOrgName">
-          <b-button variant="success" size="" @click="handleOrganizationNew(newOrgName)">➕ Add organization</b-button>
+          <div>
+            <b-btn variant="success" size="" v-b-modal.modalnew>➕ Add organization</b-btn>
+            <b-modal id="modalnew"
+                     title="New orgranization name"
+                     @ok="handleOrganizationNew(newOrgName)"
+                     size="sm"
+                     centered
+                     >
+                <b-form-input v-model="newOrgName" placeholder="Enter orgranization name">></b-form-input>
+            </b-modal>
+          </div>
         </div>
 
         <b-table hover
@@ -64,14 +73,41 @@
           @row-clicked="handleOrganizationSelect"
         >
           <template slot="actions" slot-scope="data">
-            <b-button variant="primary" size="sm" @click="handleOrganizationEdit(data.item)">🖉</b-button>
-            <b-button variant="danger" size="sm" v-show="data.item.role === 'Admin'" @click="handleOrganizationDelete(data.item)">✖</b-button>
+            <b-button variant="primary" size="sm" v-b-modal="modalId(data.item.id)+'edit'">🖉</b-button>
+            <b-button variant="danger" size="sm" v-b-modal="modalId(data.item.id)+'del'" v-show="data.item.role === 'Admin'">✖</b-button>
+            <b-modal :id="'modal' + data.item.id + 'del'"
+                     :title="'Delete ' + data.item.name + '?'"
+                     size="sm"
+                     centered
+                     ok-variant="danger"
+                     @ok="handleOrganizationDelete(data.item)"
+                     ok-title="delete"
+                     >
+            </b-modal>
+
+            <b-modal :id="'modal' + data.item.id + 'edit'"
+                     title="Edit"
+                     size="sm"
+                     centered
+                     ok-variant="submit"
+                     @ok="handleOrganizationEdit(data.item)"
+                     ok-title="submit"
+                     >
+                <b-form-input v-model=data.item.name placeholder=data.item.name></b-form-input>
+            </b-modal>
+
           </template>
         </b-table>
       </b-tab>
 
       <b-tab title="Users">
-        Users
+         <b-nav-item-dropdown :text="$store.state.organization.name" left>
+          <b-dropdown-item href="#"
+            v-for="org in $store.state.user.organizations"
+            v-bind:key="org.id"
+            @click="handleOrgChange(org)"
+          >{{ org.name }}</b-dropdown-item>
+        </b-nav-item-dropdown>
       </b-tab>
 
     </b-tabs>
@@ -92,25 +128,38 @@ export default {
       apikey: null,
       users: [],
       newOrgName: '',
-
-      saving: false
+      saving: false,
+      currentOrg: {}
     };
   },
 
   mounted () {
-    // this.handleTabChange(0);
+    this.handleTabChange(0);
   },
 
   computed: {
   },
 
   methods: {
+    modalId(i) {
+      return 'modal' + i;
+    },
+    loadCurrentOrg() {
+      if (!this.currentOrg) {
+        this.loadOrganization();
+        console.log(this.organizations);
+        this.currentOrg = this.organizations[0];
+        console.log(this.organizations);
+        return this.currentOrg;
+      }
+    },
     handleTabChange(index) {
       if (index === 0) {
         if (!this.profile.email) this.loadProfile();
       } else if (index === 1) {
         if (!this.organizations.length) this.loadOrganization();
       } else if (index === 2) {
+        this.loadOrganization();
         if (!this.users.length) this.loadUsers();
       }
     },
@@ -164,8 +213,9 @@ export default {
       }
     },
 
-    async loadUsers() {
+    async loadUsers(org) {
       this.$loading(true);
+
       this.$loading(false);
     },
 
@@ -237,8 +287,24 @@ export default {
       org._rowVariant = 'active success';
     },
 
-    handleOrganizationEdit(org) {
+    async handleOrganizationEdit(org) {
       console.log('Edit:', JSON.stringify(org));
+      if (!org.name) {
+        return this.$notify({group: 'error', type: 'err', text: 'Empty organization name field'});
+      }
+      try {
+        // debugger;
+        const response = await this.axios.post('/api/org/update', { name: String(org.name), orgid: String(org.id) });
+        console.log(response);
+        this.$notify({group: 'app', type: 'success', text: 'Organization updated'});
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to update organization.`);
+      } catch (error) {
+        this.loadOrganization();
+        return this.$errorMessage.show(error);
+      } finally {
+        // this.loadOrganization();
+      }
     },
 
     async handleOrganizationDelete(org) {
@@ -249,8 +315,6 @@ export default {
         const response = await this.axios.post('/api/org/delete', { userid: String(this.profile.id), orgid: String(org.id) });
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new organization.`);
-
-        // this.apikey = _get(response, 'data.apikey');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
