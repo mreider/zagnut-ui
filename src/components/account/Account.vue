@@ -27,7 +27,6 @@ export default {
 
   mounted() {
     this.form = _get(this.$route, 'params.action', 'login');
-    console.log('Account mounted:', this.form, this.$route);
   },
   methods: {
     changeForm(form) {
@@ -42,7 +41,6 @@ export default {
   },
   watch: {
     '$route' (to, from) {
-      console.log('watched to:', to);
       this.form = _get(to, 'params.action', 'login', 'login');
     }
   }

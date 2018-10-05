@@ -60,7 +60,6 @@ export default {
   methods: {
     async handleOrgChange(org) {
       try {
-        console.log('Org change:', JSON.stringify(org));
         await switchOrganization(this, org.id);
       } catch (error) {
         this.$loading(false);
