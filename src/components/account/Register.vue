@@ -78,8 +78,6 @@ export default {
     async handleSubmit(event) {
       event.preventDefault();
 
-      console.log(JSON.stringify(this.form));
-
       try {
         let response = await this.axios.post('/api/account/register', this.form);
 

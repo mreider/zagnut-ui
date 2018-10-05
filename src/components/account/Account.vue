@@ -6,7 +6,7 @@
 
     <register v-if="form === 'register'" :on-change-form="changeForm"/>
 
-    <reset-password v-if="form === 'reset-password'" :on-change-form="changeForm" :token="token"/>
+    <reset-password v-if="form === 'reset'" :on-change-form="changeForm"/>
   </div>
 </template>
 
@@ -16,28 +16,22 @@ import Login from './Login';
 import ForgotPassword from './ForgotPassword';
 import Register from './Register';
 import ResetPassword from './ResetPassword';
+
 export default {
   name: '',
   data() {
     return {
-      form: 'login',
-      token: null
+      form: 'login'
     };
   },
-  beforeCreate() {
-  },
+
   mounted() {
-    if (this.$route.name === 'ResetPassword') {
-      this.form = _get(this.$router, 'params.action', 'reset-password');
-      this.token = this.$route.query.token;
-    } else {
-      this.form = _get(this.$router, 'params.action', 'login');
-      this.token = this.$route.query.token;
-    }
+    this.form = _get(this.$route, 'params.action', 'login');
+    console.log('Account mounted:', this.form, this.$route);
   },
   methods: {
     changeForm(form) {
-      this.form = form;
+      this.$router.push({ name: 'account', params: {action: form}, query: this.$route.query });
     }
   },
   components: {
@@ -48,14 +42,8 @@ export default {
   },
   watch: {
     '$route' (to, from) {
-      if (this.$route.name === 'ResetPassword') {
-       // this.form = _get(to, 'params.action', 'reset-password');
-       // console.log('сюда', to, from);
-        this.$router.push({ name: 'reset-password' });
-      } else {
-       // this.form = _get(to, 'params.action', 'login', 'login');
-       // console.log('туда', to, from);
-      }
+      console.log('watched to:', to);
+      this.form = _get(to, 'params.action', 'login', 'login');
     }
   }
 };

@@ -27,14 +27,12 @@ import { doLogout } from '@/utils';
 import Topbar from './components/common/Topbar.vue';
 // import Sidebar from './components/common/Sidebar.vue';
 import Account from './components/account/Account.vue';
-import ResetPassword from './components/account/ResetPassword.vue';
 import { isCookieEnabled, getCookie } from 'tiny-cookie';
 import _get from 'lodash/get';
 
 export default {
   name: 'App',
-  beforeCreate() {
-  },
+
   async mounted() {
     let token = this.$store.state.token;
     if (!token && isCookieEnabled()) token = getCookie('token');
@@ -56,9 +54,9 @@ export default {
         return doLogout(this);
       }
     } else {
-      this.$router.push({ name: 'account' });
+      this.$router.push({ name: 'account', params: { action: 'login' }, query: this.$route.query });
     }
-    // this.$router.push({ name: 'ResetPassword' });
+
     this.axios.interceptors.response.use(response => {
       if (response.status === 403 || response.status === 401) {
         return doLogout(this);
@@ -84,7 +82,6 @@ export default {
 
   components: {
     'topbar': Topbar,
-    'ResetPassword': ResetPassword,
     'account': Account
   }
 };

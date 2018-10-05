@@ -22,13 +22,7 @@
 import _get from 'lodash/get';
 
 export default {
-  name: 'reset-password',
-  mounted() {
-    if (!this.token) {
-      this.$notify({group: 'error', type: 'warn', text: 'Token invalid or missing'});
-    }
-    this.form.token = this.token;
-  },
+  name: 'ResetPassword',
 
   data() {
     return {
@@ -40,13 +34,20 @@ export default {
     };
   },
 
+  mounted() {
+    this.form.token = _get(this.$route, 'query.token');
+
+    if (!this.form.token) {
+      this.$notify({group: 'error', type: 'warn', text: 'Token invalid or missing'});
+    }
+  },
+
   methods: {
     async submit(event) {
       event.preventDefault();
 
       try {
         let response = await this.axios.post('/api/account/changepassword', this.form);
-        // console.log(this.form);
         const success = _get(response, 'data.success');
         const message = _get(response, 'data.message', 'Unable to set new password');
         if (!success) {
@@ -54,7 +55,7 @@ export default {
         } else {
           this.$notify({group: 'app', type: success, text: `Your password was changed, in 3 seconds you'll be redirected to login page.`});
           setTimeout(() => {
-            this.$router.go({ name: 'home' });
+            this.$router.push({ name: 'account' });
           }, 3000);
         }
       } catch (error) {
@@ -66,8 +67,7 @@ export default {
   },
 
   props: {
-    onChangeForm: Function,
-    token: String
+    onChangeForm: Function
   }
 };
 </script>

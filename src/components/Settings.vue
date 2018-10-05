@@ -147,9 +147,7 @@ export default {
     loadCurrentOrg() {
       if (!this.currentOrg) {
         this.loadOrganization();
-        console.log(this.organizations);
         this.currentOrg = this.organizations[0];
-        console.log(this.organizations);
         return this.currentOrg;
       }
     },
