@@ -26,11 +26,10 @@ export function doLogin(vue, token, user) {
   } else {
     doLogout(vue);
   }
-  window.location.reload();
   vue.$loading(false);
 }
 
-export async function switchOrganization(vue, orgId, notreload) {
+export async function switchOrganization(vue, orgId, reload) {
   vue.$loading(true);
 
   const response = await axios.post(`/api/org/switch/${orgId}`);
@@ -45,7 +44,10 @@ export async function switchOrganization(vue, orgId, notreload) {
   vue.$store.commit({type: 'token', token});
   vue.$store.commit({type: 'organization', name: organization.name, id: organization.id});
   vue.$loading(false);
-  if (!notreload) window.location.reload();
+  if (reload === true) {
+    window.location.reload();
+    debugger;
+  }
 }
 
 export async function forgotPassword(vue, email) {

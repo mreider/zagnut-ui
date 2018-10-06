@@ -59,7 +59,7 @@ export default {
   methods: {
     async handleOrgChange(org) {
       try {
-        await switchOrganization(this, org.id);
+        await switchOrganization(this, org.id, true);
       } catch (error) {
         this.$loading(false);
         return this.$errorMessage.show(error);

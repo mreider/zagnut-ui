@@ -162,7 +162,7 @@ export default {
     },
     handleTabChange(index) {
       if (index === 0) {
-        if (!this.profile.email) this.loadProfile(); this.loadOrganization();
+        if (!this.profile.email) this.loadProfile();
       } else if (index === 1) {
         if (!this.organizations.length) this.loadOrganization();
       } else if (index === 2) {
@@ -199,7 +199,7 @@ export default {
     async OrgChange(org) {
       this.$loading(true);
       try {
-        await switchOrganization(this, org.id, true);
+        await switchOrganization(this, org.id, false);
       } catch (error) {
         this.$loading(false);
         return this.$errorMessage.show(error);
@@ -222,7 +222,6 @@ export default {
         });
         organizations.forEach(o => {
           o.menuName = o.name;
-          console.log(o.role);
           if (o.role === 'Pending') {
             o.menuName = o.name + ' (authorization pending)';
           }
@@ -372,7 +371,7 @@ export default {
         this.loadOrganization();
         return this.$errorMessage.show(error);
       } finally {
-        // this.loadOrganization();
+        this.loadOrganization();
       }
     },
 
@@ -436,6 +435,7 @@ export default {
     },
 
     async handleRevokeAdmin(data) {
+      this.$loading(true);
       let usersToRevokeAdmin = [];
       this.users.forEach(u => {
         if (u._rowVariant === 'active success') {
@@ -473,12 +473,13 @@ export default {
         try {
         // debugger;
           const response = await this.axios.post('/api/org/delete/users', data);
-          this.$notify({group: 'app', type: 'success', text: 'Deleted'});
           const success = _get(response, 'data.success');
-          if (!success) throw new Error(`Unable to delete users`);
+          console.log(success);
+          if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to delete users'});
+          if (success === true) this.$notify({group: 'app', type: 'success', text: 'Deleted'});
         } catch (error) {
           this.loadUsers(this.$store.state.organization);
-          return this.$errorMessage.show(error);
+          // return this.$errorMessage.show(error);
         } finally {
           this.loadUsers(this.$store.state.organization);
         }
