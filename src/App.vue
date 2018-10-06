@@ -45,6 +45,9 @@ export default {
 
         if (user) {
           user.organization = _get(response, 'data.organization');
+          const role = _get(response, 'data.role');
+          user.role = role;
+          if (role === 'Pending') user.organization.name = user.organization.name + ' (authorization pending)';
           this.$store.commit({type: 'user', user});
           this.$store.commit({type: 'token', token});
         } else {

@@ -26,7 +26,7 @@ export function doLogin(vue, token, user) {
   } else {
     doLogout(vue);
   }
-
+  window.location.reload();
   vue.$loading(false);
 }
 
@@ -51,7 +51,7 @@ export async function switchOrganization(vue, orgId, notreload) {
 export async function forgotPassword(vue, email) {
   vue.$loading(true);
 
-  const response = await axios.post('http://localhost:3000/api/account/forgotpassword', { email });
+  const response = await axios.post('/api/account/forgotpassword', { email });
   const success = _get(response, 'data.success');
   const message = _get(response, 'data.message');
 

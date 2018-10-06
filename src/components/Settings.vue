@@ -106,10 +106,13 @@
             v-for="org in organizations" v-if="organizations"
             v-bind:key="org.id"
             @click="OrgChange(org)"
-          >{{ org.name }}</b-dropdown-item>
+          >{{ org.menuName }}</b-dropdown-item>
           </b-dropdown>
           <b-dropdown id="Actions" text="Action" size="sm" class="m-2" right>
-            <b-dropdown-item id="ResetPassword" @click="handleResetPassword()"> Reset password </b-dropdown-item>
+            <b-dropdown-item id="resetPassword" @click="handleResetPassword()"> Reset password </b-dropdown-item>
+            <b-dropdown-item id="granAdmin" @click="handleGranAdmin()"> Grant admin </b-dropdown-item>
+            <b-dropdown-item id="hevokeAdmin" @click="handleRevokeAdmin()"> Revoke admin </b-dropdown-item>
+            <b-dropdown-item id="removeFromOrganization" @click="handleRemoveFromOrganization()"> Remove from org </b-dropdown-item>
           </b-dropdown>
 
           <b-table hover
@@ -217,6 +220,13 @@ export default {
         organizations.forEach(o => {
           o._rowVariant = '';
         });
+        organizations.forEach(o => {
+          o.menuName = o.name;
+          console.log(o.role);
+          if (o.role === 'Pending') {
+            o.menuName = o.name + ' (authorization pending)';
+          }
+        });
 
         this.organizations = organizations;
       } catch (error) {
@@ -323,7 +333,7 @@ export default {
       };
     },
 
-    handleResetPassword() {
+    async handleResetPassword() {
       let usersToResetPassword = [];
       this.users.forEach(u => {
         if (u._rowVariant === 'active success') {
@@ -331,9 +341,20 @@ export default {
         };
       });
       if (usersToResetPassword.length > 0) {
-        let object = {};
-        object.usersid = usersToResetPassword;
-        object.orgid = this.currentOrg.id;
+        let data = {};
+        data.usersid = usersToResetPassword;
+        try {
+        // debugger;
+          const response = await this.axios.post('/api/org/resetpassword/users', data);
+          this.$notify({group: 'app', type: 'success', text: 'Passwords reset, letters sent'});
+          const success = _get(response, 'data.success');
+          if (!success) throw new Error(`Unable to reset passwords`);
+        } catch (error) {
+          // this.loadUsers();
+          return this.$errorMessage.show(error);
+        } finally {
+          // this.loadUsers();
+        }
       }
     },
 
@@ -388,7 +409,82 @@ export default {
         this.loadOrganization();
         this.newOrgName = '';
       }
+    },
+    async handleGranAdmin(data) {
+      let usersToGranAdmin = [];
+      this.users.forEach(u => {
+        if (u._rowVariant === 'active success') {
+          usersToGranAdmin.push(String(u.id));
+        };
+      });
+      if (usersToGranAdmin.length > 0) {
+        let data = {};
+        data.usersid = usersToGranAdmin;
+        try {
+        // debugger;
+          const response = await this.axios.post('/api/org/changerole/admin/users', data);
+          this.$notify({group: 'app', type: 'success', text: 'Administrator rights granted'});
+          const success = _get(response, 'data.success');
+          if (!success) throw new Error(`Unable to grant admin`);
+        } catch (error) {
+          this.loadUsers(this.$store.state.organization);
+          return this.$errorMessage.show(error);
+        } finally {
+          this.loadUsers(this.$store.state.organization);
+        }
+      }
+    },
+
+    async handleRevokeAdmin(data) {
+      let usersToRevokeAdmin = [];
+      this.users.forEach(u => {
+        if (u._rowVariant === 'active success') {
+          usersToRevokeAdmin.push(String(u.id));
+        };
+      });
+      if (usersToRevokeAdmin.length > 0) {
+        let data = {};
+        data.usersid = usersToRevokeAdmin;
+        try {
+        // debugger;
+          const response = await this.axios.post('/api/org/changerole/member/users', data);
+          this.$notify({group: 'app', type: 'success', text: 'Administrator rights removed'});
+          const success = _get(response, 'data.success');
+          if (!success) throw new Error(`Unable to remove admin rights`);
+        } catch (error) {
+          this.loadUsers(this.$store.state.organization);
+          return this.$errorMessage.show(error);
+        } finally {
+          this.loadUsers(this.$store.state.organization);
+        }
+      }
+    },
+
+    async handleRemoveFromOrganization(data) {
+      let usersToRemoveFromOrg = [];
+      this.users.forEach(u => {
+        if (u._rowVariant === 'active success') {
+          usersToRemoveFromOrg.push(String(u.id));
+        };
+      });
+      if (usersToRemoveFromOrg.length > 0) {
+        let data = {};
+        data.usersid = usersToRemoveFromOrg;
+        try {
+        // debugger;
+          const response = await this.axios.post('/api/org/delete/users', data);
+          this.$notify({group: 'app', type: 'success', text: 'Deleted'});
+          const success = _get(response, 'data.success');
+          if (!success) throw new Error(`Unable to delete users`);
+        } catch (error) {
+          this.loadUsers(this.$store.state.organization);
+          return this.$errorMessage.show(error);
+        } finally {
+          this.loadUsers(this.$store.state.organization);
+        }
+      }
     }
+
   },
 
   components: {
