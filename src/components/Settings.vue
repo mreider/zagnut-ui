@@ -101,13 +101,24 @@
       </b-tab>
 
       <b-tab title="Users">
-         <b-nav-item-dropdown :text="$store.state.organization.name" left>
-          <b-dropdown-item href="#"
-            v-for="org in $store.state.user.organizations"
+          <b-dropdown :text="currentOrg" class="m-2" split size="sm" left>
+          <b-dropdown-item
+            v-for="org in organizations" v-if="organizations"
             v-bind:key="org.id"
-            @click="handleOrgChange(org)"
+            @click="OrgChange(org)"
           >{{ org.name }}</b-dropdown-item>
-        </b-nav-item-dropdown>
+          </b-dropdown>
+          <b-dropdown id="Actions" text="Action" size="sm" class="m-2" right>
+            <b-dropdown-item id="ResetPassword" @click="handleResetPassword()"> Reset password </b-dropdown-item>
+          </b-dropdown>
+
+          <b-table hover
+          :items="users"
+          :fields="usersFields"
+          @row-clicked="handleUserSelect">
+            <template slot="item" slot-scope="data" v-html="item.value">
+            </template>
+          </b-table>
       </b-tab>
 
     </b-tabs>
@@ -116,6 +127,7 @@
 
 <script>
 import _get from 'lodash/get';
+import { switchOrganization } from '@/utils';
 
 export default {
   name: 'Settings',
@@ -127,9 +139,10 @@ export default {
       profileOrig: {},
       apikey: null,
       users: [],
+      usersFields: ['id', 'email', 'role', 'first_name', 'last_name', 'is_active'],
       newOrgName: '',
       saving: false,
-      currentOrg: {}
+      currentOrg: 'Organization'
     };
   },
 
@@ -144,21 +157,13 @@ export default {
     modalId(i) {
       return 'modal' + i;
     },
-    loadCurrentOrg() {
-      if (!this.currentOrg) {
-        this.loadOrganization();
-        this.currentOrg = this.organizations[0];
-        return this.currentOrg;
-      }
-    },
     handleTabChange(index) {
       if (index === 0) {
-        if (!this.profile.email) this.loadProfile();
+        if (!this.profile.email) this.loadProfile(); this.loadOrganization();
       } else if (index === 1) {
         if (!this.organizations.length) this.loadOrganization();
       } else if (index === 2) {
         this.loadOrganization();
-        if (!this.users.length) this.loadUsers();
       }
     },
 
@@ -188,7 +193,17 @@ export default {
 
       this.$loading(false);
     },
-
+    async OrgChange(org) {
+      this.$loading(true);
+      try {
+        await switchOrganization(this, org.id, true);
+      } catch (error) {
+        this.$loading(false);
+        return this.$errorMessage.show(error);
+      };
+      this.loadUsers(org);
+      this.$loading(false);
+    },
     async loadOrganization() {
       this.$loading(true);
 
@@ -212,9 +227,25 @@ export default {
     },
 
     async loadUsers(org) {
-      this.$loading(true);
-
-      this.$loading(false);
+      if (org) {
+        try {
+          this.$loading(true);
+          const response = await this.axios.get('/api/org/users/' + String(org.id));
+          const success = _get(response, 'data.success');
+          if (!success) throw new Error(`Unable to load user's organizations.`);
+          const users = _get(response, 'data.users');
+          users.forEach(u => {
+            u._rowVariant = '';
+          });
+          this.users = users;
+        } catch (error) {
+          this.$loading(false);
+          return this.$errorMessage.show(error);
+        } finally {
+          this.currentOrg = org.name;
+          this.$loading(false);
+        }
+      }
     },
 
     async handleProfileSubmit(event) {
@@ -231,8 +262,6 @@ export default {
         }
       });
 
-      console.log('Data to save:', canSave, data);
-
       if (!canSave) return;
 
       if (data.password !== data.confirmation) {
@@ -248,9 +277,7 @@ export default {
 
       try {
         data.email = this.profile.email;
-        console.log(data);
         const response = await this.axios.put('/api/user', data);
-        console.log(response);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to save user profile.`);
 
@@ -268,7 +295,6 @@ export default {
 
       try {
         const response = await this.axios.post('/api/user/apikey');
-        console.log(response);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to generate new api key.`);
 
@@ -281,19 +307,43 @@ export default {
     },
 
     handleOrganizationSelect(org) {
-      this.organizations.forEach(o => { o._rowVariant = ''; });// todo change in api
+      this.organizations.forEach(o => { o._rowVariant = ''; });
       org._rowVariant = 'active success';
+    },
+    handleUserSelect(user) {
+      // this.users.forEach(u => { u._rowVariant = ''; });
+      if (String(this.$store.state.user.id) === String(user.id)) {
+        user._rowVariant = '';
+        return;
+      };
+      if (user._rowVariant === 'active success') {
+        user._rowVariant = '';
+      } else {
+        user._rowVariant = 'active success';
+      };
+    },
+
+    handleResetPassword() {
+      let usersToResetPassword = [];
+      this.users.forEach(u => {
+        if (u._rowVariant === 'active success') {
+          usersToResetPassword.push(String(u.id));
+        };
+      });
+      if (usersToResetPassword.length > 0) {
+        let object = {};
+        object.usersid = usersToResetPassword;
+        object.orgid = this.currentOrg.id;
+      }
     },
 
     async handleOrganizationEdit(org) {
-      console.log('Edit:', JSON.stringify(org));
       if (!org.name) {
         return this.$notify({group: 'error', type: 'err', text: 'Empty organization name field'});
       }
       try {
         // debugger;
         const response = await this.axios.post('/api/org/update', { name: String(org.name), orgid: String(org.id) });
-        console.log(response);
         this.$notify({group: 'app', type: 'success', text: 'Organization updated'});
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update organization.`);
@@ -328,7 +378,6 @@ export default {
       }
       try {
         const response = await this.axios.post('/api/org/new', {name: data});
-        console.log(response);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new organization.`);
 

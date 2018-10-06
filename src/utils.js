@@ -30,7 +30,7 @@ export function doLogin(vue, token, user) {
   vue.$loading(false);
 }
 
-export async function switchOrganization(vue, orgId) {
+export async function switchOrganization(vue, orgId, notreload) {
   vue.$loading(true);
 
   const response = await axios.post(`/api/org/switch/${orgId}`);
@@ -44,10 +44,8 @@ export async function switchOrganization(vue, orgId) {
   if (isCookieEnabled()) setCookie('token', token, {expires: '7D'});
   vue.$store.commit({type: 'token', token});
   vue.$store.commit({type: 'organization', name: organization.name, id: organization.id});
-
   vue.$loading(false);
-
-  window.location.reload();
+  if (!notreload) window.location.reload();
 }
 
 export async function forgotPassword(vue, email) {
