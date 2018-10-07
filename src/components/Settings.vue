@@ -283,7 +283,7 @@ export default {
 
       const data = {};
       let canSave = false;
-      const keys = ['firstName', 'lastName', 'email', 'password', 'confirmation, id'];
+      const keys = ['firstName', 'lastName', 'email', 'password', 'confirmation', 'id'];
 
       keys.forEach(key => {
         if (this.profile[key] !== this.profileOrig[key]) {
@@ -293,11 +293,11 @@ export default {
       });
 
       if (!canSave) return;
-
-      if (data.password !== data.confirmation) {
-        return this.$notify({group: 'error', type: 'warn', text: 'Password and confirmation does\'n match'});
+      if (!data.confirmation && !data.password) {
+        delete data.password;
+        delete data.confirmation;
       }
-
+      console.log(data.confirmation, data.password);
       if (data.hasOwnProperty('email') && !data.email) {
         return this.$notify({group: 'error', type: 'warn', text: 'Email cannot be empty'});
       }
@@ -309,7 +309,8 @@ export default {
         data.email = this.profile.email;
         const response = await this.axios.put('/api/user', data);
         const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to save user profile.`);
+        console.log(response.data);
+        if (!success) throw new Error(_get(response, 'data.message'));
 
         this.$notify({group: 'app', type: 'success', text: 'Profile updated'});
       } catch (error) {
@@ -384,7 +385,7 @@ export default {
       }
       try {
         // debugger;
-        const response = await this.axios.post('/api/org/update', { name: String(org.name), orgid: String(org.id) });
+        const response = await this.axios.post('/api/org/update', { name: String(org.name), organizationId: String(org.id) });
         this.$notify({group: 'app', type: 'success', text: 'Organization updated'});
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update organization.`);
@@ -401,9 +402,10 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        const response = await this.axios.post('/api/org/delete', { userid: String(this.profile.id), orgid: String(org.id) });
+        const response = await this.axios.post('/api/org/delete', { userid: String(this.profile.id), organizationId: String(org.id) });
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new organization.`);
+        console.log(response);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
