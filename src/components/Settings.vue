@@ -48,8 +48,26 @@
           <label>API key</label>
           <b-form-input readonly v-model="apikey"></b-form-input>
           <b-button variant="warning" size="sm" @click="handleRegenerageApiKey" :disabled="saving">Regenerate</b-button>
+          <b-btn variant="success" size="sm" v-b-modal.modalinvite>➕invite link</b-btn>
+            <b-modal id="modalinvite"
+                     title="Invite link generate"
+                     centered
+                     >
+                   <b-dropdown :text="currentOrg" class="m-2" split size="sm" left>
+                   <b-dropdown-item
+                    v-for="org in organizations" v-if="organizations"
+                    v-bind:key="org.id"
+                    @click="OrgChange(org)"
+                    >{{ org.menuName }}</b-dropdown-item>
+                   </b-dropdown>
+                <b-form-input v-model="inviteuseremail" placeholder="email@email.mail">></b-form-input>
+                <b-form-input v-model="inviteuserelink"></b-form-input>
+                <div class="button-box">
+                  <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(false)">generate link</b-button>
+                  <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(true)">send link</b-button>
+                </div>
+            </b-modal>
         </div>
-
       </b-tab>
 
       <b-tab title="Organization">
@@ -145,7 +163,9 @@ export default {
       usersFields: ['id', 'email', 'role', 'first_name', 'last_name', 'is_active'],
       newOrgName: '',
       saving: false,
-      currentOrg: 'Organization'
+      currentOrg: 'Organization',
+      inviteuseremail: '',
+      inviteuserelink: ''
     };
   },
 
@@ -163,10 +183,11 @@ export default {
     handleTabChange(index) {
       if (index === 0) {
         if (!this.profile.email) this.loadProfile();
+        if (!this.organizations.length) this.loadOrganization();
       } else if (index === 1) {
         if (!this.organizations.length) this.loadOrganization();
       } else if (index === 2) {
-        this.loadOrganization();
+        if (!this.organizations.length) this.loadOrganization();
       }
     },
 
@@ -474,7 +495,6 @@ export default {
         // debugger;
           const response = await this.axios.post('/api/org/delete/users', data);
           const success = _get(response, 'data.success');
-          console.log(success);
           if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to delete users'});
           if (success === true) this.$notify({group: 'app', type: 'success', text: 'Deleted'});
         } catch (error) {
@@ -484,8 +504,24 @@ export default {
           this.loadUsers(this.$store.state.organization);
         }
       }
-    }
+    },
 
+    async handleGenerateLink(send) {
+      let data = {};
+      data.email = this.inviteuseremail;
+      data.name = this.$store.state.organization.name;
+      data.send = send;
+      try {
+        const response = await this.axios.post('/api/org/invitelink', data);
+        const success = _get(response, 'data.success');
+        this.inviteuserelink = _get(response, 'data.confirm_url');
+        if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to invite user'});
+        if (success === true && send === true) this.$notify({group: 'app', type: 'success', text: 'Email sent'});
+        if (success === true && send === false) this.$notify({group: 'app', type: 'success', text: 'Link generated'});
+      } catch (error) {
+      } finally {
+      }
+    }
   },
 
   components: {
