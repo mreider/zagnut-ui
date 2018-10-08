@@ -11,7 +11,7 @@ export function doLogout(vue) {
   if (isCookieEnabled()) removeCookie('token');
 
   vue.$loading(false);
-  vue.$router.push({ name: 'account' });
+  vue.$router.push({ name: 'account', params: {action: 'login'} });
 }
 
 export function doLogin(vue, token, user) {
@@ -23,6 +23,9 @@ export function doLogin(vue, token, user) {
     if (user.organization) vue.$store.commit({type: 'organization', name: user.organization.name, id: user.organization.id});
     vue.$store.commit({type: 'token', token});
     vue.$store.commit({type: 'user', user});
+
+    vue.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    vue.$router.push({ name: 'home' });
   } else {
     doLogout(vue);
   }
