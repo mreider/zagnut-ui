@@ -424,8 +424,9 @@ export default {
 
       try {
         this.$loading(true);
+        console.log(usersToGranAdmin);
 
-        const response = await this.axios.post(`/api/org/${this.selectedOrg.orgId}/admin/grant`, { usersId: usersToGranAdmin });
+        const response = await this.axios.put(`/api/org/${this.selectedOrg.orgId}/admin/grant`, { usersId: usersToGranAdmin });
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error('Unable to grant administrative privileges to user(s)');
@@ -446,12 +447,12 @@ export default {
       try {
         this.$loading(true);
 
-        const response = await this.axios.post(`/api/org/${this.selectedOrg.orgId}/admin/revoke`, { usersId: usersToRevokeAdmin });
+        const response = await this.axios.put(`/api/org/${this.selectedOrg.orgId}/admin/revoke`, { usersId: usersToRevokeAdmin });
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error('Unable to revoke administrative privileges from user(s)');
 
-        this.$notify({group: 'app', type: 'success', text: 'Administrator rights granted'});
+        this.$notify({group: 'app', type: 'success', text: 'Administrator rights removed'});
         this.loadOrgUsers(this.selectedOrg);
       } catch (error) {
         return this.$errorMessage.show(error);

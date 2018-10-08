@@ -92,7 +92,9 @@ export default {
         try {
           const response = await this.axios.get('api/org/invitelink/?token=' + token);
           const success = _get(response, 'data.success');
+          console.log(_get(response, 'data'));
           if (success) {
+            console.log(_get(response, 'data'));
             this.organization_name = _get(response, 'data.orgranization_name');
             this.form.organization = String(_get(response, 'data.organization_id'));
             this.form.email = _get(response, 'data.email');
