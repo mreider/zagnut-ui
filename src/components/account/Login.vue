@@ -52,7 +52,7 @@ export default {
 
         doLogin(this, token, user);
       } catch (error) {
-        return this.$errorMessage.show(error);
+        this.$errorMessage.show(error);
       } finally {
         this.$loading(false);
       }
