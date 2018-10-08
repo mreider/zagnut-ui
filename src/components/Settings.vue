@@ -1,6 +1,6 @@
 <template>
   <div class="settings">
-    <b-tabs @input="handleTabChange">
+    <b-tabs>
       <b-tab title="Profile" active>
         <b-form @submit="handleProfileSubmit">
           <b-row>
@@ -44,22 +44,48 @@
           </div>
         </b-form>
 
-        <div class="api-key form-inline float-right">
+        <div class="api-key-invite form-inline float-right">
           <label>API key</label>
           <b-form-input readonly v-model="profile.apiKey"></b-form-input>
-          <b-button variant="warning" size="sm" @click="handleRegenerageApiKey" :disabled="saving">Regenerate</b-button>
-          <b-btn variant="success" size="sm" v-b-modal.modalinvite>➕invite link</b-btn>
-            <b-modal id="modalinvite" title="Invite link generate" centered >
-              <b-dropdown :text="selectedOrg.name" class="m-2" split size="sm" left>
-                <b-dropdown-item
-                  v-for="org in organizations" v-if="organizations"
-                  v-bind:key="org.id"
-                >{{ org.name }}</b-dropdown-item>
-              </b-dropdown>
 
-              <b-form-input v-model="inviteUserEmail" placeholder="E-Mail">></b-form-input>
+          <b-button variant="warning" size="sm" v-b-modal="modalId(1, 'regenerate-api-key')">Regenerate</b-button>
+          <b-modal :id="modalId(1, 'regenerate-api-key')"
+                    button-size="sm"
+                    title="Generate new API key?"
+                    size="sm"
+                    centered
+                    ok-variant="warning"
+                    ok-title="Create new"
+                    @ok="handleRegenerageApiKey"
+          >
+            <p>All application that uses this API key wouldn't work until new key promoted to its instances.</p>
+            <p>Are absolutely sure you want to create new API key?</p>
+          </b-modal>
 
-              <b-form-input v-model="inviteUsereLink"></b-form-input>
+          <b-btn variant="success" size="sm" v-b-modal.modal-invite>➕ Invite link</b-btn>
+            <b-modal id="modal-invite" title="Invite link generate" centered button-size="sm">
+              <b-row>
+                <b-col md="12" sm="12">
+                  <b-dropdown :text="selectedOrg.name" class="m-2" split size="sm" left>
+                    <b-dropdown-item
+                      v-for="org in organizations" v-if="organizations"
+                      v-bind:key="org.id"
+                    >{{ org.name }}</b-dropdown-item>
+                  </b-dropdown>
+                </b-col>
+              </b-row>
+
+              <b-row>
+                <b-col md="12" sm="12">
+                  <b-form-input v-model="inviteUserEmail" placeholder="E-Mail">></b-form-input>
+                </b-col>
+              </b-row>
+
+              <b-row>
+                <b-col md="12" sm="12">
+                  <b-form-input v-model="inviteUsereLink"></b-form-input>
+                </b-col>
+              </b-row>
 
               <div class="button-box">
                 <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(false)">generate link</b-button>
@@ -74,6 +100,7 @@
           <div>
             <b-btn variant="success" size="" v-b-modal.modalnew>➕ Add organization</b-btn>
             <b-modal id="modalnew"
+                     button-size="sm"
                      title="New orgranization name"
                      @ok="handleOrganizationNew(newOrgName)"
                      size="sm"
@@ -90,6 +117,7 @@
             <b-button variant="danger" size="sm" v-b-modal="modalId(data.item.orgId, 'del')" v-if="data.item.role === 'Admin'">✖</b-button>
             <b-modal :id="modalId(data.item.orgId, 'del')"
                      :title="'Delete ' + data.item.name + '?'"
+                     button-size="sm"
                      size="sm"
                      centered
                      body-class="zero-size"
@@ -101,6 +129,7 @@
 
             <b-modal :id="modalId(data.item.orgId, 'edit')"
                      title="Edit"
+                     button-size="sm"
                      size="sm"
                      centered
                      ok-variant="submit"
@@ -165,7 +194,9 @@ export default {
     };
   },
 
-  mounted () {
+  async mounted () {
+    await this.loadProfile();
+    await this.loadOrganizations();
   },
 
   methods: {
@@ -237,16 +268,6 @@ export default {
       } finally {
         this.selectedOrg = org;
         this.$loading(false);
-      }
-    },
-
-    handleTabChange(index) {
-      if (index === 0) {
-        if (!this.profile.email) this.loadProfile();
-      } else if (index === 1) {
-        if (!this.organizations.length) this.loadOrganizations();
-      } else if (index === 2) {
-        if (!this.organizations.length) this.loadOrganizations();
       }
     },
 
@@ -493,7 +514,7 @@ export default {
         padding-bottom: 10px;
       }
 
-      .api-key {
+      .api-key-invite {
         label {
           margin-right: 10px;
         }
@@ -504,6 +525,10 @@ export default {
           padding-top: 4px;
           height: 27px;
           width: 300px;
+        }
+
+        &>button {
+          margin-left: 10px;
         }
       }
 
