@@ -48,8 +48,26 @@
           <label>API key</label>
           <b-form-input readonly v-model="profile.apiKey"></b-form-input>
           <b-button variant="warning" size="sm" @click="handleRegenerageApiKey" :disabled="saving">Regenerate</b-button>
+          <b-btn variant="success" size="sm" v-b-modal.modalinvite>➕invite link</b-btn>
+            <b-modal id="modalinvite"
+                     title="Invite link generate"
+                     centered
+                     >
+                   <b-dropdown :text="currentOrg" class="m-2" split size="sm" left>
+                   <b-dropdown-item
+                    v-for="org in organizations" v-if="organizations"
+                    v-bind:key="org.id"
+                    @click="OrgChange(org)"
+                    >{{ org.menuName }}</b-dropdown-item>
+                   </b-dropdown>
+                <b-form-input v-model="inviteuseremail" placeholder="email@email.mail">></b-form-input>
+                <b-form-input v-model="inviteuserelink"></b-form-input>
+                <div class="button-box">
+                  <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(false)">generate link</b-button>
+                  <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(true)">send link</b-button>
+                </div>
+            </b-modal>
         </div>
-
       </b-tab>
 
       <b-tab title="Organization">
@@ -105,7 +123,13 @@
             v-for="org in organizations" v-if="organizations"
             v-bind:key="org.orgId"
             @click="OrgChange(org)"
-          >{{ org.name }}</b-dropdown-item>
+          >{{ org.menuName }}</b-dropdown-item>
+          </b-dropdown>
+          <b-dropdown id="Actions" text="Action" size="sm" class="m-2" right>
+            <b-dropdown-item id="resetPassword" @click="handleResetPassword()"> Reset password </b-dropdown-item>
+            <b-dropdown-item id="granAdmin" @click="handleGranAdmin()"> Grant admin </b-dropdown-item>
+            <b-dropdown-item id="hevokeAdmin" @click="handleRevokeAdmin()"> Revoke admin </b-dropdown-item>
+            <b-dropdown-item id="removeFromOrganization" @click="handleRemoveFromOrganization()"> Remove from org </b-dropdown-item>
           </b-dropdown>
 
           <b-table hover
@@ -140,7 +164,9 @@ export default {
       usersFields: ['id', 'email', 'role', 'first_name', 'last_name', 'is_active'],
       newOrgName: '',
       saving: false,
-      currentOrg: 'Organization'
+      currentOrg: 'Organization',
+      inviteuseremail: '',
+      inviteuserelink: ''
     };
   },
 
@@ -193,6 +219,12 @@ export default {
         const organizations = _get(response, 'data.organizations');
         organizations.forEach(o => {
           o._rowVariant = '';
+        });
+        organizations.forEach(o => {
+          o.menuName = o.name;
+          if (o.role === 'Pending') {
+            o.menuName = o.name + ' (authorization pending)';
+          }
         });
 
         this.organizations = organizations;
@@ -261,7 +293,8 @@ export default {
         });
 
         const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to save user profile.`);
+        console.log(response.data);
+        if (!success) throw new Error(_get(response, 'data.message'));
 
         this.$notify({group: 'app', type: 'success', text: 'Profile updated'});
 
@@ -343,6 +376,7 @@ export default {
         const response = await this.axios.post('/api/org/delete', { userid: this.profile.id, organizationId: org.orgId });
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new organization.`);
+        console.log(response);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -367,6 +401,98 @@ export default {
       } finally {
         this.loadOrganizations();
         this.newOrgName = '';
+      }
+    },
+    async handleGranAdmin(data) {
+      let usersToGranAdmin = [];
+      this.users.forEach(u => {
+        if (u._rowVariant === 'active success') {
+          usersToGranAdmin.push(String(u.id));
+        };
+      });
+      if (usersToGranAdmin.length > 0) {
+        let data = {};
+        data.usersid = usersToGranAdmin;
+        try {
+        // debugger;
+          const response = await this.axios.post('/api/org/changerole/admin/users', data);
+          this.$notify({group: 'app', type: 'success', text: 'Administrator rights granted'});
+          const success = _get(response, 'data.success');
+          if (!success) throw new Error(`Unable to grant admin`);
+        } catch (error) {
+          this.loadUsers(this.$store.state.organization);
+          return this.$errorMessage.show(error);
+        } finally {
+          this.loadUsers(this.$store.state.organization);
+        }
+      }
+    },
+
+    async handleRevokeAdmin(data) {
+      this.$loading(true);
+      let usersToRevokeAdmin = [];
+      this.users.forEach(u => {
+        if (u._rowVariant === 'active success') {
+          usersToRevokeAdmin.push(String(u.id));
+        };
+      });
+      if (usersToRevokeAdmin.length > 0) {
+        let data = {};
+        data.usersid = usersToRevokeAdmin;
+        try {
+        // debugger;
+          const response = await this.axios.post('/api/org/changerole/member/users', data);
+          this.$notify({group: 'app', type: 'success', text: 'Administrator rights removed'});
+          const success = _get(response, 'data.success');
+          if (!success) throw new Error(`Unable to remove admin rights`);
+        } catch (error) {
+          this.loadUsers(this.$store.state.organization);
+          return this.$errorMessage.show(error);
+        } finally {
+          this.loadUsers(this.$store.state.organization);
+        }
+      }
+    },
+
+    async handleRemoveFromOrganization(data) {
+      let usersToRemoveFromOrg = [];
+      this.users.forEach(u => {
+        if (u._rowVariant === 'active success') {
+          usersToRemoveFromOrg.push(String(u.id));
+        };
+      });
+      if (usersToRemoveFromOrg.length > 0) {
+        let data = {};
+        data.usersid = usersToRemoveFromOrg;
+        try {
+        // debugger;
+          const response = await this.axios.post('/api/org/delete/users', data);
+          const success = _get(response, 'data.success');
+          if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to delete users'});
+          if (success === true) this.$notify({group: 'app', type: 'success', text: 'Deleted'});
+        } catch (error) {
+          this.loadUsers(this.$store.state.organization);
+          // return this.$errorMessage.show(error);
+        } finally {
+          this.loadUsers(this.$store.state.organization);
+        }
+      }
+    },
+
+    async handleGenerateLink(send) {
+      let data = {};
+      data.email = this.inviteuseremail;
+      data.name = this.$store.state.organization.name;
+      data.send = send;
+      try {
+        const response = await this.axios.post('/api/org/invitelink', data);
+        const success = _get(response, 'data.success');
+        this.inviteuserelink = _get(response, 'data.confirm_url');
+        if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to invite user'});
+        if (success === true && send === true) this.$notify({group: 'app', type: 'success', text: 'Email sent'});
+        if (success === true && send === false) this.$notify({group: 'app', type: 'success', text: 'Link generated'});
+      } catch (error) {
+      } finally {
       }
     }
   },

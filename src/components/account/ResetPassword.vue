@@ -20,10 +20,14 @@
 
 <script>
 import _get from 'lodash/get';
-
 export default {
-  name: 'ResetPassword',
-
+  name: 'reset-password',
+  mounted() {
+    if (!this.token) {
+      this.$notify({group: 'error', type: 'warn', text: 'Token invalid or missing'});
+    }
+    this.form.token = this.token;
+  },
   data() {
     return {
       form: {
@@ -33,19 +37,9 @@ export default {
       }
     };
   },
-
-  mounted() {
-    this.form.token = _get(this.$route, 'query.token');
-
-    if (!this.form.token) {
-      this.$notify({group: 'error', type: 'warn', text: 'Token invalid or missing'});
-    }
-  },
-
   methods: {
     async submit(event) {
       event.preventDefault();
-
       try {
         let response = await this.axios.post('/api/account/changepassword', this.form);
         const success = _get(response, 'data.success');
@@ -55,7 +49,7 @@ export default {
         } else {
           this.$notify({group: 'app', type: success, text: `Your password was changed, in 3 seconds you'll be redirected to login page.`});
           setTimeout(() => {
-            this.$router.push({ name: 'account' });
+            this.$router.go({ name: 'home' });
           }, 3000);
         }
       } catch (error) {
@@ -65,9 +59,9 @@ export default {
       }
     }
   },
-
   props: {
-    onChangeForm: Function
+    onChangeForm: Function,
+    token: String
   }
 };
 </script>
@@ -76,7 +70,6 @@ export default {
   .reset-password {
     margin: auto;
     width: 300px;
-
     h1 {
       margin-bottom: 30px;
     }

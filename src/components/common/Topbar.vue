@@ -48,7 +48,6 @@ export default {
   computed: {
     username() {
       const {firstName, lastName, email} = this.$store.state.user;
-
       if (firstName && lastName) return `${firstName} ${lastName}`;
       else if (firstName) return firstName;
       else if (lastName) return lastName;
@@ -60,7 +59,7 @@ export default {
   methods: {
     async handleOrgChange(org) {
       try {
-        await switchOrganization(this, org.id);
+        await switchOrganization(this, org.id, true);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {

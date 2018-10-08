@@ -1,7 +1,7 @@
 <template>
   <b-form @submit="submit" class="forgot">
     <h2 class="center">Restore password<br/>for</h2>
-    <h1 class="center">PM4151</h1>
+    <h1 class="center">PM415</h1>
 
     <b-form-group>
       <b-form-input type="email" v-model="form.email" required placeholder="Email address">
@@ -19,7 +19,6 @@
 
 <script>
 import _get from 'lodash/get';
-
 export default {
   name: 'ForgotPassword',
   data() {
@@ -29,10 +28,8 @@ export default {
       }
     };
   },
-
   computed: {
   },
-
   methods: {
     async submit(event) {
       event.preventDefault();
@@ -48,7 +45,6 @@ export default {
       }
     }
   },
-
   props: {
     onChangeForm: Function
   }
@@ -59,7 +55,6 @@ export default {
   .forgot {
     margin: auto;
     width: 300px;
-
     h1 {
       margin-bottom: 30px;
     }

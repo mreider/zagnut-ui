@@ -4,9 +4,10 @@
 
     <forgot-password v-if="form === 'forgot'" :on-change-form="changeForm"/>
 
-    <register v-if="form === 'register'" :on-change-form="changeForm"/>
+    <register v-if="form === 'register'" :on-change-form="changeForm" :token="token"/>
 
-    <reset-password v-if="form === 'reset'" :on-change-form="changeForm"/>
+    <reset-password v-if="form === 'reset-password'" :on-change-form="changeForm" :token="token"/>
+
   </div>
 </template>
 
@@ -16,32 +17,47 @@ import Login from './Login';
 import ForgotPassword from './ForgotPassword';
 import Register from './Register';
 import ResetPassword from './ResetPassword';
-
 export default {
   name: '',
   data() {
     return {
-      form: 'login'
+      form: 'login',
+      token: null
     };
   },
-
+  beforeCreate() {
+  },
   mounted() {
-    this.form = _get(this.$route, 'params.action', 'login');
+    if (this.$route.name === 'ResetPassword') {
+      this.form = _get(this.$router, 'params.action', 'reset-password');
+      this.token = this.$route.query.token;
+    } else if (this.$route.name === 'RegisterInvite') {
+      this.form = _get(this.$router, 'params.action', 'register');
+      this.token = this.$route.query.token;
+    } else if (this.$route.name === 'Register') {
+      this.form = _get(this.$router, 'params.action', 'register');
+    } else {
+      this.form = _get(this.$router, 'params.action', 'login');
+      this.token = this.$route.query.token;
+    }
   },
   methods: {
     changeForm(form) {
-      this.$router.push({ name: 'account', params: {action: form}, query: this.$route.query });
+      this.form = form;
+      if (form === 'register') this.token = undefined;
     }
   },
   components: {
     'login': Login,
     'forgot-password': ForgotPassword,
     'register': Register,
-    'reset-password': ResetPassword
+    'reset-password': ResetPassword,
+    'invite-link': Register
   },
   watch: {
     '$route' (to, from) {
-      this.form = _get(to, 'params.action', 'login', 'login');
+      if (this.$route.name === 'ResetPassword') this.$router.push({ name: 'reset-password' });
+     // if (this.$route.name === 'RegisterInvite') this.$router.push({ name: 'RegisterInvite' }, { token: this.token });
     }
   }
 };
