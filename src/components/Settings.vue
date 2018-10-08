@@ -141,10 +141,10 @@
                      size="sm"
                      centered
                      ok-variant="submit"
-                     @ok="handleOrganizationEdit(data.item)"
+                     @ok="handleOrganizationEdit(data.item, newOrgName)"
                      ok-title="submit"
                      >
-                <b-form-input v-model=data.item.name placeholder="data.item.name"></b-form-input>
+                <b-form-input v-model=newOrgName :placeholder="data.item.name"></b-form-input>
             </b-modal>
           </template>
         </b-table>
@@ -167,6 +167,7 @@
 
         <b-table hover :items="users" :fields="usersFields" @row-clicked="handleUserSelect">
           <template slot="item" slot-scope="data" v-html="item.value">
+
           </template>
         </b-table>
       </b-tab>
@@ -200,6 +201,9 @@ export default {
       users: [],
       usersFields: ['userId', 'email', 'role', 'firstName', 'lastName', 'isActive'],
       selectedOrg: { name: 'Organization' },
+
+      selectedUsers: [],
+      selectAllUsers: false,
 
       saving: false
     };
@@ -363,15 +367,15 @@ export default {
       };
     },
 
-    async handleOrganizationEdit(org) {
-      if (!org.name) {
+    async handleOrganizationEdit(org, newOrgName) {
+      if (!newOrgName) {
         return this.$notify({group: 'error', type: 'err', text: 'Empty organization name field'});
       }
 
       try {
         this.$loading(true);
 
-        const response = await this.axios.put(`/api/org/${org.orgId}`, { name: org.name });
+        const response = await this.axios.put(`/api/org/${org.orgId}`, { name: newOrgName });
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update organization.`);
@@ -382,6 +386,7 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.$loading(false);
+        this.newOrgName = '';
       }
     },
 
