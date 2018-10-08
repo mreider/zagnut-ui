@@ -4,10 +4,9 @@ export default {
   install (Vue, options = {}) {
     Vue.prototype.$errorMessage = {
       show (error, callback, defaultMessage = 'Server error occurs') {
-        let status = _get(error, 'response.data.statusCode');
-        if (status === 401) return (window.location = '/');
+        let message;
 
-        let message = _get(error, 'response.data.message');
+        if (!message) message = _get(error, 'response.data.message');
         if (!message) message = _get(error, 'response.details[0]');
         if (!message) message = error.message;
         if (!message && typeof error === 'string') message = error;
