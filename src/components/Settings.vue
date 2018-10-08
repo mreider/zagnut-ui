@@ -49,22 +49,22 @@
           <b-form-input readonly v-model="profile.apiKey"></b-form-input>
           <b-button variant="warning" size="sm" @click="handleRegenerageApiKey" :disabled="saving">Regenerate</b-button>
           <b-btn variant="success" size="sm" v-b-modal.modalinvite>➕invite link</b-btn>
-            <b-modal id="modalinvite"
-                     title="Invite link generate"
-                     centered
-                     >
-                   <b-dropdown :text="currentOrg" class="m-2" split size="sm" left>
-                   <b-dropdown-item
-                    v-for="org in organizations" v-if="organizations"
-                    v-bind:key="org.id"
-                    >{{ org.menuName }}</b-dropdown-item>
-                   </b-dropdown>
-                <b-form-input v-model="inviteuseremail" placeholder="email@email.mail">></b-form-input>
-                <b-form-input v-model="inviteuserelink"></b-form-input>
-                <div class="button-box">
-                  <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(false)">generate link</b-button>
-                  <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(true)">send link</b-button>
-                </div>
+            <b-modal id="modalinvite" title="Invite link generate" centered >
+              <b-dropdown :text="selectedOrg.name" class="m-2" split size="sm" left>
+                <b-dropdown-item
+                  v-for="org in organizations" v-if="organizations"
+                  v-bind:key="org.id"
+                >{{ org.name }}</b-dropdown-item>
+              </b-dropdown>
+
+              <b-form-input v-model="inviteUserEmail" placeholder="E-Mail">></b-form-input>
+
+              <b-form-input v-model="inviteUsereLink"></b-form-input>
+
+              <div class="button-box">
+                <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(false)">generate link</b-button>
+                <b-button type="submit" size="sm" variant="primary" @click="handleGenerateLink(true)">send link</b-button>
+              </div>
             </b-modal>
         </div>
       </b-tab>
@@ -84,11 +84,7 @@
           </div>
         </div>
 
-        <b-table hover
-          :items="organizations"
-          :fields="organizationsFields"
-          @row-clicked="handleOrganizationSelect"
-        >
+        <b-table hover :items="organizations" :fields="organizationsFields">
           <template slot="actions" slot-scope="data">
             <b-button variant="primary" size="sm" v-b-modal="modalId(data.item.orgId, 'edit')" v-if="data.item.role === 'Admin'">🖉</b-button>
             <b-button variant="danger" size="sm" v-b-modal="modalId(data.item.orgId, 'del')" v-if="data.item.role === 'Admin'">✖</b-button>
@@ -117,27 +113,25 @@
         </b-table>
       </b-tab>
 
-      <b-tab title="Users">
-          <b-dropdown :text="currentOrg" class="m-2" split size="sm" left>
+      <b-tab title="Users" class="users">
+        <b-dropdown :text="selectedOrg.name" size="sm">
           <b-dropdown-item
             v-for="org in organizations" v-if="organizations"
             v-bind:key="org.orgId"
-          >{{ org.menuName }}</b-dropdown-item>
-          </b-dropdown>
-          <b-dropdown id="Actions" text="Action" size="sm" class="m-2" right>
-            <b-dropdown-item id="resetPassword" @click="handleResetPassword()"> Reset password </b-dropdown-item>
-            <b-dropdown-item id="granAdmin" @click="handleGranAdmin()"> Grant admin </b-dropdown-item>
-            <b-dropdown-item id="hevokeAdmin" @click="handleRevokeAdmin()"> Revoke admin </b-dropdown-item>
-            <b-dropdown-item id="removeFromOrganization" @click="handleRemoveFromOrganization()"> Remove from org </b-dropdown-item>
-          </b-dropdown>
+            @click="handleOrgChange(org)"
+          >{{ org.name }}</b-dropdown-item>
+        </b-dropdown>
 
-          <b-table hover
-          :items="users"
-          :fields="usersFields"
-          @row-clicked="handleUserSelect">
-            <template slot="item" slot-scope="data" v-html="item.value">
-            </template>
-          </b-table>
+        <b-dropdown id="Actions" text="Action" size="sm" class="m-2">
+          <b-dropdown-item id="granAdmin" @click="handleGranAdmin()"> Grant admin </b-dropdown-item>
+          <b-dropdown-item id="hevokeAdmin" @click="handleRevokeAdmin()"> Revoke admin </b-dropdown-item>
+          <b-dropdown-item id="removeFromOrganization" @click="handleRemoveFromOrganization()"> Remove from org </b-dropdown-item>
+        </b-dropdown>
+
+        <b-table hover :items="users" :fields="usersFields" @row-clicked="handleUserSelect">
+          <template slot="item" slot-scope="data" v-html="item.value">
+          </template>
+        </b-table>
       </b-tab>
 
     </b-tabs>
@@ -154,18 +148,20 @@ export default {
 
   data() {
     return {
-      organizationsFields: ['orgId', 'name', 'role', 'actions'],
-      organizations: [],
-
       profile: {},
 
-      users: [],
-      usersFields: ['id', 'email', 'role', 'first_name', 'last_name', 'is_active'],
+      inviteUserEmail: null,
+      inviteUsereLink: null,
+
+      organizationsFields: ['orgId', 'name', 'role', 'actions'],
+      organizations: [],
       newOrgName: '',
-      saving: false,
-      currentOrg: 'Organization',
-      inviteuseremail: '',
-      inviteuserelink: ''
+
+      users: [],
+      usersFields: ['userId', 'email', 'role', 'firstName', 'lastName', 'isActive'],
+      selectedOrg: { name: 'Organization' },
+
+      saving: false
     };
   },
 
@@ -175,16 +171,6 @@ export default {
   methods: {
     modalId(i, postfix) {
       return `modal-${i}-${postfix}`;
-    },
-
-    handleTabChange(index) {
-      if (index === 0) {
-        if (!this.profile.email) this.loadProfile();
-      } else if (index === 1) {
-        if (!this.organizations.length) this.loadOrganizations();
-      } else if (index === 2) {
-        this.loadOrganizations();
-      }
     },
 
     async loadProfile() {
@@ -234,25 +220,33 @@ export default {
       }
     },
 
-    async loadUsers(org) {
-      if (org) {
-        try {
-          this.$loading(true);
-          const response = await this.axios.get(`/api/org/${org.orgId}/users`);
+    async loadOrgUsers(org) {
+      try {
+        this.$loading(true);
+        const response = await this.axios.get(`/api/org/${org.orgId}/users`);
 
-          const success = _get(response, 'data.success');
-          if (!success) throw new Error(`Unable to load user's organizations.`);
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to load user's organizations.`);
 
-          const users = _get(response, 'data.users');
-          users.forEach(u => { u._rowVariant = ''; });
+        const users = _get(response, 'data.users');
+        users.forEach(u => { u._rowVariant = ''; });
 
-          this.users = users;
-        } catch (error) {
-          return this.$errorMessage.show(error);
-        } finally {
-          this.currentOrg = org.name;
-          this.$loading(false);
-        }
+        this.users = users;
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.selectedOrg = org;
+        this.$loading(false);
+      }
+    },
+
+    handleTabChange(index) {
+      if (index === 0) {
+        if (!this.profile.email) this.loadProfile();
+      } else if (index === 1) {
+        if (!this.organizations.length) this.loadOrganizations();
+      } else if (index === 2) {
+        if (!this.organizations.length) this.loadOrganizations();
       }
     },
 
@@ -315,9 +309,9 @@ export default {
       }
     },
 
-    handleOrganizationSelect(org) {
-      this.organizations.forEach(o => { o._rowVariant = ''; });
-      org._rowVariant = 'active success';
+    handleOrgChange(org) {
+      this.selectedOrg = org;
+      this.loadOrgUsers(org);
     },
 
     handleUserSelect(user) {
@@ -403,10 +397,10 @@ export default {
           const success = _get(response, 'data.success');
           if (!success) throw new Error(`Unable to grant admin`);
         } catch (error) {
-          this.loadUsers(this.$store.state.organization);
+          this.loadOrgUsers(this.$store.state.organization);
           return this.$errorMessage.show(error);
         } finally {
-          this.loadUsers(this.$store.state.organization);
+          this.loadOrgUsers(this.$store.state.organization);
         }
       }
     },
@@ -428,47 +422,46 @@ export default {
           const success = _get(response, 'data.success');
           if (!success) throw new Error(`Unable to remove admin rights`);
         } catch (error) {
-          this.loadUsers(this.$store.state.organization);
+          this.loadOrgUsers(this.$store.state.organization);
           return this.$errorMessage.show(error);
         } finally {
-          this.loadUsers(this.$store.state.organization);
+          this.loadOrgUsers(this.$store.state.organization);
         }
       }
     },
 
     async handleRemoveFromOrganization(data) {
-      let usersToRemoveFromOrg = [];
-      this.users.forEach(u => {
-        if (u._rowVariant === 'active success') {
-          usersToRemoveFromOrg.push(String(u.id));
-        };
-      });
-      if (usersToRemoveFromOrg.length > 0) {
-        let data = {};
-        data.usersid = usersToRemoveFromOrg;
-        try {
-          const response = await this.axios.post('/api/org/delete/users', data);
-          const success = _get(response, 'data.success');
-          if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to delete users'});
-          if (success === true) this.$notify({group: 'app', type: 'success', text: 'Deleted'});
-        } catch (error) {
-          this.loadUsers(this.$store.state.organization);
-          // return this.$errorMessage.show(error);
-        } finally {
-          this.loadUsers(this.$store.state.organization);
-        }
+        // TODO: I don't like this approach - to use CSS flag and flag of selected state.
+      const usersToRemove = this.users.filter(row => row._rowVariant === 'active success').map(row => row.userId);
+
+      if (usersToRemove < 1) return;
+
+      try {
+        this.$loading(true);
+
+        const response = await this.axios.post(`/api/org/${this.selectedOrg.orgId}/users/remove`, { usersId: usersToRemove });
+        const success = _get(response, 'data.success');
+        if (success === false) return this.$notify({group: 'error', type: 'err', text: 'Unable to delete users'});
+
+        this.$notify({group: 'app', type: 'success', text: 'Selected user were removed from organization'});
+
+        this.users = this.users.filter(row => usersToRemove.indexOf(row.userId) === -1);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
       }
     },
 
     async handleGenerateLink(send) {
       let data = {};
-      data.email = this.inviteuseremail;
+      data.email = this.inviteUserEmail;
       data.name = this.$store.state.organization.name;
       data.send = send;
       try {
         const response = await this.axios.post('/api/org/invitelink', data);
         const success = _get(response, 'data.success');
-        this.inviteuserelink = _get(response, 'data.confirm_url');
+        this.inviteUsereLink = _get(response, 'data.confirm_url');
         if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to invite user'});
         if (success === true && send === true) this.$notify({group: 'app', type: 'success', text: 'Email sent'});
         if (success === true && send === false) this.$notify({group: 'app', type: 'success', text: 'Link generated'});
@@ -520,6 +513,32 @@ export default {
           padding-top: 4px;
           height: 27px;
           width: 300px;
+        }
+      }
+
+      .users {
+        .btn {
+          &.dropdown-toggle{
+            &::before {
+              display: none;
+            }
+
+            &::after {
+              box-sizing: border-box;
+              display: inline-block;
+              width: 0;
+              height: 0;
+              margin-left: 0.3em;
+              vertical-align: middle;
+              content: "";
+              border-top: 0.3em solid;
+              border-right: 0.3em solid transparent;
+              border-left: 0.3em solid transparent;
+
+              opacity: 1;
+              position: relative;
+            }
+          }
         }
       }
     }

@@ -57,11 +57,14 @@ import _get from 'lodash/get';
 
 export default {
   name: 'Register',
+
   beforeCreate() {
   },
+
   mounted() {
     this.checkToken(this.token);
   },
+
   data() {
     return {
       form: {
