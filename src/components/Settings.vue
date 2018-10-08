@@ -63,27 +63,28 @@
           </b-modal>
 
           <b-btn variant="success" size="sm" v-b-modal.modal-invite>➕ Invite link</b-btn>
-            <b-modal id="modal-invite" title="Invite link generate" centered button-size="sm">
+            <b-modal id="modal-invite" class="invite-link-modal" title="Invite link generate" centered button-size="sm">
               <b-row>
-                <b-col md="12" sm="12">
-                  <b-dropdown :text="selectedOrg.name" class="m-2" split size="sm" left>
+                <b-col md="4" sm="4">
+                  <b-dropdown :text="invite.org.name" class="m-2" split size="sm" left>
                     <b-dropdown-item
                       v-for="org in organizations" v-if="organizations"
                       v-bind:key="org.id"
+                      @click="handleInviteOrgChange(org)"
                     >{{ org.name }}</b-dropdown-item>
                   </b-dropdown>
                 </b-col>
-              </b-row>
 
-              <b-row>
-                <b-col md="12" sm="12">
-                  <b-form-input v-model="inviteUserEmail" placeholder="E-Mail">></b-form-input>
+                <b-col md="8" sm="8">
+                  <b-form-input v-model="invite.email" placeholder="E-Mail">></b-form-input>
                 </b-col>
               </b-row>
 
-              <b-row>
+              <b-row class="link-wrap">
                 <b-col md="12" sm="12">
-                  <b-form-input v-model="inviteUsereLink"></b-form-input>
+                  <b-form-group label="Invitation link">
+                    <b-form-input v-model="invite.link" readonly></b-form-input>
+                  </b-form-group>
                 </b-col>
               </b-row>
 
@@ -179,8 +180,11 @@ export default {
     return {
       profile: {},
 
-      inviteUserEmail: null,
-      inviteUsereLink: null,
+      invite: {
+        org: { name: 'Organization' },
+        email: null,
+        link: null
+      },
 
       organizationsFields: ['orgId', 'name', 'role', 'actions'],
       organizations: [],
@@ -335,6 +339,10 @@ export default {
       this.loadOrgUsers(org);
     },
 
+    handleInviteOrgChange(org) {
+      this.invite.org = org;
+    },
+
     handleUserSelect(user) {
       // this.users.forEach(u => { u._rowVariant = ''; });
       if (this.$store.state.user.id === user.id) {
@@ -469,19 +477,24 @@ export default {
     },
 
     async handleGenerateLink(send) {
-      let data = {};
-      data.email = this.inviteUserEmail;
-      data.name = this.$store.state.organization.name;
-      data.send = send;
+      if (!this.invite.org.orgId) return this.$notify({group: 'error', type: 'error', text: 'Organization not selected'});
+      if (!this.invite.email) return this.$notify({group: 'error', type: 'error', text: 'Email must be provided'});
+
       try {
-        const response = await this.axios.post('/api/org/invitelink', data);
+        const response = await this.axios.post(`/api/org/${this.invite.org.orgId}/invitelink`, {
+          email: this.invite.email,
+          send
+        });
         const success = _get(response, 'data.success');
-        this.inviteUsereLink = _get(response, 'data.confirm_url');
-        if (!success) this.$notify({group: 'error', type: 'err', text: 'Unable to invite user'});
-        if (success === true && send === true) this.$notify({group: 'app', type: 'success', text: 'Email sent'});
-        if (success === true && send === false) this.$notify({group: 'app', type: 'success', text: 'Link generated'});
+        if (!success) throw new Error('Unable to invite user');
+
+        this.invite.link = _get(response, 'data.confirmUrl');
+
+        this.$notify({group: 'app', type: 'success', text: send ? 'Email sent' : 'Link created'});
       } catch (error) {
+        return this.$errorMessage.show(error);
       } finally {
+        this.$loading(false);
       }
     }
   }
@@ -529,6 +542,17 @@ export default {
 
         &>button {
           margin-left: 10px;
+        }
+
+        .invite-link-modal {
+          input {
+            width: 100%;
+            height: 35px
+          }
+
+          .link-wrap {
+            margin-top: 20px;
+          }
         }
       }
 
