@@ -96,6 +96,7 @@
                      :title="'Delete ' + data.item.name + '?'"
                      size="sm"
                      centered
+                     body-class="zero-size"
                      ok-variant="danger"
                      @ok="handleOrganizationDelete(data.item)"
                      ok-title="delete"
@@ -359,15 +360,14 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        const response = await this.axios.post('/api/org/delete', { userid: this.profile.id, organizationId: org.orgId });
+        const response = await this.axios.delete(`/api/org/${org.orgId}`);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new organization.`);
-        console.log(response);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
+        this.$notify({group: 'app', type: 'success', text: `Organization ${org.name} was deleted`});
         this.loadOrganizations();
-        this.$notify({group: 'app', type: 'success', text: 'Deleted'});
       }
     },
 
@@ -377,11 +377,9 @@ export default {
         return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        const response = await this.axios.post('/api/org/new', {name: data});
+        const response = await this.axios.post('/api/org', {name: data});
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new organization.`);
-
-        // this.apiKey = _get(response, 'data.apiKey');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
