@@ -32,27 +32,6 @@ export function doLogin(vue, token, user) {
   vue.$loading(false);
 }
 
-export async function switchOrganization(vue, orgId, reload) {
-  vue.$loading(true);
-
-  const response = await axios.post(`/api/org/switch/${orgId}`);
-  const success = _get(response, 'data.success');
-  const message = _get(response, 'data.message');
-  const token = _get(response, 'data.token');
-  const organization = _get(response, 'data.organization');
-
-  if (!success || !token || !organization) throw (new Error(message));
-
-  if (isCookieEnabled()) setCookie('token', token, {expires: '7D'});
-  vue.$store.commit({type: 'token', token});
-  vue.$store.commit({type: 'organization', name: organization.name, id: organization.id});
-  vue.$loading(false);
-  if (reload === true) {
-    window.location.reload();
-    debugger;
-  }
-}
-
 export async function forgotPassword(vue, email) {
   vue.$loading(true);
 

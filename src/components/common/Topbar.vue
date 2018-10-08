@@ -35,7 +35,9 @@
 </template>
 
 <script>
-import { doLogout, switchOrganization } from '@/utils';
+import { doLogout } from '@/utils';
+import _get from 'lodash/get';
+import { isCookieEnabled, setCookie } from 'tiny-cookie';
 
 export default {
   name: 'Topbar',
@@ -59,7 +61,21 @@ export default {
   methods: {
     async handleOrgChange(org) {
       try {
-        await switchOrganization(this, org.id, true);
+        this.$loading(true);
+
+        const response = await this.axios.post(`/api/org/switch/${org.id}`);
+        const success = _get(response, 'data.success');
+        const message = _get(response, 'data.message');
+        const token = _get(response, 'data.token');
+        const organization = _get(response, 'data.organization');
+
+        if (!success || !token || !organization) throw (new Error(message));
+
+        if (isCookieEnabled()) setCookie('token', token, {expires: '7D'});
+        this.$store.commit({type: 'token', token});
+        this.$store.commit({type: 'organization', name: organization.name, id: organization.id});
+
+        window.location.reload();
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {

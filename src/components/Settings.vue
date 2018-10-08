@@ -57,7 +57,6 @@
                    <b-dropdown-item
                     v-for="org in organizations" v-if="organizations"
                     v-bind:key="org.id"
-                    @click="OrgChange(org)"
                     >{{ org.menuName }}</b-dropdown-item>
                    </b-dropdown>
                 <b-form-input v-model="inviteuseremail" placeholder="email@email.mail">></b-form-input>
@@ -122,7 +121,6 @@
           <b-dropdown-item
             v-for="org in organizations" v-if="organizations"
             v-bind:key="org.orgId"
-            @click="OrgChange(org)"
           >{{ org.menuName }}</b-dropdown-item>
           </b-dropdown>
           <b-dropdown id="Actions" text="Action" size="sm" class="m-2" right>
@@ -147,7 +145,7 @@
 
 <script>
 import _get from 'lodash/get';
-import { switchOrganization, doLogout } from '@/utils';
+import { doLogout } from '@/utils';
 
 export default {
 
@@ -257,18 +255,6 @@ export default {
       }
     },
 
-    async OrgChange(org) {
-      this.$loading(true);
-      try {
-        await switchOrganization(this, org.orgId, true);
-      } catch (error) {
-        this.$loading(false);
-        return this.$errorMessage.show(error);
-      };
-      this.loadUsers(org);
-      this.$loading(false);
-    },
-
     async handleProfileSubmit(event) {
       event.preventDefault();
 
@@ -320,7 +306,7 @@ export default {
 
         this.profile.apiKey = _get(response, 'data.apiKey');
 
-        return this.$notify({group: 'error', type: 'success', text: 'New API key was created. Do not remember to update it everywhere.'});
+        return this.$notify({group: 'error', type: 'success', text: 'New API key was created. Do not forget to update it everywhere.'});
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -414,7 +400,6 @@ export default {
         let data = {};
         data.usersid = usersToGranAdmin;
         try {
-        // debugger;
           const response = await this.axios.post('/api/org/changerole/admin/users', data);
           this.$notify({group: 'app', type: 'success', text: 'Administrator rights granted'});
           const success = _get(response, 'data.success');
@@ -440,7 +425,6 @@ export default {
         let data = {};
         data.usersid = usersToRevokeAdmin;
         try {
-        // debugger;
           const response = await this.axios.post('/api/org/changerole/member/users', data);
           this.$notify({group: 'app', type: 'success', text: 'Administrator rights removed'});
           const success = _get(response, 'data.success');
@@ -465,7 +449,6 @@ export default {
         let data = {};
         data.usersid = usersToRemoveFromOrg;
         try {
-        // debugger;
           const response = await this.axios.post('/api/org/delete/users', data);
           const success = _get(response, 'data.success');
           if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to delete users'});
