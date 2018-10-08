@@ -63,7 +63,14 @@
           </b-modal>
 
           <b-btn variant="success" size="sm" v-b-modal.modal-invite>➕ Invite link</b-btn>
-            <b-modal id="modal-invite" class="invite-link-modal" title="Invite link generate" centered button-size="sm">
+            <b-modal
+              id="modal-invite"
+              class="invite-link-modal"
+              title="Invite link generate"
+              centered button-size="sm"
+              :ok-only="true"
+              ok-title="close"
+            >
               <b-row>
                 <b-col md="4" sm="4">
                   <b-dropdown :text="invite.org.name" class="m-2" split size="sm" left>
