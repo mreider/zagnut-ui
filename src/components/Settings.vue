@@ -46,7 +46,7 @@
 
         <div class="api-key form-inline float-right">
           <label>API key</label>
-          <b-form-input readonly v-model="apikey"></b-form-input>
+          <b-form-input readonly v-model="profile.apiKey"></b-form-input>
           <b-button variant="warning" size="sm" @click="handleRegenerageApiKey" :disabled="saving">Regenerate</b-button>
         </div>
 
@@ -62,7 +62,7 @@
                      size="sm"
                      centered
                      >
-                <b-form-input v-model="newOrgName" placeholder="Enter orgranization name">></b-form-input>
+                <b-form-input v-model="newOrgName" placeholder="Enter organization name">></b-form-input>
             </b-modal>
           </div>
         </div>
@@ -73,9 +73,9 @@
           @row-clicked="handleOrganizationSelect"
         >
           <template slot="actions" slot-scope="data">
-            <b-button variant="primary" size="sm" v-b-modal="modalId(data.item.id)+'edit'">🖉</b-button>
-            <b-button variant="danger" size="sm" v-b-modal="modalId(data.item.id)+'del'" v-show="data.item.role === 'Admin'">✖</b-button>
-            <b-modal :id="'modal' + data.item.id + 'del'"
+            <b-button variant="primary" size="sm" v-b-modal="modalId(data.item.orgId, 'edit')" v-if="data.item.role === 'Admin'">🖉</b-button>
+            <b-button variant="danger" size="sm" v-b-modal="modalId(data.item.orgId, 'del')" v-if="data.item.role === 'Admin'">✖</b-button>
+            <b-modal :id="modalId(data.item.orgId, 'del')"
                      :title="'Delete ' + data.item.name + '?'"
                      size="sm"
                      centered
@@ -85,7 +85,7 @@
                      >
             </b-modal>
 
-            <b-modal :id="'modal' + data.item.id + 'edit'"
+            <b-modal :id="modalId(data.item.orgId, 'edit')"
                      title="Edit"
                      size="sm"
                      centered
@@ -93,9 +93,8 @@
                      @ok="handleOrganizationEdit(data.item)"
                      ok-title="submit"
                      >
-                <b-form-input v-model=data.item.name placeholder=data.item.name></b-form-input>
+                <b-form-input v-model=data.item.name placeholder="data.item.name"></b-form-input>
             </b-modal>
-
           </template>
         </b-table>
       </b-tab>
@@ -104,12 +103,9 @@
           <b-dropdown :text="currentOrg" class="m-2" split size="sm" left>
           <b-dropdown-item
             v-for="org in organizations" v-if="organizations"
-            v-bind:key="org.id"
+            v-bind:key="org.orgId"
             @click="OrgChange(org)"
           >{{ org.name }}</b-dropdown-item>
-          </b-dropdown>
-          <b-dropdown id="Actions" text="Action" size="sm" class="m-2" right>
-            <b-dropdown-item id="ResetPassword" @click="handleResetPassword()"> Reset password </b-dropdown-item>
           </b-dropdown>
 
           <b-table hover
@@ -127,17 +123,19 @@
 
 <script>
 import _get from 'lodash/get';
-import { switchOrganization } from '@/utils';
+import { switchOrganization, doLogout } from '@/utils';
 
 export default {
+
   name: 'Settings',
+
   data() {
     return {
-      organizationsFields: ['id', 'name', 'role', 'actions'],
+      organizationsFields: ['orgId', 'name', 'role', 'actions'],
       organizations: [],
+
       profile: {},
-      profileOrig: {},
-      apikey: null,
+
       users: [],
       usersFields: ['id', 'email', 'role', 'first_name', 'last_name', 'is_active'],
       newOrgName: '',
@@ -147,23 +145,20 @@ export default {
   },
 
   mounted () {
-    this.handleTabChange(0);
-  },
-
-  computed: {
   },
 
   methods: {
-    modalId(i) {
-      return 'modal' + i;
+    modalId(i, postfix) {
+      return `modal-${i}-${postfix}`;
     },
+
     handleTabChange(index) {
       if (index === 0) {
-        if (!this.profile.email) this.loadProfile(); this.loadOrganization();
+        if (!this.profile.email) this.loadProfile();
       } else if (index === 1) {
-        if (!this.organizations.length) this.loadOrganization();
+        if (!this.organizations.length) this.loadOrganizations();
       } else if (index === 2) {
-        this.loadOrganization();
+        this.loadOrganizations();
       }
     },
 
@@ -171,20 +166,12 @@ export default {
       this.$loading(true);
 
       try {
-        const [userResponse, apiKeyResponse] = await Promise.all([
-          this.axios.get('/api/user').catch(() => { return null; }),
-          this.axios.get('/api/user/apikey').catch(() => { return null; })
-        ]);
-        let success = _get(userResponse, 'data.success');
+        const response = await this.axios.get('/api/user');
+
+        let success = _get(response, 'data.success');
         if (!success) this.$errorMessage.show('Unable to load current user profile');
 
-        success = _get(apiKeyResponse, 'data.success');
-        if (!success) this.$errorMessage.show('Unable to load current user API key');
-
-        this.profile = _get(userResponse, 'data.user');
-        this.apikey = _get(apiKeyResponse, 'data.apikey');
-
-        this.profileOrig = JSON.parse(JSON.stringify(this.profile));
+        this.profile = _get(response, 'data.user');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -193,18 +180,8 @@ export default {
 
       this.$loading(false);
     },
-    async OrgChange(org) {
-      this.$loading(true);
-      try {
-        await switchOrganization(this, org.id, true);
-      } catch (error) {
-        this.$loading(false);
-        return this.$errorMessage.show(error);
-      };
-      this.loadUsers(org);
-      this.$loading(false);
-    },
-    async loadOrganization() {
+
+    async loadOrganizations() {
       this.$loading(true);
 
       try {
@@ -230,16 +207,16 @@ export default {
       if (org) {
         try {
           this.$loading(true);
-          const response = await this.axios.get('/api/org/users/' + String(org.id));
+          const response = await this.axios.get(`/api/org/${org.orgId}/users`);
+
           const success = _get(response, 'data.success');
           if (!success) throw new Error(`Unable to load user's organizations.`);
+
           const users = _get(response, 'data.users');
-          users.forEach(u => {
-            u._rowVariant = '';
-          });
+          users.forEach(u => { u._rowVariant = ''; });
+
           this.users = users;
         } catch (error) {
-          this.$loading(false);
           return this.$errorMessage.show(error);
         } finally {
           this.currentOrg = org.name;
@@ -248,27 +225,26 @@ export default {
       }
     },
 
+    async OrgChange(org) {
+      this.$loading(true);
+      try {
+        await switchOrganization(this, org.orgId, true);
+      } catch (error) {
+        this.$loading(false);
+        return this.$errorMessage.show(error);
+      };
+      this.loadUsers(org);
+      this.$loading(false);
+    },
+
     async handleProfileSubmit(event) {
       event.preventDefault();
 
-      const data = {};
-      let canSave = false;
-      const keys = ['firstName', 'lastName', 'email', 'password', 'confirmation, id'];
-
-      keys.forEach(key => {
-        if (this.profile[key] !== this.profileOrig[key]) {
-          data[key] = this.profile[key];
-          canSave = true;
-        }
-      });
-
-      if (!canSave) return;
-
-      if (data.password !== data.confirmation) {
+      if (this.profile.password !== this.profile.confirmation) {
         return this.$notify({group: 'error', type: 'warn', text: 'Password and confirmation does\'n match'});
       }
 
-      if (data.hasOwnProperty('email') && !data.email) {
+      if (this.profile.hasOwnProperty('email') && !this.profile.email) {
         return this.$notify({group: 'error', type: 'warn', text: 'Email cannot be empty'});
       }
 
@@ -276,12 +252,23 @@ export default {
       this.saving = true;
 
       try {
-        data.email = this.profile.email;
-        const response = await this.axios.put('/api/user', data);
+        const response = await this.axios.put('/api/user', {
+          firstName: this.profile.firstName,
+          lastName: this.profile.lastName,
+          email: this.profile.email,
+          password: this.profile.password,
+          confirmation: this.profile.confirmation
+        });
+
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to save user profile.`);
 
         this.$notify({group: 'app', type: 'success', text: 'Profile updated'});
+
+        const shouldLogout = _get(response, 'data.doLogout');
+        if (shouldLogout) {
+          doLogout(this);
+        }
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -298,7 +285,9 @@ export default {
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to generate new api key.`);
 
-        this.apikey = _get(response, 'data.apikey');
+        this.profile.apiKey = _get(response, 'data.apiKey');
+
+        return this.$notify({group: 'error', type: 'success', text: 'New API key was created. Do not remember to update it everywhere.'});
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -310,9 +299,10 @@ export default {
       this.organizations.forEach(o => { o._rowVariant = ''; });
       org._rowVariant = 'active success';
     },
+
     handleUserSelect(user) {
       // this.users.forEach(u => { u._rowVariant = ''; });
-      if (String(this.$store.state.user.id) === String(user.id)) {
+      if (this.$store.state.user.id === user.id) {
         user._rowVariant = '';
         return;
       };
@@ -323,35 +313,25 @@ export default {
       };
     },
 
-    handleResetPassword() {
-      let usersToResetPassword = [];
-      this.users.forEach(u => {
-        if (u._rowVariant === 'active success') {
-          usersToResetPassword.push(String(u.id));
-        };
-      });
-      if (usersToResetPassword.length > 0) {
-        let object = {};
-        object.usersid = usersToResetPassword;
-        object.orgid = this.currentOrg.id;
-      }
-    },
-
     async handleOrganizationEdit(org) {
       if (!org.name) {
         return this.$notify({group: 'error', type: 'err', text: 'Empty organization name field'});
       }
+
       try {
-        // debugger;
-        const response = await this.axios.post('/api/org/update', { name: String(org.name), orgid: String(org.id) });
-        this.$notify({group: 'app', type: 'success', text: 'Organization updated'});
+        this.$loading(true);
+
+        const response = await this.axios.put(`/api/org/${org.orgId}`, { name: org.name });
+
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update organization.`);
+
+        this.$notify({group: 'app', type: 'success', text: 'Organization updated'});
+        this.loadOrganizations();
       } catch (error) {
-        this.loadOrganization();
         return this.$errorMessage.show(error);
       } finally {
-        // this.loadOrganization();
+        this.$loading(false);
       }
     },
 
@@ -360,13 +340,13 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        const response = await this.axios.post('/api/org/delete', { userid: String(this.profile.id), orgid: String(org.id) });
+        const response = await this.axios.post('/api/org/delete', { userid: this.profile.id, organizationId: org.orgId });
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new organization.`);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.loadOrganization();
+        this.loadOrganizations();
         this.$notify({group: 'app', type: 'success', text: 'Deleted'});
       }
     },
@@ -381,11 +361,11 @@ export default {
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new organization.`);
 
-        // this.apikey = _get(response, 'data.apikey');
+        // this.apiKey = _get(response, 'data.apiKey');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.loadOrganization();
+        this.loadOrganizations();
         this.newOrgName = '';
       }
     }
