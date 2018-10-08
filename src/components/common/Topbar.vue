@@ -3,7 +3,7 @@
 
     <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-    <b-navbar-brand href="#">NavBar</b-navbar-brand>
+    <b-navbar-brand href="#">PM415</b-navbar-brand>
 
     <b-collapse is-nav id="nav_collapse">
 
@@ -14,7 +14,6 @@
         <b-nav-item to="bugs">Bugs</b-nav-item>
       </b-navbar-nav>
 
-      <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
 
         <b-nav-item-dropdown :text="$store.state.organization.name" right>
@@ -39,7 +38,8 @@
 import { doLogout, switchOrganization } from '@/utils';
 
 export default {
-  name: '',
+  name: 'Topbar',
+
   data() {
     return {
     };
@@ -62,8 +62,9 @@ export default {
       try {
         await switchOrganization(this, org.id);
       } catch (error) {
-        this.$loading(false);
         return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
       }
     },
 
