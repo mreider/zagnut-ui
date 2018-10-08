@@ -381,52 +381,46 @@ export default {
         this.newOrgName = '';
       }
     },
+
     async handleGranAdmin(data) {
-      let usersToGranAdmin = [];
-      this.users.forEach(u => {
-        if (u._rowVariant === 'active success') {
-          usersToGranAdmin.push(String(u.id));
-        };
-      });
-      if (usersToGranAdmin.length > 0) {
-        let data = {};
-        data.usersid = usersToGranAdmin;
-        try {
-          const response = await this.axios.post('/api/org/changerole/admin/users', data);
-          this.$notify({group: 'app', type: 'success', text: 'Administrator rights granted'});
-          const success = _get(response, 'data.success');
-          if (!success) throw new Error(`Unable to grant admin`);
-        } catch (error) {
-          this.loadOrgUsers(this.$store.state.organization);
-          return this.$errorMessage.show(error);
-        } finally {
-          this.loadOrgUsers(this.$store.state.organization);
-        }
+      const usersToGranAdmin = this.users.filter(row => row._rowVariant === 'active success').map(row => row.userId);
+      if (usersToGranAdmin < 1) return;
+
+      try {
+        this.$loading(true);
+
+        const response = await this.axios.post(`/api/org/${this.selectedOrg.orgId}/admin/grant`, { usersId: usersToGranAdmin });
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error('Unable to grant administrative privileges to user(s)');
+
+        this.$notify({group: 'app', type: 'success', text: 'Administrator rights granted'});
+        this.loadOrgUsers(this.selectedOrg);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
       }
     },
 
     async handleRevokeAdmin(data) {
-      this.$loading(true);
-      let usersToRevokeAdmin = [];
-      this.users.forEach(u => {
-        if (u._rowVariant === 'active success') {
-          usersToRevokeAdmin.push(String(u.id));
-        };
-      });
-      if (usersToRevokeAdmin.length > 0) {
-        let data = {};
-        data.usersid = usersToRevokeAdmin;
-        try {
-          const response = await this.axios.post('/api/org/changerole/member/users', data);
-          this.$notify({group: 'app', type: 'success', text: 'Administrator rights removed'});
-          const success = _get(response, 'data.success');
-          if (!success) throw new Error(`Unable to remove admin rights`);
-        } catch (error) {
-          this.loadOrgUsers(this.$store.state.organization);
-          return this.$errorMessage.show(error);
-        } finally {
-          this.loadOrgUsers(this.$store.state.organization);
-        }
+      const usersToRevokeAdmin = this.users.filter(row => row._rowVariant === 'active success').map(row => row.userId);
+      if (usersToRevokeAdmin < 1) return;
+
+      try {
+        this.$loading(true);
+
+        const response = await this.axios.post(`/api/org/${this.selectedOrg.orgId}/admin/revoke`, { usersId: usersToRevokeAdmin });
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error('Unable to revoke administrative privileges from user(s)');
+
+        this.$notify({group: 'app', type: 'success', text: 'Administrator rights granted'});
+        this.loadOrgUsers(this.selectedOrg);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
       }
     },
 
@@ -441,7 +435,7 @@ export default {
 
         const response = await this.axios.post(`/api/org/${this.selectedOrg.orgId}/users/remove`, { usersId: usersToRemove });
         const success = _get(response, 'data.success');
-        if (success === false) return this.$notify({group: 'error', type: 'err', text: 'Unable to delete users'});
+        if (!success) throw new Error('Unable to delete users');
 
         this.$notify({group: 'app', type: 'success', text: 'Selected user were removed from organization'});
 
@@ -462,16 +456,13 @@ export default {
         const response = await this.axios.post('/api/org/invitelink', data);
         const success = _get(response, 'data.success');
         this.inviteUsereLink = _get(response, 'data.confirm_url');
-        if (success === false) this.$notify({group: 'error', type: 'err', text: 'Unable to invite user'});
+        if (!success) this.$notify({group: 'error', type: 'err', text: 'Unable to invite user'});
         if (success === true && send === true) this.$notify({group: 'app', type: 'success', text: 'Email sent'});
         if (success === true && send === false) this.$notify({group: 'app', type: 'success', text: 'Link generated'});
       } catch (error) {
       } finally {
       }
     }
-  },
-
-  components: {
   }
 };
 </script>
