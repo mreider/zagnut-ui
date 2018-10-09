@@ -164,12 +164,36 @@
           <b-dropdown-item id="hevokeAdmin" @click="handleRevokeAdmin()"> Revoke admin </b-dropdown-item>
           <b-dropdown-item id="removeFromOrganization" @click="handleRemoveFromOrganization()"> Remove from org </b-dropdown-item>
         </b-dropdown>
+          <template>
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>
+                    <label class="form-checkbox">
+                      <input type="checkbox" v-model="selectAllUsers" @click="select()">
+                      <i class="form-icon"></i>
+                    </label>
+                  </th>
+                  <th v-for="uf in usersFields"  v-bind:key="uf" >{{ uf }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="u in users" v-bind:key="u.userId">
+                  <td>
+                    <label class="form-checkbox">
+                      <input type="checkbox" @click="select(u)" :checked="u.selected">
+                      <i class="form-icon"></i>
+                    </label>
+                  </td>
+                  <td v-for="uf in usersFields"  v-bind:key="uf">
+                    <tr>{{ u[uf] }}</tr>
+                  </td>
+                </tr>
+                <tr></tr>
+              </tbody>
 
-        <b-table hover :items="users" :fields="usersFields" @row-clicked="handleUserSelect">
-          <template slot="item" slot-scope="data" v-html="item.value">
-
+             </table>
           </template>
-        </b-table>
       </b-tab>
 
     </b-tabs>
@@ -202,7 +226,6 @@ export default {
       usersFields: ['userId', 'email', 'role', 'firstName', 'lastName', 'isActive'],
       selectedOrg: { name: 'Organization' },
 
-      selectedUsers: [],
       selectAllUsers: false,
 
       saving: false
@@ -217,6 +240,22 @@ export default {
   methods: {
     modalId(i, postfix) {
       return `modal-${i}-${postfix}`;
+    },
+    select(user) {
+      if (!user) {
+        this.selectAllUsers = !this.selectAllUsers;
+        this.users.forEach(u => { u.selected = this.selectAllUsers; });
+        return;
+      };
+
+      if (user) user.selected = !user.selected;
+
+      if (this.users) {
+        const indexel = this.users.findIndex(el => el.selected === this.selectAllUsers);
+        if (indexel === -1) this.selectAllUsers = !this.selectAllUsers;
+      }
+
+      return user.selected;
     },
 
     async loadProfile() {
@@ -275,7 +314,8 @@ export default {
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
         const users = _get(response, 'data.users');
-        users.forEach(u => { u._rowVariant = ''; });
+        users.forEach(u => { u.selected = false; });
+        this.selectAllUsers = false;
 
         this.users = users;
       } catch (error) {
@@ -310,7 +350,6 @@ export default {
         });
 
         const success = _get(response, 'data.success');
-        console.log(response.data);
         if (!success) throw new Error(_get(response, 'data.message'));
 
         this.$notify({group: 'app', type: 'success', text: 'Profile updated'});
@@ -357,13 +396,13 @@ export default {
     handleUserSelect(user) {
       // this.users.forEach(u => { u._rowVariant = ''; });
       if (this.$store.state.user.id === user.id) {
-        user._rowVariant = '';
+        user.selected = false;
         return;
       };
-      if (user._rowVariant === 'active success') {
-        user._rowVariant = '';
+      if (user.selected === true) {
+        user.selected = false;
       } else {
-        user._rowVariant = 'active success';
+        user.selected = true;
       };
     },
 
@@ -424,12 +463,11 @@ export default {
     },
 
     async handleGranAdmin(data) {
-      const usersToGranAdmin = this.users.filter(row => row._rowVariant === 'active success').map(row => row.userId);
+      const usersToGranAdmin = this.users.filter(row => row.selected === true).map(row => row.userId);
       if (usersToGranAdmin < 1) return;
 
       try {
         this.$loading(true);
-        console.log(usersToGranAdmin);
 
         const response = await this.axios.put(`/api/org/${this.selectedOrg.orgId}/admin/grant`, { usersId: usersToGranAdmin });
 
@@ -446,7 +484,7 @@ export default {
     },
 
     async handleRevokeAdmin(data) {
-      const usersToRevokeAdmin = this.users.filter(row => row._rowVariant === 'active success').map(row => row.userId);
+      const usersToRevokeAdmin = this.users.filter(row => row.selected === true).map(row => row.userId);
       if (usersToRevokeAdmin < 1) return;
 
       try {
@@ -468,7 +506,7 @@ export default {
 
     async handleRemoveFromOrganization(data) {
         // TODO: I don't like this approach - to use CSS flag and flag of selected state.
-      const usersToRemove = this.users.filter(row => row._rowVariant === 'active success').map(row => row.userId);
+      const usersToRemove = this.users.filter(row => row.selected === true).map(row => row.userId);
 
       if (usersToRemove < 1) return;
 
