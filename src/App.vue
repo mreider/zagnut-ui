@@ -51,8 +51,6 @@ export default {
       } catch (error) {
         return doLogout(this);
       }
-    } else {
-      this.$router.push({ name: 'account' });
     }
 
     this.axios.interceptors.response.use(response => {

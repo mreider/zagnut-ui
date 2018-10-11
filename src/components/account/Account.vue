@@ -4,7 +4,7 @@
 
     <forgot-password v-if="form === 'forgot'" :on-change-form="changeForm"/>
 
-    <register v-if="form === 'register'" :on-change-form="changeForm" :token="token"/>
+    <register v-if="form === 'register' || form === 'invite'" :on-change-form="changeForm" :token="token"/>
 
     <reset-password v-if="form === 'reset-password'" :on-change-form="changeForm" :token="token"/>
 
@@ -49,6 +49,7 @@ export default {
     'login': Login,
     'forgot-password': ForgotPassword,
     'register': Register,
+    'invite': Register,
     'reset-password': ResetPassword
   }
 };

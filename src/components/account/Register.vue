@@ -19,13 +19,7 @@
     <b-row>
       <b-col md="6" sm="12">
         <b-form-group>
-          <b-form-input type="email" required v-model="form.email" placeholder="Email"></b-form-input>
-        </b-form-group>
-      </b-col>
-
-      <b-col md="6" sm="12">
-        <b-form-group>
-          <b-form-input type="text" required v-model="form.organization" placeholder="Organization"></b-form-input>
+          <b-form-input type="email" required v-model="form.email" placeholder="Email" :readonly="invited"></b-form-input>
         </b-form-group>
       </b-col>
     </b-row>
@@ -40,6 +34,14 @@
       <b-col md="6" sm="12">
         <b-form-group>
           <b-form-input type="password" v-model="form.confirmation" placeholder="Confrmation"></b-form-input>
+        </b-form-group>
+      </b-col>
+    </b-row>
+
+    <b-row>
+      <b-col md="6" sm="12">
+        <b-form-group>
+          <b-form-input type="text" required v-model="form.organization" placeholder="Organization" :readonly="invited"></b-form-input>
         </b-form-group>
       </b-col>
     </b-row>
@@ -65,7 +67,7 @@ export default {
   },
 
   mounted() {
-    this.checkToken(this.token);
+    this.checkToken();
   },
 
   data() {
@@ -79,29 +81,33 @@ export default {
         organization: undefined,
         tosAccepted: false
       },
+
       saving: false,
-      showOrganization: false,
-      organization_name: ''
+
+      invited: false
     };
-  },
-  computed: {
   },
 
   methods: {
-    async checkToken(token) {
-      this.showOrganization = false;
+    async checkToken() {
+      const token = this.$route.query.token;
+
+      if (!token) return;
+
       if (token) {
+        this.invited = true;
+
         this.$loading(true);
+
         try {
-          const response = await this.axios.get('api/org/invitelink/?token=' + token);
+          const response = await this.axios.get('api/org/invite', { params: { token } });
+
           const success = _get(response, 'data.success');
-          if (success) {
-            this.organization_name = _get(response, 'data.orgranization_name');
-            this.form.organization = String(_get(response, 'data.organization_id'));
-            this.form.email = _get(response, 'data.email');
-            this.showOrganization = true;
-          }
-          if (!success) throw new Error(`Token invalid or missing.`);
+          if (!success) throw new Error('Token iinvalid or expired');
+
+          this.form.organization = _get(response, 'data.organization');
+          this.form.email = _get(response, 'data.email');
+          this.form.token = token;
         } catch (error) {
           return this.$errorMessage.show(error);
         } finally {
@@ -109,15 +115,19 @@ export default {
         }
       }
     },
+
     async handleSubmit(event) {
       event.preventDefault();
+
       try {
         let response = await this.axios.post('/api/account/register', this.form);
+
         const success = _get(response, 'data.userId');
         if (!success) throw new Error(_get(response, 'data.message', 'Unable to create account'));
 
-        this.$notify({group: 'app', type: 'success', text: 'Your account created, please check your inbo for confirmation email.'});
-        this.$router.push({ name: 'account' });
+        this.$notify({group: 'app', type: 'success', text: 'Your account created, please check your inbox for confirmation email.'});
+
+        this.$router.push({ name: 'account', params: { action: 'login' } });
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -127,8 +137,7 @@ export default {
   },
 
   props: {
-    onChangeForm: Function,
-    token: String
+    onChangeForm: Function
   }
 };
 </script>

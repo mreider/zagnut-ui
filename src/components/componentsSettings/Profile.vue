@@ -209,7 +209,7 @@ export default {
 
         this.$notify({group: 'app', type: 'success', text: send ? 'Email sent' : 'Link created'});
       } catch (error) {
-        // return this.$errorMessage.show(error);
+        return this.$errorMessage.show(error);
       } finally {
         this.$loading(false);
       }
