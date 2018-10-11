@@ -2,9 +2,6 @@
   <b-form @submit="handleSubmit" class="register">
     <h2 class="center">Welcome to</h2>
     <h1 class="center">PM415</h1>
-      <b-form-group>
-          <b-form-input type="text" v-model="organization_name" v-if="showOrganization" :readonly=true placeholder="Organization">{{ organization_name }}</b-form-input>
-      </b-form-group>
     <b-row>
       <b-col md="6" sm="12">
         <b-form-group>
@@ -23,6 +20,12 @@
       <b-col md="6" sm="12">
         <b-form-group>
           <b-form-input type="email" required v-model="form.email" placeholder="Email"></b-form-input>
+        </b-form-group>
+      </b-col>
+
+      <b-col md="6" sm="12">
+        <b-form-group>
+          <b-form-input type="text" required v-model="form.organization" placeholder="Organization"></b-form-input>
         </b-form-group>
       </b-col>
     </b-row>
