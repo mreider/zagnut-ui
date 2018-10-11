@@ -13,52 +13,43 @@
 
 <script>
 import _get from 'lodash/get';
+
 import Login from './Login';
 import ForgotPassword from './ForgotPassword';
 import Register from './Register';
 import ResetPassword from './ResetPassword';
+
 export default {
-  name: '',
+  name: 'Account',
+
   data() {
     return {
       form: 'login',
       token: null
     };
   },
-  beforeCreate() {
-  },
+
   mounted() {
-    if (this.$route.name === 'ResetPassword') {
-      this.form = _get(this.$router, 'params.action', 'reset-password');
-      this.token = this.$route.query.token;
-    } else if (this.$route.name === 'RegisterInvite') {
-      this.form = _get(this.$router, 'params.action', 'register');
-      this.token = this.$route.query.token;
-    } else if (this.$route.name === 'Register') {
-      this.form = _get(this.$router, 'params.action', 'register');
-    } else {
-      this.form = _get(this.$router, 'params.action', 'login');
-      this.token = this.$route.query.token;
-    }
+    this.form = _get(this.$route, 'params.action', 'login');
   },
+
   methods: {
     changeForm(form) {
-      this.form = form;
-      if (form === 'register') this.token = undefined;
+      this.$router.push({ name: 'account', params: { action: form } });
     }
   },
+
+  watch: {
+    '$route' (to, from) {
+      this.form = _get(to, 'params.action', 'login', 'login');
+    }
+  },
+
   components: {
     'login': Login,
     'forgot-password': ForgotPassword,
     'register': Register,
-    'reset-password': ResetPassword,
-    'invite-link': Register
-  },
-  watch: {
-    '$route' (to, from) {
-      if (this.$route.name === 'ResetPassword') this.$router.push({ name: 'reset-password' });
-     // if (this.$route.name === 'RegisterInvite') this.$router.push({ name: 'RegisterInvite' }, { token: this.token });
-    }
+    'reset-password': ResetPassword
   }
 };
 </script>

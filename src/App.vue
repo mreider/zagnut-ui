@@ -32,8 +32,7 @@ import { isCookieEnabled, getCookie } from 'tiny-cookie';
 import _get from 'lodash/get';
 export default {
   name: 'App',
-  beforeCreate() {
-  },
+
   async mounted() {
     let token = this.$store.state.token;
     if (!token && isCookieEnabled()) token = getCookie('token');
@@ -55,7 +54,7 @@ export default {
     } else {
       this.$router.push({ name: 'account' });
     }
-    // this.$router.push({ name: 'ResetPassword' });
+
     this.axios.interceptors.response.use(response => {
       if (response.status === 403 || response.status === 401) {
         return doLogout(this);
@@ -66,14 +65,18 @@ export default {
     });
     this.$loading(false);
   },
+
   data() {
     return {
     };
   },
+
   methods: {
   },
+
   sockets: {
   },
+
   components: {
     'topbar': Topbar,
     'ResetPassword': ResetPassword,
