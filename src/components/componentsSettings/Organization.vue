@@ -49,6 +49,8 @@
 
 <script>
 import _get from 'lodash/get';
+import { eventBus } from '@/main';
+
 export default {
   name: 'Organization',
   data() {
@@ -85,6 +87,7 @@ export default {
         this.loadOrganizations();
         this.newOrgName = '';
       }
+      eventBus.$emit('reload', { loadOrganization: true });
     },
 
     async handleOrganizationDelete(org) {
@@ -100,6 +103,7 @@ export default {
       } finally {
         this.$notify({group: 'app', type: 'success', text: `Organization ${org.name} was deleted`});
         this.loadOrganizations();
+        eventBus.$emit('reload', { loadOrganization: true });
       }
     },
     async handleOrganizationEdit(org, newOrgName) {
@@ -122,6 +126,7 @@ export default {
       } finally {
         this.$loading(false);
         this.newOrgName = '';
+        eventBus.$emit('reload', { loadOrganization: true });
       }
     },
 

@@ -1,6 +1,6 @@
 <template>
   <div class="users">
-    <b-dropdown :text="selectedOrg.name" size="sm">
+    <b-dropdown :text="selectedOrg.name" size="sm" @show="readOrgs()">
       <b-dropdown-item
         v-for="org in organizations" v-if="organizations"
         v-bind:key="org.orgId"
@@ -40,8 +40,7 @@
             </tr>
             <tr></tr>
           </tbody>
-
-          </table>
+        </table>
       </template>
 
   </div>
@@ -49,6 +48,7 @@
 
 <script>
 import _get from 'lodash/get';
+import { eventBus } from '@/main';
 export default {
   name: 'Users',
   data() {
@@ -57,10 +57,10 @@ export default {
       users: [],
       usersFields: ['userId', 'email', 'role', 'firstName', 'lastName', 'isActive'],
       selectedOrg: { name: 'Organization' },
-      selectAllUsers: false
+      selectAllUsers: false,
+      loadOrganization: false
     };
   },
-
   computed: {
   },
   async mounted () {
@@ -68,6 +68,12 @@ export default {
   },
 
   methods: {
+    readOrgs() {
+      eventBus.$on('reload', data => {
+        this.loadOrganization = data.loadOrganization;
+      });
+      console.log('reload', this.loadOrganization);
+    },
     handleSelect(user) {
       if (!user) {
         this.selectAllUsers = !this.selectAllUsers;
@@ -202,6 +208,9 @@ export default {
   },
 
   components: {
+  },
+  watch: {
+
   }
 };
 </script>

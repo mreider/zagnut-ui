@@ -40,6 +40,9 @@ if (process.env.BACKEND_URL) {
 // });
 
 /* eslint-disable no-new */
+
+export const eventBus = new Vue();
+
 new Vue({
   el: '#app',
   router,
