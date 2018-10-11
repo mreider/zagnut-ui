@@ -30,6 +30,11 @@ export default {
   },
 
   mounted() {
+    if (this.$store.state.token) {
+      this.$router.push({ name: 'invite', query: this.$route.query });
+      return;
+    }
+
     this.form = _get(this.$route, 'params.action', 'login');
   },
 
