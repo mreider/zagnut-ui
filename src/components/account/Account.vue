@@ -30,7 +30,7 @@ export default {
   },
 
   mounted() {
-    if (this.$store.state.token) {
+    if (this.$route.path.indexOf('account/invite') !== -1 && this.$store.state.token) {
       this.$router.push({ name: 'invite', query: this.$route.query });
       return;
     }
