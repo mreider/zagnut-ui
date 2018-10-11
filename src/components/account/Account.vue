@@ -8,6 +8,7 @@
 
     <reset-password v-if="form === 'reset-password'" :on-change-form="changeForm"/>
 
+    <verify v-if="form === 'verify'" :on-change-form="changeForm"/>
   </div>
 </template>
 
@@ -18,7 +19,7 @@ import Login from './Login';
 import ForgotPassword from './ForgotPassword';
 import Register from './Register';
 import ResetPassword from './ResetPassword';
-
+import Verify from './Verify';
 export default {
   name: 'Account',
 
@@ -55,7 +56,8 @@ export default {
     'forgot-password': ForgotPassword,
     'register': Register,
     'invite': Register,
-    'reset-password': ResetPassword
+    'reset-password': ResetPassword,
+    'verify': Verify
   }
 };
 </script>
