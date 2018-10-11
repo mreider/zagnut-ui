@@ -53,19 +53,15 @@ import { eventBus } from '@/main';
 
 export default {
   name: 'Organization',
+  props: ['organizations'],
   data() {
     return {
       organizationsFields: ['orgId', 'name', 'role', 'actions'],
-      organizations: [],
       newOrgName: ''
     };
   },
 
   computed: {
-  },
-
-  async mounted () {
-    await this.loadOrganizations();
   },
 
   methods: {
@@ -84,7 +80,6 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.loadOrganizations();
         this.newOrgName = '';
       }
       eventBus.$emit('reload', { loadOrganization: true });
@@ -102,7 +97,6 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.$notify({group: 'app', type: 'success', text: `Organization ${org.name} was deleted`});
-        this.loadOrganizations();
         eventBus.$emit('reload', { loadOrganization: true });
       }
     },
@@ -120,41 +114,12 @@ export default {
         if (!success) throw new Error(`Unable to update organization.`);
 
         this.$notify({group: 'app', type: 'success', text: 'Organization updated'});
-        this.loadOrganizations();
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
         this.$loading(false);
         this.newOrgName = '';
         eventBus.$emit('reload', { loadOrganization: true });
-      }
-    },
-
-    async loadOrganizations() {
-      this.$loading(true);
-
-      try {
-        const response = await this.axios.get('/api/user/orgs');
-
-        const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to load user's organizations.`);
-
-        const organizations = _get(response, 'data.organizations');
-        organizations.forEach(o => {
-          o._rowVariant = '';
-        });
-        organizations.forEach(o => {
-          o.menuName = o.name;
-          if (o.role === 'Pending') {
-            o.menuName = o.name + ' (authorization pending)';
-          }
-        });
-
-        this.organizations = organizations;
-      } catch (error) {
-        return this.$errorMessage.show(error);
-      } finally {
-        this.$loading(false);
       }
     }
   },

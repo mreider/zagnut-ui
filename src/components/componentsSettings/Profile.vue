@@ -108,6 +108,7 @@ import { doLogout } from '@/utils';
 import _get from 'lodash/get';
 export default {
   name: 'Profile',
+  props: ['organizations'],
   data() {
     return {
       profile: {},
@@ -116,13 +117,11 @@ export default {
         email: null,
         link: null
       },
-      organizations: [],
       saving: false
     };
   },
   async mounted () {
     await this.loadProfile();
-    await this.loadOrganizations();
   },
 
   computed: {
@@ -193,6 +192,7 @@ export default {
     handleInviteOrgChange(org) {
       this.invite.org = org;
     },
+
     async handleGenerateLink(send) {
       if (!this.invite.org.orgId) return this.$notify({group: 'error', type: 'error', text: 'Organization not selected'});
       if (!this.invite.email) return this.$notify({group: 'error', type: 'error', text: 'Email must be provided'});
@@ -232,34 +232,6 @@ export default {
       }
 
       this.$loading(false);
-    },
-
-    async loadOrganizations() {
-      this.$loading(true);
-
-      try {
-        const response = await this.axios.get('/api/user/orgs');
-
-        const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to load user's organizations.`);
-
-        const organizations = _get(response, 'data.organizations');
-        organizations.forEach(o => {
-          o._rowVariant = '';
-        });
-        organizations.forEach(o => {
-          o.menuName = o.name;
-          if (o.role === 'Pending') {
-            o.menuName = o.name + ' (authorization pending)';
-          }
-        });
-
-        this.organizations = organizations;
-      } catch (error) {
-        return this.$errorMessage.show(error);
-      } finally {
-        this.$loading(false);
-      }
     }
   },
 

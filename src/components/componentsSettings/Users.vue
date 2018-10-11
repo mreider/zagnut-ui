@@ -1,6 +1,6 @@
 <template>
   <div class="users">
-    <b-dropdown :text="selectedOrg.name" size="sm" @show="readOrgs()">
+    <b-dropdown :text="selectedOrg.name" size="sm">
       <b-dropdown-item
         v-for="org in organizations" v-if="organizations"
         v-bind:key="org.orgId"
@@ -51,29 +51,19 @@ import _get from 'lodash/get';
 import { eventBus } from '@/main';
 export default {
   name: 'Users',
+  props: ['organizations'],
   data() {
     return {
-      organizations: [],
       users: [],
       usersFields: ['userId', 'email', 'role', 'firstName', 'lastName', 'isActive'],
       selectedOrg: { name: 'Organization' },
-      selectAllUsers: false,
-      loadOrganization: false
+      selectAllUsers: false
     };
   },
   computed: {
   },
-  async mounted () {
-    await this.loadOrganizations();
-  },
 
   methods: {
-    readOrgs() {
-      eventBus.$on('reload', data => {
-        this.loadOrganization = data.loadOrganization;
-      });
-      console.log('reload', this.loadOrganization);
-    },
     handleSelect(user) {
       if (!user) {
         this.selectAllUsers = !this.selectAllUsers;
@@ -90,37 +80,12 @@ export default {
 
       return user.selected;
     },
-    async loadOrganizations() {
-      this.$loading(true);
 
-      try {
-        const response = await this.axios.get('/api/user/orgs');
-
-        const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to load user's organizations.`);
-
-        const organizations = _get(response, 'data.organizations');
-        organizations.forEach(o => {
-          o._rowVariant = '';
-        });
-        organizations.forEach(o => {
-          o.menuName = o.name;
-          if (o.role === 'Pending') {
-            o.menuName = o.name + ' (authorization pending)';
-          }
-        });
-
-        this.organizations = organizations;
-      } catch (error) {
-        return this.$errorMessage.show(error);
-      } finally {
-        this.$loading(false);
-      }
-    },
     handleOrgChange(org) {
       this.selectedOrg = org;
       this.loadOrgUsers(org);
     },
+
     async loadOrgUsers(org) {
       try {
         this.$loading(true);
@@ -202,6 +167,7 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
+        eventBus.$emit('reload', { loadOrganization: true });
         this.$loading(false);
       }
     }
