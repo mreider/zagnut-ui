@@ -4,9 +4,9 @@
 
     <forgot-password v-if="form === 'forgot'" :on-change-form="changeForm"/>
 
-    <register v-if="form === 'register' || form === 'invite'" :on-change-form="changeForm" :token="token"/>
+    <register v-if="form === 'register' || form === 'invite'" :on-change-form="changeForm"/>
 
-    <reset-password v-if="form === 'reset-password'" :on-change-form="changeForm" :token="token"/>
+    <reset-password v-if="form === 'reset-password'" :on-change-form="changeForm"/>
 
   </div>
 </template>

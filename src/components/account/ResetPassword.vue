@@ -20,14 +20,20 @@
 
 <script>
 import _get from 'lodash/get';
+
 export default {
-  name: 'reset-password',
+  name: 'ResetPassword',
+
   mounted() {
-    if (!this.token) {
+    const token = this.$route.query.token;
+
+    if (!token) {
       this.$notify({group: 'error', type: 'warn', text: 'Token invalid or missing'});
+      this.$router.push({ name: 'account', params: { action: 'forgot' } });
     }
-    this.form.token = this.token;
+    this.form.token = token;
   },
+
   data() {
     return {
       form: {
@@ -37,6 +43,7 @@ export default {
       }
     };
   },
+
   methods: {
     async submit(event) {
       event.preventDefault();
@@ -47,10 +54,8 @@ export default {
         if (!success) {
           this.$notify({group: 'app', type: success, text: message});
         } else {
-          this.$notify({group: 'app', type: success, text: `Your password was changed, in 3 seconds you'll be redirected to login page.`});
-          setTimeout(() => {
-            this.$router.go({ name: 'home' });
-          }, 3000);
+          this.$notify({group: 'app', type: success, text: `Your password was changed.`});
+          this.$router.push({ name: 'account', params: { action: 'login' } });
         }
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -59,9 +64,9 @@ export default {
       }
     }
   },
+
   props: {
-    onChangeForm: Function,
-    token: String
+    onChangeForm: Function
   }
 };
 </script>
