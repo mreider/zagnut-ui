@@ -10,7 +10,9 @@
 
     <b-dropdown id="Actions" text="Action" size="sm" class="m-2">
       <b-dropdown-item id="granAdmin" @click="handleGrantAdmin()"> Grant admin </b-dropdown-item>
-      <b-dropdown-item id="hevokeAdmin" @click="handleRevokeAdmin()"> Revoke admin </b-dropdown-item>
+      <b-dropdown-item id="revokeAdmin" @click="handleRevokeAdmin()"> Revoke admin </b-dropdown-item>
+      <b-dropdown-item id="Authorise" @click="handleRevokeAdmin()"> Authorize user </b-dropdown-item>
+      <b-dropdown-item id="ReasetPassword" @click="handleResetPassword()"> Reset password </b-dropdown-item>
       <b-dropdown-item id="removeFromOrganization" @click="handleRemoveFromOrganization()"> Remove from org </b-dropdown-item>
     </b-dropdown>
       <template>
@@ -138,10 +140,30 @@ export default {
         const response = await this.axios.put(`/api/org/${this.selectedOrg.orgId}/admin/revoke`, { usersId: usersToRevokeAdmin });
 
         const success = _get(response, 'data.success');
+        const message = _get(response, 'data.message');
         if (!success) throw new Error('Unable to revoke administrative privileges from user(s)');
 
-        this.$notify({group: 'app', type: 'success', text: 'Administrator rights removed'});
+        this.$notify({ group: 'app', type: 'success', text: message });
         this.loadOrgUsers(this.selectedOrg);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+      }
+    },
+
+    async handleResetPassword() {
+      const usersToResetPassword = this.users.filter(row => row.selected === true).map(row => row.userId);
+      if (usersToResetPassword < 1) return;
+
+      try {
+        this.$loading(true);
+
+        const response = await this.axios.put(`/api/org/${this.selectedOrg.orgId}/admin/resetpassword`, { usersId: usersToResetPassword });
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error('Unable to reset passwords');
+
+        this.$notify({ group: 'app', type: 'success', text: 'Passwords reset, letters sent' });
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -157,7 +179,7 @@ export default {
       try {
         this.$loading(true);
 
-        const response = await this.axios.delete(`/api/org/${this.selectedOrg.orgId}/users/remove`, { usersId: usersToRemove });
+        const response = await this.axios.post(`/api/org/${this.selectedOrg.orgId}/users/remove`, { usersId: usersToRemove });
         const success = _get(response, 'data.success');
         if (!success) throw new Error('Unable to delete users');
 
@@ -167,6 +189,7 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
+        this.loadOrgUsers(this.selectedOrg);
         eventBus.$emit('reload', { loadOrganization: true });
         this.$loading(false);
       }
