@@ -31,7 +31,6 @@ export default {
     },
     async checkToken() {
       const token = this.$route.query.token;
-
       if (!token) return;
 
       if (token) {

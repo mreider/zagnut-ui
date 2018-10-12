@@ -38,7 +38,6 @@ export default {
     if (this.$route.path.indexOf('account/invite') !== -1 && this.$store.state.token) {
       this.$store.commit({ type: 'token', token: null });
     }
-
     this.form = _get(this.$route, 'params.action', 'login');
   },
 
