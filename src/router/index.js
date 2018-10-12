@@ -8,7 +8,6 @@ import Ideas from '@/components/Ideas';
 import Backlogs from '@/components/Backlogs';
 import Bugs from '@/components/Bugs';
 import Settings from '@/components/Settings';
-import Invite from '@/components/Invite';
 
 Vue.use(Router);
 
@@ -49,11 +48,6 @@ export default new Router({
       path: '/settings',
       name: 'settings',
       component: Settings
-    },
-    {
-      path: '/invite',
-      name: 'invite',
-      component: Invite
     }
   ]
 });

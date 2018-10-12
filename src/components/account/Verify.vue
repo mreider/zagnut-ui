@@ -12,7 +12,7 @@
 import _get from 'lodash/get';
 
 export default {
-  name: 'ResetPassword',
+  name: 'Verify',
 
   mounted() {
     this.checkToken();
@@ -40,7 +40,7 @@ export default {
         this.$loading(true);
 
         try {
-          const response = await this.axios.get('api/account/verify', { params: { token } });
+          const response = await this.axios.get('/api/account/verify', { params: { token } });
           const success = _get(response, 'data.success');
           this.message = _get(response, 'data.message');
           if (!success) {

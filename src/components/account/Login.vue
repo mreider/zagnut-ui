@@ -38,9 +38,6 @@ export default {
     };
   },
 
-  computed: {
-  },
-
   methods: {
     async submit(event) {
       event.preventDefault();

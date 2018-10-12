@@ -4,11 +4,13 @@
 
     <forgot-password v-if="form === 'forgot'" :on-change-form="changeForm"/>
 
-    <register v-if="form === 'register' || form === 'invite'" :on-change-form="changeForm"/>
+    <register v-if="form === 'register'" :on-change-form="changeForm"/>
 
     <reset-password v-if="form === 'reset-password'" :on-change-form="changeForm"/>
 
     <verify v-if="form === 'verify'" :on-change-form="changeForm"/>
+
+    <invite v-if="form === 'invite'"/>
   </div>
 </template>
 
@@ -20,6 +22,8 @@ import ForgotPassword from './ForgotPassword';
 import Register from './Register';
 import ResetPassword from './ResetPassword';
 import Verify from './Verify';
+import Invite from './Invite';
+
 export default {
   name: 'Account',
 
@@ -32,8 +36,7 @@ export default {
 
   mounted() {
     if (this.$route.path.indexOf('account/invite') !== -1 && this.$store.state.token) {
-      this.$router.push({ name: 'invite', query: this.$route.query });
-      return;
+      this.$store.commit({ type: 'token', token: null });
     }
 
     this.form = _get(this.$route, 'params.action', 'login');
@@ -55,9 +58,9 @@ export default {
     'login': Login,
     'forgot-password': ForgotPassword,
     'register': Register,
-    'invite': Register,
     'reset-password': ResetPassword,
-    'verify': Verify
+    'verify': Verify,
+    'invite': Invite
   }
 };
 </script>

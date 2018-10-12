@@ -110,7 +110,7 @@ export default {
         this.$loading(true);
 
         try {
-          const response = await this.axios.get('api/org/invite', { params: { token } });
+          const response = await this.axios.get('/api/org/invite', { params: { token } });
 
           const success = _get(response, 'data.success');
           if (!success) throw new Error('Token iinvalid or expired');
