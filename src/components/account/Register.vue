@@ -2,57 +2,65 @@
   <b-form @submit="handleSubmit" class="register">
     <h2 class="center">Welcome to</h2>
     <h1 class="center">PM415</h1>
-    <b-row>
-      <b-col md="6" sm="12">
-        <b-form-group>
-          <b-form-input type="text" v-model="form.firstName" placeholder="First Name"></b-form-input>
-        </b-form-group>
-      </b-col>
 
-      <b-col md="6" sm="12">
-        <b-form-group>
-          <b-form-input type="text" v-model="form.lastName" placeholder="Last Name"></b-form-input>
-        </b-form-group>
-      </b-col>
-    </b-row>
+    <div class="not-registered" v-if="!registered">
+      <b-row>
+        <b-col md="6" sm="12">
+          <b-form-group>
+            <b-form-input type="text" v-model="form.firstName" placeholder="First Name"></b-form-input>
+          </b-form-group>
+        </b-col>
 
-    <b-row>
-      <b-col md="6" sm="12">
-        <b-form-group>
-          <b-form-input type="email" required v-model="form.email" placeholder="Email" :readonly="invited"></b-form-input>
-        </b-form-group>
-      </b-col>
-    </b-row>
+        <b-col md="6" sm="12">
+          <b-form-group>
+            <b-form-input type="text" v-model="form.lastName" placeholder="Last Name"></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
 
-    <b-row>
-      <b-col md="6" sm="12">
-        <b-form-group>
-          <b-form-input type="password" v-model="form.password" placeholder="Password"></b-form-input>
-        </b-form-group>
-      </b-col>
+      <b-row>
+        <b-col md="6" sm="12">
+          <b-form-group>
+            <b-form-input type="email" required v-model="form.email" placeholder="Email" :readonly="invited"></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
 
-      <b-col md="6" sm="12">
-        <b-form-group>
-          <b-form-input type="password" v-model="form.confirmation" placeholder="Confrmation"></b-form-input>
-        </b-form-group>
-      </b-col>
-    </b-row>
+      <b-row>
+        <b-col md="6" sm="12">
+          <b-form-group>
+            <b-form-input type="password" v-model="form.password" placeholder="Password"></b-form-input>
+          </b-form-group>
+        </b-col>
 
-    <b-row>
-      <b-col md="6" sm="12">
-        <b-form-group>
-          <b-form-input type="text" required v-model="form.organization" placeholder="Organization" :readonly="invited"></b-form-input>
-        </b-form-group>
-      </b-col>
-    </b-row>
+        <b-col md="6" sm="12">
+          <b-form-group>
+            <b-form-input type="password" v-model="form.confirmation" placeholder="Confrmation"></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
 
-    <b-row class="tos">
-        <b-form-checkbox value="Y" v-model="form.tosAccepted">I accept <a href="#">Terms of Service</a> </b-form-checkbox>
-    </b-row>
+      <b-row>
+        <b-col md="6" sm="12">
+          <b-form-group>
+            <b-form-input type="text" required v-model="form.organization" placeholder="Organization" :readonly="invited"></b-form-input>
+          </b-form-group>
+        </b-col>
+      </b-row>
 
-    <div class="button-box center">
-      <b-button type="submit" variant="primary" :disabled="saving">Save</b-button>
-      <a href="#" class="small" @click="onChangeForm && onChangeForm('login')">Already registered?</a>
+      <b-row class="tos">
+          <b-form-checkbox value="Y" v-model="form.tosAccepted">I accept <a href="#">Terms of Service</a> </b-form-checkbox>
+      </b-row>
+
+      <div class="button-box center">
+        <b-button type="submit" variant="primary" :disabled="saving">Save</b-button>
+        <a href="#" class="small" @click="onChangeForm && onChangeForm('login')">Already registered?</a>
+      </div>
+    </div>
+
+    <div class="registered" v-if="registered">
+      <h3>Thank you for regstration</h3>
+      <h4>Please check your inbox for verification email and <router-link tag="a" to="/account/login"><a>process to login</a></router-link>.</h4>
     </div>
   </b-form>
 </template>
@@ -83,6 +91,8 @@ export default {
       },
 
       saving: false,
+
+      registered: false,
 
       invited: false
     };
@@ -127,7 +137,7 @@ export default {
 
         this.$notify({group: 'app', type: 'success', text: 'Your account created, please check your inbox for confirmation email.'});
 
-        this.$router.push({ name: 'account', params: { action: 'login' } });
+        this.registered = true;
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -153,6 +163,10 @@ export default {
 
     .tos {
       margin-left: 0;
+    }
+
+    .registered {
+      text-align: center;
     }
   }
 </style>
