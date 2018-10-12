@@ -10,12 +10,19 @@
 
 <script>
 import _get from 'lodash/get';
+import { isCookieEnabled, getCookie } from 'tiny-cookie';
 
 export default {
   name: 'Verify',
 
-  mounted() {
-    this.checkToken();
+  async mounted() {
+    let userToken = this.$store.state.token;
+    if (!userToken && isCookieEnabled()) userToken = getCookie('token');
+    if (userToken) {
+      this.$router.replace('/');
+    };
+
+    await this.checkToken();
   },
 
   data() {
@@ -35,7 +42,6 @@ export default {
 
       if (token) {
         this.invited = true;
-
         this.$loading(true);
 
         try {
