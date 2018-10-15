@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="submit" class="login">
+  <b-form @submit="submit" class="login col-lg-4 col-md-8 col-sm-4 col-xs-2">
     <h2 class="center">Welcome to</h2>
     <h1 class="center">PM415</h1>
 
@@ -66,7 +66,6 @@ export default {
   .login {
     margin: auto;
     width: 300px;
-
     h1 {
       margin-bottom: 30px;
     }
