@@ -66,7 +66,7 @@ export default {
 
 <style lang="scss">
   .account {
-    margin-top: 200px;
+    margin-top: 150px;
     .button-box {
       &> a {
         margin-left: 16px;

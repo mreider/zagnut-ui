@@ -5,8 +5,8 @@
     </div>
 
     <div class="notifications-container">
-      <notifications group="error" width="500px" position="bottom right" />
-      <notifications group="app" width="500px" position="bottom right" />
+      <notifications group="error" width="405px" position="bottom right" />
+      <notifications group="app" width="405px" position="bottom right" />
     </div>
 
     <div v-if="$store.state.token">
