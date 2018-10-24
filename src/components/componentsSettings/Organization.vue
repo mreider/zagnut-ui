@@ -130,6 +130,4 @@ export default {
 </script>
 
 <style lang="scss">
-  .organization {
-  }
 </style>
