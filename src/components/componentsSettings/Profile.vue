@@ -252,7 +252,7 @@ export default {
           padding-bottom: 4px;
           padding-top: 4px;
           height: 27px;
-          width: 300px;
+          // width: 300px;
         }
 
         &>button {

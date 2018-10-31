@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="handlelogin" class="verify">
+  <b-form @submit="handlelogin" class="verify col-lg-4 col-md-8 col-sm-12 col-xs-12">
     <h1 class="center">{{ message }}</h1>
 
     <div class="button-box center" v-if="showLoginButton === true">
@@ -72,7 +72,7 @@ export default {
 <style lang="scss">
   .verify {
     margin: auto;
-    width: 300px;
+    // width: 300px;
     h1 {
       margin-bottom: 30px;
     }

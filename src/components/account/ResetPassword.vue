@@ -74,7 +74,7 @@ export default {
 <style lang="scss">
   .reset-password {
     margin: auto;
-    width: 300px;
+    // width: 300px;
     h1 {
       margin-bottom: 30px;
     }

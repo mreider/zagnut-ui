@@ -1,5 +1,5 @@
 <template>
-  <b-form @submit="submit" class="forgot">
+  <b-form @submit="submit" class="forgot col-lg-4 col-md-8 col-sm-12 col-xs-12">
     <h2 class="center">Restore password<br/>for</h2>
     <h1 class="center">PM415</h1>
 
@@ -54,7 +54,7 @@ export default {
 <style lang="scss">
   .forgot {
     margin: auto;
-    width: 300px;
+    // width: 300px;
     h1 {
       margin-bottom: 30px;
     }

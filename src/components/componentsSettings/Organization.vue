@@ -1,49 +1,49 @@
 <template>
- <div>
-  <div class="button-box right">
-    <div>
-      <b-btn variant="success" size="" v-b-modal.modalnew>➕ Add organization</b-btn>
-      <b-modal id="modalnew"
-                button-size="sm"
-                title="New orgranization name"
-                @ok="handleOrganizationNew(newOrgName)"
-                size="sm"
-                centered
-                >
-          <b-form-input v-model="newOrgName" placeholder="Enter organization name">></b-form-input>
-      </b-modal>
+  <div>
+    <div class="button-box right">
+      <div>
+        <b-btn variant="success" size="" v-b-modal.modalnew>➕ Add organization</b-btn>
+        <b-modal id="modalnew"
+                  button-size="sm"
+                  title="New orgranization name"
+                  @ok="handleOrganizationNew(newOrgName)"
+                  size="sm"
+                  centered
+                  >
+            <b-form-input v-model="newOrgName" placeholder="Enter organization name">></b-form-input>
+        </b-modal>
+      </div>
     </div>
-  </div>
 
-  <b-table hover :items="organizations" :fields="organizationsFields">
+    <b-table hover :items="organizations" :fields="organizationsFields">
       <template slot="actions" slot-scope="data">
-        <b-button variant="primary" size="sm" v-b-modal="modalId(data.item.orgId, 'edit')" v-if="data.item.role === 'Admin'">🖉</b-button>
-        <b-button variant="danger" size="sm" v-b-modal="modalId(data.item.orgId, 'del')" v-if="data.item.role === 'Admin'">✖</b-button>
-        <b-modal :id="modalId(data.item.orgId, 'del')"
-                  :title="'Delete ' + data.item.name + '?'"
-                  button-size="sm"
-                  size="sm"
-                  centered
-                  body-class="zero-size"
-                  ok-variant="danger"
-                  @ok="handleOrganizationDelete(data.item)"
-                  ok-title="delete"
-                  >
-        </b-modal>
-
-        <b-modal :id="modalId(data.item.orgId, 'edit')"
-                  title="Edit"
-                  button-size="sm"
-                  size="sm"
-                  centered
-                  ok-variant="submit"
-                  @ok="handleOrganizationEdit(data.item, newOrgName)"
-                  ok-title="submit"
-                  >
-            <b-form-input v-model=newOrgName :placeholder="data.item.name"></b-form-input>
-        </b-modal>
+        <b-button variant="primary" size="sm" v-b-modal.edit v-if="data.item.role === 'Admin'" @click="setCurrentOrg(data.item)">🖉</b-button>
+        <b-button variant="danger" size="sm" v-b-modal.delete v-if="data.item.role === 'Admin'" @click="setCurrentOrg(data.item)">✖</b-button>
       </template>
     </b-table>
+    <b-modal id="delete"
+              :title="'Delete ' + currentOrganization.name + '?'"
+              button-size="sm"
+              size="sm"
+              centered
+              body-class="zero-size"
+              ok-variant="danger"
+              @ok="handleOrganizationDelete(currentOrganization)"
+              ok-title="delete"
+              >
+    </b-modal>
+
+    <b-modal id="edit"
+              title="Edit"
+              button-size="sm"
+              size="sm"
+              centered
+              ok-variant="submit"
+              @ok="handleOrganizationEdit(currentOrganization, newOrgName)"
+              ok-title="submit"
+              >
+        <b-form-input v-model=newOrgName :placeholder="currentOrganization.name"></b-form-input>
+    </b-modal>
   </div>
 </template>
 
@@ -57,7 +57,8 @@ export default {
   data() {
     return {
       organizationsFields: ['orgId', 'name', 'role', 'actions'],
-      newOrgName: ''
+      newOrgName: '',
+      currentOrganization: ''
     };
   },
 
@@ -65,9 +66,10 @@ export default {
   },
 
   methods: {
-    modalId(i, postfix) {
-      return `modal-${i}-${postfix}`;
+    setCurrentOrg(org) {
+      this.currentOrganization = org;
     },
+
     async handleOrganizationNew(data) {
       // this.$loading(true);
       if (!data) {
@@ -83,6 +85,7 @@ export default {
         this.newOrgName = '';
       }
       eventBus.$emit('reload', { loadOrganization: true });
+      this.setCurrentOrg('');
     },
 
     async handleOrganizationDelete(org) {
@@ -98,6 +101,7 @@ export default {
       } finally {
         this.$notify({group: 'app', type: 'success', text: `Organization ${org.name} was deleted`});
         eventBus.$emit('reload', { loadOrganization: true });
+        this.setCurrentOrg('');
       }
     },
     async handleOrganizationEdit(org, newOrgName) {
@@ -120,6 +124,7 @@ export default {
         this.$loading(false);
         this.newOrgName = '';
         eventBus.$emit('reload', { loadOrganization: true });
+        this.setCurrentOrg('');
       }
     }
   },
