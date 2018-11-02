@@ -8,10 +8,10 @@
     <b-collapse is-nav id="nav_collapse">
 
       <b-navbar-nav>
-        <b-nav-item to="initiatives">Strategic Initiatives</b-nav-item>
-        <b-nav-item to="ideas">Ideas</b-nav-item>
-        <b-nav-item to="backlogs">Backlogs</b-nav-item>
-        <b-nav-item to="bugs">Bugs</b-nav-item>
+        <b-nav-item :to="{ path: '/initiatives' }">Strategic Initiatives</b-nav-item>
+        <b-nav-item :to="{ path: '/ideas' }">Ideas</b-nav-item>
+        <b-nav-item :to="{ path: '/backlogs' }">Backlogs</b-nav-item>
+        <b-nav-item :to="{ path: '/bugs' }">Bugs</b-nav-item>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
@@ -25,7 +25,7 @@
         </b-nav-item-dropdown>
 
         <b-nav-item-dropdown :text="username" right>
-          <b-dropdown-item to="settings">Settings</b-dropdown-item>
+          <b-dropdown-item :to="{ path: '/settings' }">Settings</b-dropdown-item>
           <b-dropdown-item @click="handleLogout">Logout</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>

@@ -45,3 +45,13 @@ export async function forgotPassword(vue, email) {
 
   window.location.reload();
 }
+
+export function username(user) {
+  if (!user) return '';
+  const {firstName, lastName, email} = user;
+  if (firstName && lastName) return `${firstName} ${lastName}`;
+  else if (firstName) return firstName;
+  else if (lastName) return lastName;
+
+  return email;
+}

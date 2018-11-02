@@ -120,13 +120,13 @@
 
         <div class="col">
           <b-form-group label = "Assignee: " label-for = "newBacklogAssignee" horizontal>
-            <b-dropdown :text="username(newBacklog.assignee)" name="newBacklogAssignee" size="sm" class="users m-2" >
+            <b-dropdown :text="handleUsername(newBacklog.assignee)" name="newBacklogAssignee" size="sm" class="users m-2" >
               <b-dropdown-item
               v-for="element in users"
               v-bind:key="element.userId"
               @click="handleBacklogNewItemSetField(element, 'assignee')"
               size = "sm"
-              >{{ username(element) }}
+              >{{ handleUsername(element) }}
               </b-dropdown-item>
             </b-dropdown>
           </b-form-group>
@@ -149,6 +149,7 @@
 import _get from 'lodash/get';
 import _ from 'lodash';
 import Backlog from './componentsBacklogs/backlog.vue';
+import { username } from '@/utils';
 export default {
   name: 'Backlogs',
   data() {
@@ -240,7 +241,7 @@ export default {
 
         const backlogs = _get(response, 'data.backlogs');
         backlogs.forEach(element => {
-          element.author = this.username(element);
+          element.author = username(element);
         });
         this.backlogs = backlogs;
       } catch (error) {
@@ -255,12 +256,8 @@ export default {
     async handleBacklogNewItemSetField(element, name) {
       this.newBacklog[name] = element;
     },
-    async handleBacklogEdit(element) {
-      // todo open edit backlog form
-    },
     setCurrentBacklog(element) {
       this.currentBacklog = element;
-      console.log(this.selected);
     },
     async handleBacklogEditTitle(element, newNameOldBacklog) {
       if (!newNameOldBacklog) {
@@ -318,13 +315,8 @@ export default {
         this.newBacklog = {title: '', description: '', points: 0, status: { id: 1, name: 'Unplaned' }, assignee: ''};
       }
     },
-    username(user) {
-      const {firstName, lastName, email} = user;
-      if (firstName && lastName) return `${firstName} ${lastName}`;
-      else if (firstName) return firstName;
-      else if (lastName) return lastName;
-
-      return email;
+    handleUsername (element) {
+      return username(element);
     },
     onFiltered (filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
