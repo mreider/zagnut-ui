@@ -1,5 +1,5 @@
 <template>
-  <div class="backlog">
+  <div class="backlog col-lg-12 col-md-8 col-sm-6 col-xs-4">
      <b-card bg-variant="light" class="card col-lg-12">
 
       <b-form-group horizontal
@@ -14,9 +14,9 @@
             <div>
               <label class="left">Created by: {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
             </div>
-            <div>
+            <!-- <div>
               <label class="left" v-if="form.plannedOn" >Planned on: {{new Date(form.plannedOn).toLocaleString()}}</label>
-            </div>
+            </div> -->
           </div>
           <div class="col-2" >
             <b-form-group label = "Status: " label-for = "labelStatus" label-size="sm" :label-cols="2">
@@ -166,6 +166,7 @@ export default {
         delete data['createdAt'];
         delete data['updatedAt'];
         delete data['createdBy'];
+        delete data['organizationId'];
 
         data.points = String(data.points);
         console.log(this.form);

@@ -1,53 +1,56 @@
 <template>
+<b-card bg-variant="light" class="card col-lg-12">
   <div class="backlogs">
-    <div class="headerMenu row">
-      <label class="header col-12"><h2>Some things to do</h2></label>
-      <b-form-group label = "<h4> Group by: </h4>" label-for = "checkboxGroup" class="left col-6" horizontal>
-        <b-dropdown :text="currentGroupBy" name="groupBy" size="sm" class="m-2" >
-          <b-dropdown-item
-          v-for="element in groupByList" v-if="groupByList"
-          v-bind:key="element"
-          @click="handleChangeGroupBy(element)"
-          size = "sm"
-          >{{ element }}
-          </b-dropdown-item>
-        </b-dropdown>
-      </b-form-group>
-
-      <b-form-group label = "<h4> Show: </h4> " label-for = "statuses" class="right col-6" horizontal>
-        <b-form-checkbox-group id="statuses" name="statuses" v-model="selected" :options="options" style="vertical-align: top;">
-        </b-form-checkbox-group>
-      </b-form-group>
-
-      <div class="button-box col-offset-5">
-        <b-btn variant="success" size="sm" v-b-modal.modalnew>➕ New item</b-btn>
+    <div class="container-fluid row">
+      <label class="header col-12"><h2>Backlogs</h2></label>
+      <div class="col-4">
+        <b-form-group label = "Group by:" label-for = "checkboxGroup" :label-cols="4">
+          <b-dropdown :text="currentGroupBy" name="groupBy" size="sm" class="m-2" >
+            <b-dropdown-item
+            v-for="element in groupByList" v-if="groupByList"
+            v-bind:key="element"
+            @click="handleChangeGroupBy(element)"
+            size = "sm"
+            >{{ element }}
+            </b-dropdown-item>
+          </b-dropdown>
+        </b-form-group>
       </div>
-      <b-form-group horizontal label="Filter" class="mb-2">
+
+      <div class="col-8">
+        <b-form-group label = "Show: " label-for = "statuses" class="float-right">
+          <b-form-checkbox-group id="statuses" name="statuses" v-model="selected" :options="options" class="float-right">
+          </b-form-checkbox-group>
+          <div>
+            <b-btn class="float-right" style="margin-top: 2em" variant="success" size="sm" v-b-modal.modalnew>➕ New item</b-btn>
+          </div>
+        </b-form-group>
+      </div>
+
+      <b-form-group label="Filter" class="col-6 mb-2">
         <b-input-group>
-          <b-form-input v-model="filter" placeholder="Type to Search" size="sm" />
+          <b-form-input v-model="filter" placeholder="Type to Search" />
           <b-input-group-append>
             <b-btn size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
     </div>
-
-    <div v-for="element in selected" v-bind:key="element.id" > <h6>{{ element.name }}</h6>
+    <div v-for="element in selected" v-bind:key="element.id" class="container-fluid row"> <h6>{{ element.name }}</h6>
       <b-table  bordered
                 fixed
                 responsive
                 :items="element.filteredBacklogs"
                 :fields="backlogsFields"
-                style="width:75%;"
                 thead-class="hidden_header"
                 :filter="filter"
                 >
-        <template slot="title" slot-scope="data">
+        <template slot="title" slot-scope="data" class="col-8">
           <a :href="`#`" v-b-modal.edit @click="setCurrentBacklog(data.item)">
             {{  data.item.title }}
           </a>
         </template>
-        <template slot="author" slot-scope="data">
+        <template slot="author" slot-scope="data" class="col-4">
           <a :href="`#`" v-on:click="filter = data.item.author">
             {{ data.item.author }}
           </a>
@@ -93,8 +96,8 @@
         <b-form-input v-model="newBacklog.title" placeholder="Title backlog" id="title">></b-form-input>
       </b-form-group>
       <div>
-        <b-form-group label = "Description: " label-for = "textarea1" horizontal>
-          <b-form-textarea id="textarea1"
+        <b-form-group label = "Description: " label-for = "description" horizontal>
+          <b-form-textarea id="description"
               v-model="newBacklog.description"
               placeholder="Title description"
               :rows="3"
@@ -105,7 +108,7 @@
 
       <div class="newBacklogtable row" >
         <div class="col">
-          <b-form-group label = "Status: " label-for = "labelStatus" horizontal>
+          <b-form-group label = "Status: " label-for = "labelStatus">
             <b-dropdown :text="newBacklog.status.name" name="newBacklogStatuses" size="sm" class="statuses m-2" >
               <b-dropdown-item
               v-for="element in objStatuses" v-if="objStatuses"
@@ -119,7 +122,7 @@
         </div>
 
         <div class="col">
-          <b-form-group label = "Assignee: " label-for = "newBacklogAssignee" horizontal>
+          <b-form-group label = "Assignee: " label-for = "newBacklogAssignee">
             <b-dropdown :text="handleUsername(newBacklog.assignee)" name="newBacklogAssignee" size="sm" class="users m-2" >
               <b-dropdown-item
               v-for="element in users"
@@ -133,16 +136,23 @@
         </div>
 
         <div class="col">
-          <div class="input-group">
-            <b-form-group label = "Points: " label-for = "points" horizontal>
-              <b-form-input v-model="newBacklog.points" id="points" type="number" min="0" style="width:50%">{{newBacklog.points}}</b-form-input>
+          <b-form-group label = "Points: " label-for = "newBacklogPoints">
+              <b-dropdown :text="String(newBacklog.points)" name="newBacklogPoints" size="sm" class="points m-2" >
+                <b-dropdown-item
+                v-for="element in pointsVar"
+                v-bind:key="element"
+                @click="handleBacklogNewItemSetField(element, 'points')"
+                size = "sm"
+                >{{ element }}
+                </b-dropdown-item>
+              </b-dropdown>
             </b-form-group>
-          </div>
         </div>
       </div>
     </b-modal>
 
   </div>
+  </b-card>
 </template>
 
 <script>
@@ -162,6 +172,7 @@ export default {
       users: [],
       newBacklog: { title: '', description: '', points: 0, status: { id: 1, name: 'Unplaned' }, assignee: {} },
       backlogs: [],
+      pointsVar: ['0', '1', '2', '3', '5', '8', '13', '21'],
       backlogsFields: ['title', 'author'],
       newNameOldBacklog: '',
       currentBacklog: '',
@@ -223,6 +234,7 @@ export default {
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
         const users = _get(response, 'data.users');
+        this.newBacklog.assignee = this.$store.state.user;
 
         this.users = users;
       } catch (error) {
@@ -338,12 +350,16 @@ export default {
 </script>
 
 <style lang="scss">
+ .card {
+    margin-top:50px;
+  }
   .backlogs {
     .header {
-      margin-top:50px;
+      margin-top:10px;
     }
     .hidden_header {
       display: none;
     }
+
   };
 </style>
