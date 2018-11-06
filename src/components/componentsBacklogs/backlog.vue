@@ -76,10 +76,53 @@
           </b-form-group>
           </div>
           <div class="button-box">
-            <b-button class="float-right" type="submit" variant="primary" @click="handleBacklogSaveBacklog()">Save</b-button>
-           </div>
-        </div>
+            <b-btn class="float-right" type="submit" variant="primary" @click="handleBacklogSaveBacklog()">Save</b-btn>
+            <div>
+              <b-btn @click="showComments = !showComments"
+                    :class="showComments ? 'collapsed' : null"
+                    aria-controls="collapse4"
+                    :aria-expanded="showComments ? 'true' : 'false'">
+                Show comments
+              </b-btn>
+              <b-btn @click="addComment = !addComment"
+                    :class="addComment ? 'collapsed' : null"
+                    aria-controls="collapse4"
+                    :aria-expanded="addComment ? 'true' : 'false'">
+                Add comment
+              </b-btn>
+              <b-collapse class="mt-2" v-model="showComments" id="collapse4">
+                <b-form-group
+                    v-for="element in comments" v-if="comments"
+                    v-bind:key="element.id"
+                    breakpoint="lg"
+                    :label="labelComment(element)"
+                    label-size="sm"
+                    label-class="font-weight-bold pt-0"
+                    class="container-fluid"
+                    >
+                    <b-form-textarea class="text-center" v-model="element.comment" v-bind:readonly.sync="element.readOnly"></b-form-textarea>
+                    <div style="float: right;">
+                      <b-button style="vertical-align: right;" variant="primary" size="sm" v-if="$store.state.user.id === element.createdBy" @click="handleReadOnly(element)">🖉</b-button>
+                      <b-button style="bottom" variant="danger" size="sm" v-if="admin" @click="handleDeleteComment(element)">✖</b-button>
+                      <b-button style="bottom" variant="success" size="sm" v-if="!element.readOnly" @click="handleUpdateComment(element)">💾</b-button>
+                    </div>
+                </b-form-group>
+              </b-collapse>
+              <b-collapse class="mt-2" v-model="addComment" id="collapse5">
+                  <b-form-textarea id="newComment"
+                   v-model="newComment"
+                   placeholder="Enter comment text"
+                   :rows="2"
+                   class="text-center"
+                   ></b-form-textarea>
+                  <div style="float: right;">
+                    <b-button style="bottom" variant="success" size="sm" @click="handleNewComment(newComment)">💾</b-button>
+                  </div>
 
+              </b-collapse>
+            </div>
+          </div>
+        </div>
     </b-card>
 
   </div>
@@ -109,13 +152,19 @@ export default {
         statusId: 0,
         id: '',
         Author: {firstName: '', lastName: '', email: ''}
-      }
+      },
+      comments: [],
+      showComments: false,
+      addComment: false,
+      newComment: '',
+      admin: false
     };
   },
   async mounted() {
     await this.loadOrgStatuses();
     await this.loadOrgUsers();
     await this.loadBacklog();
+    await this.loadComments();
   },
 
   computed: {
@@ -135,14 +184,32 @@ export default {
         if (this.objStatuses) this.form.status = _.find(this.objStatuses, { 'id': this.form.statusId });
         this.currentStatus = this.form.status.name;
         this.points = String(this.form.points);
+        this.admin = _get(response, 'data.admin');
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+      }
+    },
+    async loadComments() {
+      this.$loading(true);
+      const orgId = this.$route.query.orgId;
+      const id = this.$route.query.id;
+      try {
+        const response = await this.axios.get('/api/comments/get/' + 'backlogs/' + orgId + '/' + id);
+
+        let success = _get(response, 'data.success');
+        if (!success) this.$errorMessage.show('Unable to load comments');
+        this.comments = _get(response, 'data.comments');
+        this.comments.forEach(element => {
+          element.readOnly = false;
+        });
         // if (this.users) this.form.assignee = _.find(this.users, { 'id': this.form.assignee });
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
         this.$loading(false);
       }
-
-      this.$loading(false);
     },
 
     async handleBacklogSaveBacklog() {
@@ -204,9 +271,72 @@ export default {
     handleUsername(element) {
       return username(element);
     },
+    labelComment(element) {
+      let label = 'Created: ' + username(_.find(this.users, { 'userId': element.createdBy }));
+      label = label + ' ' + 'on ' + new Date(element.createdAt).toLocaleString();
+      return label;
+    },
+    handleReadOnly(element) {
+      element.readOnly = false;
+      // this.$set(this.comments);
+    },
+    async handleUpdateComment(element) {
+      try {
+        this.$loading(true);
+
+        const response = await this.axios.put(`/api/comments/edit/${element.id}`, { comment: element.comment });
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to update comment.`);
+
+        this.$notify({group: 'app', type: 'success', text: 'Comment updated'});
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+      }
+    },
+    async handleDeleteComment(element) {
+      const orgId = this.$route.query.orgId;
+      try {
+        this.$loading(true);
+
+        const response = await this.axios.delete('/api/comments/delete/' + orgId + '/' + element.id);
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to delete comment.`);
+
+        this.$notify({group: 'app', type: 'success', text: 'Comment deleted'});
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+        await this.loadComments();
+      }
+    },
+    async handleNewComment(newComment) {
+      const orgId = this.$route.query.orgId;
+      const id = this.$route.query.id;
+
+      try {
+        this.$loading(true);
+
+        const response = await this.axios.post('/api/comments/new/backlogs/' + orgId + '/' + id, { comment: newComment });
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to create comment.`);
+
+        this.$notify({group: 'app', type: 'success', text: 'Comment created'});
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+        await this.loadComments();
+        this.newComment = '';
+      }
+    },
     handleBacklogSetField(element, name) {
       this.form[name] = element;
-      console.log(this.form);
       if (name === 'status') this.currentStatus = element.name;
       if (name === 'status') this.points = element.name;
     },
