@@ -6,7 +6,8 @@ import Home from '@/components/Home';
 import Initiatives from '@/components/Initiatives';
 import Ideas from '@/components/Ideas';
 import Backlogs from '@/components/Backlogs';
-import Backlog from '@/components/componentsBacklogs/backlog';
+import Items from '@/components/componentsBacklogs/items';
+import Item from '@/components/componentsBacklogs/item';
 import Bugs from '@/components/Bugs';
 import Settings from '@/components/Settings';
 
@@ -41,9 +42,14 @@ export default new Router({
       component: Backlogs
     },
     {
-      path: '/backlog',
-      name: 'backlog',
-      component: Backlog
+      path: '/items',
+      name: 'items',
+      component: Items
+    },
+    {
+      path: '/items/item',
+      name: 'item',
+      component: Item
     },
     {
       path: '/bugs',
