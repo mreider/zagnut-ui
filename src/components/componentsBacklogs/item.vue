@@ -103,11 +103,11 @@
                     label-class="font-weight-bold pt-0"
                     class="container-fluid"
                     >
-                    <b-form-textarea class="text-center" v-model="element.comment" v-bind:readonly.sync="element.readOnly"></b-form-textarea>
+                    <b-form-textarea class="text-center" v-model="element.comment" :ref="'comment' + element.id" v-bind:readonly="element.readOnly"></b-form-textarea>
                     <div style="float: right;">
-                      <b-button style="vertical-align: right;" variant="primary" size="sm" v-if="$store.state.user.id === element.createdBy" @click="handleReadOnly(element)">🖉</b-button>
-                      <b-button style="bottom" variant="danger" size="sm" v-if="admin" @click="handleDeleteComment(element)">✖</b-button>
+                      <b-button style="bottom" variant="primary" size="sm" v-if="$store.state.user.id === element.createdBy && element.readOnly" @click="handleReadOnly(element)">🖉</b-button>
                       <b-button style="bottom" variant="success" size="sm" v-if="!element.readOnly" @click="handleUpdateComment(element)">💾</b-button>
+                      <b-button style="bottom" variant="danger" size="sm" v-if="admin" @click="handleDeleteComment(element)">✖</b-button>
                     </div>
                 </b-form-group>
               </b-collapse>
@@ -127,11 +127,24 @@
           </div>
         </div>
     </b-card>
-
+    <div>
+      <autocomplete
+      url="http://localhost:3000/api/org/1/userslist"
+      :customHeaders="{ Authorization: 'Bearer 88c5c1b465314fc392ec526f59e9dd1e593bf72d750f4185ad5125e01d0ed063'}"
+      anchor="email"
+      label="writer"
+      :on-select="getData">
+      </autocomplete>
+      <div v-if="resultContent">
+          <b>Selected Data:</b>
+          {{ resultContent }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+
 import _get from 'lodash/get';
 import _ from 'lodash';
 import { username } from '@/utils';
@@ -156,11 +169,12 @@ export default {
         id: '',
         Author: {firstName: '', lastName: '', email: ''}
       },
-      comments: [],
+      comments: [{ comment: '', readOnly: true }],
       showComments: false,
       addComment: false,
       newComment: '',
-      admin: false
+      admin: false,
+      resultContent: ''
     };
   },
   async mounted() {
@@ -174,6 +188,12 @@ export default {
   },
 
   methods: {
+    getData(obj) {
+      this.resultContent = obj;
+    },
+    getUsers() {
+      return this.users;
+    },
     async loadItem() {
       this.$loading(true);
       const orgId = this.$route.query.orgId;
@@ -203,10 +223,11 @@ export default {
 
         let success = _get(response, 'data.success');
         if (!success) this.$errorMessage.show('Unable to load comments');
-        this.comments = _get(response, 'data.comments');
-        this.comments.forEach(element => {
-          element.readOnly = false;
+        let comments = _get(response, 'data.comments');
+        comments.forEach(element => {
+          element.readOnly = true;
         });
+        this.comments = comments;
         // if (this.users) this.form.assignee = _.find(this.users, { 'id': this.form.assignee });
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -256,9 +277,10 @@ export default {
       }
     },
     async loadOrgUsers() {
+      const orgId = this.$route.query.orgId;
       try {
         this.$loading(true);
-        const response = await this.axios.get(`/api/org/${this.$store.state.organization.id}/users`);
+        const response = await this.axios.get(`/api/org/${orgId}/users`);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
@@ -281,8 +303,11 @@ export default {
       return label;
     },
     handleReadOnly(element) {
+      this.comments.forEach(el => {
+        el.readOnly = true;
+      });
       element.readOnly = false;
-      // this.$set(this.comments);
+      this.$refs['comment' + element.id][0].focus();
     },
     async handleUpdateComment(element) {
       try {
@@ -298,6 +323,7 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.$loading(false);
+        element.readOnly = true;
       }
     },
     async handleDeleteComment(element) {
@@ -364,6 +390,7 @@ export default {
   },
 
   components: {
+    // Autocomplete: Autocomplete
   }
 };
 </script>
