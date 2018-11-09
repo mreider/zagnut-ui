@@ -7,10 +7,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import App from './App';
 import router from './router';
 import store from './store';
-// Import autocomplete
-import Autocomplete from 'vue2-autocomplete-js';
-// Import CSS
-require('vue2-autocomplete-js/dist/style/vue2-autocomplete.css');
+import VueTribute from 'vue-tribute';
 
 import axios from 'axios';
 import VueAxios from 'vue-axios';
@@ -44,7 +41,6 @@ if (process.env.BACKEND_URL) {
 // });
 
 /* eslint-disable no-new */
-Vue.component('autocomplete', Autocomplete);
 export const eventBus = new Vue();
 
 new Vue({
@@ -52,5 +48,5 @@ new Vue({
   router,
   store,
   template: '<App/>',
-  components: { App }
+  components: { App, VueTribute }
 });

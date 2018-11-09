@@ -66,13 +66,13 @@
                       label-class="text-sm-right"
                       label-for="description"
                      >
-            <b-form-textarea v-model="form.description"
+          <b-form-textarea v-model="form.description"
                            id="description"
                            :rows="6"
                            :max-rows="8"
                            class="description text-center"
                            >
-            </b-form-textarea>
+          </b-form-textarea>
           </b-form-group>
           </div>
           <div class="button-box">
@@ -112,12 +112,14 @@
                 </b-form-group>
               </b-collapse>
               <b-collapse class="mt-2" v-model="addComment" id="collapse5">
+                <vue-tribute :options="options">
                   <b-form-textarea id="newComment"
                    v-model="newComment"
                    placeholder="Enter comment text"
                    :rows="2"
                    class="text-center"
                    ></b-form-textarea>
+                 </vue-tribute>
                   <div style="float: right;">
                     <b-button style="bottom" variant="success" size="sm" @click="handleNewComment(newComment)">💾</b-button>
                   </div>
@@ -127,19 +129,6 @@
           </div>
         </div>
     </b-card>
-    <div>
-      <autocomplete
-      url="http://localhost:3000/api/org/1/userslist"
-      :customHeaders="{ Authorization: 'Bearer 88c5c1b465314fc392ec526f59e9dd1e593bf72d750f4185ad5125e01d0ed063'}"
-      anchor="email"
-      label="writer"
-      :on-select="getData">
-      </autocomplete>
-      <div v-if="resultContent">
-          <b>Selected Data:</b>
-          {{ resultContent }}
-      </div>
-    </div>
   </div>
 </template>
 
@@ -148,6 +137,7 @@
 import _get from 'lodash/get';
 import _ from 'lodash';
 import { username } from '@/utils';
+import VueTribute from 'vue-tribute';
 export default {
   name: 'Item',
   data() {
@@ -173,8 +163,16 @@ export default {
       showComments: false,
       addComment: false,
       newComment: '',
+      mailers: [],
       admin: false,
-      resultContent: ''
+      options: {
+        selectTemplate: function (item) {
+          // mailers.push(item.original.value);
+          return '@' + item.original.key + '.';
+        },
+        values: []
+      }
+
     };
   },
   async mounted() {
@@ -188,12 +186,6 @@ export default {
   },
 
   methods: {
-    getData(obj) {
-      this.resultContent = obj;
-    },
-    getUsers() {
-      return this.users;
-    },
     async loadItem() {
       this.$loading(true);
       const orgId = this.$route.query.orgId;
@@ -262,8 +254,8 @@ export default {
         delete data['ownerTable'];
 
         data.points = String(data.points);
-        console.log(this.form);
 
+        this.mailers.length = 0;
         const response = await this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
 
         const success = _get(response, 'data.success');
@@ -286,8 +278,11 @@ export default {
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
         const users = _get(response, 'data.users');
-
         this.users = users;
+        this.options.values.length = 0;
+        users.forEach(el => {
+          this.options.values.push({value: el.email, key: username(el), string: username(el)});
+        });
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -314,7 +309,8 @@ export default {
         this.$loading(true);
 
         const response = await this.axios.put(`/api/comments/edit/${element.id}`, { comment: element.comment });
-
+        let result = element.comment.match(/@.+?(\.)/gi);
+        console.log(result, element.comment);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update comment.`);
 
@@ -390,7 +386,7 @@ export default {
   },
 
   components: {
-    // Autocomplete: Autocomplete
+    VueTribute
   }
 };
 </script>
