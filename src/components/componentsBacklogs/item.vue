@@ -103,7 +103,9 @@
                     label-class="font-weight-bold pt-0"
                     class="container-fluid"
                     >
-                    <b-form-textarea class="text-center" v-model="element.comment" :ref="'comment' + element.id" v-bind:readonly="element.readOnly"></b-form-textarea>
+                    <vue-tribute :options="options" @tribute-replaced="tributeReplaced(element)">
+                      <b-form-textarea class="text-center" v-model="element.comment" :ref="'comment' + element.id" :id="'comment' + element.id" v-bind:readonly="element.readOnly"></b-form-textarea>
+                    </vue-tribute>
                     <div style="float: right;">
                       <b-button style="bottom" variant="primary" size="sm" v-if="$store.state.user.id === element.createdBy && element.readOnly" @click="handleReadOnly(element)">🖉</b-button>
                       <b-button style="bottom" variant="success" size="sm" v-if="!element.readOnly" @click="handleUpdateComment(element)">💾</b-button>
@@ -186,6 +188,14 @@ export default {
   },
 
   methods: {
+    tributeReplaced(element) {
+    // init change for vue-tribute
+      let input = document.getElementById('comment' + element.id);
+      let e = document.createEvent('HTMLEvents');
+      e.initEvent('input', true, true);
+      input.dispatchEvent(e);
+    // init change for vue-tribute
+    },
     async loadItem() {
       this.$loading(true);
       const orgId = this.$route.query.orgId;
@@ -281,7 +291,7 @@ export default {
         this.users = users;
         this.options.values.length = 0;
         users.forEach(el => {
-          this.options.values.push({value: el.email, key: username(el), string: username(el)});
+          this.options.values.push({value: el.email, key: username(el), string: '@' + username(el) + '.'});
         });
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -308,9 +318,10 @@ export default {
       try {
         this.$loading(true);
 
-        const response = await this.axios.put(`/api/comments/edit/${element.id}`, { comment: element.comment });
-        let result = element.comment.match(/@.+?(\.)/gi);
-        console.log(result, element.comment);
+        this.findEmailAndReturnMailers(element.comment);
+        const response = await this.axios.put(`/api/comments/edit/${element.id}`, { comment: element.comment, mailers: this.mailers });
+        this.mailers = [];
+
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update comment.`);
 
@@ -346,8 +357,10 @@ export default {
 
       try {
         this.$loading(true);
+        this.findEmailAndReturnMailers(newComment);
 
-        const response = await this.axios.post('/api/comments/new/items/' + orgId + '/' + id, { comment: newComment });
+        const response = await this.axios.post('/api/comments/new/items/' + orgId + '/' + id, { comment: newComment, mailers: this.mailers });
+        this.mailers = [];
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create comment.`);
@@ -382,9 +395,19 @@ export default {
       } finally {
         this.$loading(false);
       }
+    },
+    findEmailAndReturnMailers(element) {
+      let result = element.match(/@.+?(\.)/gi);
+      this.mailers.length = 0;
+      if (result) {
+        result.forEach(el => {
+          let item = _.find(this.options.values, { 'string': el });
+          if (item) this.mailers.push(item.value);
+        });
+        this.mailers = _.union(this.mailers);
+      };
     }
   },
-
   components: {
     VueTribute
   }

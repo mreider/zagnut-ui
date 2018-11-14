@@ -26,7 +26,7 @@
                 :filter="filter"
                 >
         <template slot="title" slot-scope="data" class="col-8">
-          <a :href="`#`" v-b-modal.edit @click="setCurrentBacklog(data.item)">
+          <a :href="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id">
             {{  data.item.title }}
           </a>
         </template>
@@ -99,7 +99,7 @@ export default {
       newBacklog: { title: '' },
       backlogs: [],
       pointsVar: ['0', '1', '2', '3', '5', '8', '13', '21'],
-      backlogsFields: ['title', 'author'],
+      backlogsFields: [{ key: 'title', sortable: true }, { key: 'author', sortable: true }],
       newNameOldBacklog: '',
       currentBacklog: '',
       filter: null,
@@ -183,7 +183,7 @@ export default {
       try {
         let data = {};
         data.title = this.newBacklog.title;
-        const response = await this.axios.put(`/api/backlogs/new/${this.$store.state.organization.id}`, data);
+        const response = await this.axios.post(`/api/backlogs/new/${this.$store.state.organization.id}`, data);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new backlog.`);
       } catch (error) {

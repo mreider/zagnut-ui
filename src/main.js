@@ -16,7 +16,7 @@ import Notifications from 'vue-notification';
 
 // import './scss/minty-theme.css';
 import './scss/material-theme.css';
-// import './scss/darkly-theme.css';
+import './scss/tribute.css';
 
 import './scss/global.scss';
 
