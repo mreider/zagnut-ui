@@ -200,7 +200,6 @@ export default {
 
   methods: {
     sortSelected() {
-      // this.selected.sort();
       console.log(this.selected);
     },
     setCurrentUser() {
@@ -253,7 +252,7 @@ export default {
             element.currentPage = 1;
           });
         }
-        // this.selected.sort(function(a, b) { return b.id - a.id; });
+        this.selected.sort(function(a, b) { return a.id - b.id; });
 
         // this.selected = _.sortBy(this.selected, o => o.id);
       } catch (error) {
@@ -382,7 +381,7 @@ export default {
   },
   watch: {
     selected(newVal, oldVal) {
-      this.loadOrgStatuses(false);
+      if (newVal.length !== oldVal.length) this.loadOrgStatuses(false);
     }
   },
   components: {
