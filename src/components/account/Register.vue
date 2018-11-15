@@ -49,7 +49,7 @@
       </b-row>
 
       <b-row class="tos">
-          <b-form-checkbox value="Y" v-model="form.tosAccepted">I accept <a href="#">Terms of Service</a> </b-form-checkbox>
+          <b-form-checkbox value="Y">I accept <a href="#" class="small" @click="openTerms">Terms of Service</a> </b-form-checkbox>
       </b-row>
 
       <div class="button-box center">
@@ -62,6 +62,7 @@
       <h3>Thank you for regstration</h3>
       <h4>Please check your inbox for verification email and <router-link tag="a" to="/account/login"><a>process to login</a></router-link>.</h4>
     </div>
+
   </b-form>
 </template>
 
@@ -125,7 +126,9 @@ export default {
         }
       }
     },
-
+    openTerms() {
+      window.open('../static/PM415TERMSANDCONDITIONS.html', '_blank');
+    },
     async handleSubmit(event) {
       event.preventDefault();
 

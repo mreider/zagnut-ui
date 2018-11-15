@@ -11,6 +11,7 @@
     <verify v-if="form === 'verify'" :on-change-form="changeForm"/>
 
     <invite v-if="form === 'invite'"/>
+
   </div>
 </template>
 

@@ -17,8 +17,8 @@
 
     <b-table hover :items="organizations" :fields="organizationsFields">
       <template slot="actions" slot-scope="data">
-        <b-button variant="primary" size="sm" v-b-modal.edit v-if="data.item.role === 'Admin'" @click="setCurrentOrg(data.item)">🖉</b-button>
-        <b-button variant="danger" size="sm" v-b-modal.delete v-if="data.item.role === 'Admin'" @click="setCurrentOrg(data.item)">✖</b-button>
+        <b-button variant="primary" size="sm" v-b-modal.edit v-if="data.item.role === 'Admin'" @click="setCurrentOrg(data.item)"> <font-awesome-icon icon="pencil-alt" /> </b-button>
+        <b-button variant="danger" size="sm" v-b-modal.delete v-if="data.item.role === 'Admin'" @click="setCurrentOrg(data.item)"> <font-awesome-icon icon="trash-alt" /> </b-button>
       </template>
     </b-table>
     <b-modal id="delete"

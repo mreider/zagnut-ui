@@ -35,6 +35,7 @@ export default {
 
   async mounted() {
     let token = this.$store.state.token;
+
     if (!token && isCookieEnabled()) token = getCookie('token');
     if (token) {
       this.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;

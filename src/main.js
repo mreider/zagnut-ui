@@ -20,6 +20,14 @@ import './scss/tribute.css';
 
 import './scss/global.scss';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPencilAlt, faTrashAlt, faSave } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+library.add(faPencilAlt, faTrashAlt, faSave);
+
+Vue.component('font-awesome-icon', FontAwesomeIcon);
+
 import ErrorMessage from './plugins/ErrorMessagePlugin';
 import Loader from './plugins/Loader';
 

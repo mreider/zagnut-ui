@@ -59,8 +59,8 @@
             {{ data.item.author }}
           </a>
           <div style="float: right;">
-            <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id">🖉</b-button>
-            <b-button style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentItem(data.item)">✖</b-button>
+            <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id"> <font-awesome-icon icon="pencil-alt" /> </b-button>
+            <b-button style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentItem(data.item)"><font-awesome-icon icon="trash-alt" /></b-button>
           </div>
         </template>
       </b-table>

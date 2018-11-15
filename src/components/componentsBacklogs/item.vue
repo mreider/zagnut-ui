@@ -107,9 +107,9 @@
                       <b-form-textarea class="text-center" v-model="element.comment" :ref="'comment' + element.id" :id="'comment' + element.id" v-bind:readonly="element.readOnly"></b-form-textarea>
                     </vue-tribute>
                     <div style="float: right;">
-                      <b-button style="bottom" variant="primary" size="sm" v-if="$store.state.user.id === element.createdBy && element.readOnly" @click="handleReadOnly(element)">🖉</b-button>
-                      <b-button style="bottom" variant="success" size="sm" v-if="!element.readOnly" @click="handleUpdateComment(element)">💾</b-button>
-                      <b-button style="bottom" variant="danger" size="sm" v-if="admin" @click="handleDeleteComment(element)">✖</b-button>
+                      <b-button style="bottom" variant="primary" size="sm" v-if="$store.state.user.id === element.createdBy && element.readOnly" @click="handleReadOnly(element)"><font-awesome-icon icon="pencil-alt" /> </b-button>
+                      <b-button style="bottom" variant="success" size="sm" v-if="!element.readOnly" @click="handleUpdateComment(element)"><font-awesome-icon icon="save" /></b-button>
+                      <b-button style="bottom" variant="danger" size="sm" v-if="admin" @click="handleDeleteComment(element)"><font-awesome-icon icon="trash-alt" /></b-button>
                     </div>
                 </b-form-group>
               </b-collapse>
@@ -123,7 +123,7 @@
                    ></b-form-textarea>
                  </vue-tribute>
                   <div style="float: right;">
-                    <b-button style="bottom" variant="success" size="sm" @click="handleNewComment(newComment)">💾</b-button>
+                    <b-button style="bottom" variant="success" size="sm" @click="handleNewComment(newComment)"><font-awesome-icon icon="save" /></b-button>
                   </div>
 
               </b-collapse>
