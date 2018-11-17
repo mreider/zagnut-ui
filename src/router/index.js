@@ -4,7 +4,6 @@ import Router from 'vue-router';
 import Account from '@/components/account/Account';
 import Home from '@/components/Home';
 import Initiatives from '@/components/Initiatives';
-import Ideas from '@/components/Ideas';
 import Backlogs from '@/components/Backlogs';
 import Items from '@/components/componentsBacklogs/items';
 import Item from '@/components/componentsBacklogs/item';
@@ -30,11 +29,6 @@ export default new Router({
       path: '/initiatives',
       name: 'initiatives',
       component: Initiatives
-    },
-    {
-      path: '/ideas',
-      name: 'ideas',
-      component: Ideas
     },
     {
       path: '/backlogs',

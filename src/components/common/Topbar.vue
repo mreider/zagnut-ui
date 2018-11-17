@@ -8,10 +8,10 @@
     <b-collapse is-nav id="nav_collapse">
 
       <b-navbar-nav>
-        <b-nav-item :to="{ path: '/initiatives' }">Strategic Initiatives</b-nav-item>
-        <b-nav-item :to="{ path: '/ideas' }">Ideas</b-nav-item>
+        <b-nav-item :to="{ path: '/initiatives' }">Initiatives</b-nav-item>
+        <!-- <b-nav-item :to="{ path: '/ideas' }">Ideas</b-nav-item> -->
         <b-nav-item :to="{ path: '/backlogs' }">Backlogs</b-nav-item>
-        <b-nav-item :to="{ path: '/bugs' }">Bugs</b-nav-item>
+        <!-- <b-nav-item :to="{ path: '/bugs' }">Bugs</b-nav-item> -->
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">

@@ -22,7 +22,7 @@
 
       <div class="col-8">
         <b-form-group label = "Show: " label-for = "statuses" class="float-right">
-          <b-form-checkbox-group id="statuses" name="statuses" v-model="selected" :options="options" class="float-right" @change="sortSelected">
+          <b-form-checkbox-group id="statuses" name="statuses" v-model="selected" :options="options" class="float-right">
           </b-form-checkbox-group>
           <div>
             <b-btn class="float-right" style="margin-top: 2em" variant="success" size="sm"  v-b-modal.modalnew>➕ New item</b-btn>
@@ -199,9 +199,6 @@ export default {
   },
 
   methods: {
-    sortSelected() {
-      console.log(this.selected);
-    },
     setCurrentUser() {
       this.newItem.assignee = this.$store.state.user;
       this.newItem.assignee.userId = this.newItem.assignee.id;
