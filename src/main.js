@@ -21,10 +21,10 @@ import './scss/tribute.css';
 import './scss/global.scss';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPencilAlt, faTrashAlt, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faPencilAlt, faTrashAlt, faSave, faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-library.add(faPencilAlt, faTrashAlt, faSave);
+library.add(faPencilAlt, faTrashAlt, faSave, faThumbsUp, faThumbsDown);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
