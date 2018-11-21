@@ -130,6 +130,8 @@
             </div>
           </div>
         </div>
+        <Connections :toConnectionData=toConnectionData>
+        </Connections>
     </b-card>
   </div>
 </template>
@@ -140,10 +142,12 @@ import _get from 'lodash/get';
 import _ from 'lodash';
 import { username } from '@/utils';
 import VueTribute from 'vue-tribute';
+import Connections from '../common/connections.vue';
 export default {
   name: 'Item',
   data() {
     return {
+      toConnectionData: {name: 'item', id: this.$route.query.itemId, connects: ['initiative']},
       objStatuses: [],
       currentStatus: '',
       users: [],
@@ -409,7 +413,8 @@ export default {
     }
   },
   components: {
-    VueTribute
+    VueTribute,
+    Connections
   }
 };
 </script>

@@ -120,6 +120,7 @@
 import _get from 'lodash/get';
 import _ from 'lodash';
 import { username } from '@/utils';
+import Connections from './common/connections.vue';
 export default {
   name: 'Initiatives',
   data() {
@@ -293,6 +294,7 @@ export default {
     }
   },
   components: {
+    connections: Connections
   }
 };
 </script>
