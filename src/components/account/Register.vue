@@ -133,7 +133,6 @@ export default {
       event.preventDefault();
 
       try {
-        console.log(this.form);
         if (this.form.tosAccepted) this.form.tosAccepted = 'Y';
         let response = await this.axios.post('/api/account/register', this.form);
 

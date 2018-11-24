@@ -7,6 +7,7 @@ import Initiatives from '@/components/Initiatives';
 import Backlogs from '@/components/Backlogs';
 import Items from '@/components/componentsBacklogs/items';
 import Item from '@/components/componentsBacklogs/item';
+import Initiative from '@/components/componentsInitiative/initiative';
 import Bugs from '@/components/Bugs';
 import Settings from '@/components/Settings';
 
@@ -44,6 +45,11 @@ export default new Router({
       path: '/items/item',
       name: 'item',
       component: Item
+    },
+    {
+      path: '/initiative',
+      name: 'Initiative',
+      component: Initiative
     },
     {
       path: '/bugs',

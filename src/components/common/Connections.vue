@@ -1,12 +1,24 @@
 <template>
-  <b-card class="connections">
-    <!-- <p class="card-text" :value="toConnectionData">{{ toConnectionData }} и {{ relations }} </p> -->
-    <div v-for="element in relations" v-bind:key="element.key" class="container-fluid row" horizontal>
-      <b-btn class="float-right" style="margin-top: 2em" variant="danger" size="sm" @click="setCurrentConnectionType(element.key)"><font-awesome-icon icon="trash-alt" /></b-btn>
-      <b-btn class="float-right" style="margin-top: 2em" variant="success" size="sm" @click="setCurrentConnectionType(element.key)" v-b-modal.modalnew>➕</b-btn>
-      <h6>{{ element.key }}</h6>
-      <div v-for="item in element.data" v-bind:key="item.id">
-        <b-form-checkbox v-model="item.selected"> {{item.title}} </b-form-checkbox>
+  <b-card class="connections" bg-variant="light">
+    <div class="container-fluid col-lg-12 col-md-8 col-sm-6 col-xs-4">
+
+    <div class="row">
+      <div class="col-lg-12 col-md-8 col-sm-6 col-xs-4">
+        <div style="display: inline-block; margin-left: 7px;">
+          <h6>Remove seleted</h6>
+        </div>
+        <b-btn class="float-left" variant="danger" size="sm" v-b-modal.delete><font-awesome-icon icon="trash-alt" /></b-btn>
+      </div>
+
+      <div v-for="element in relations" v-bind:key="element.key" class="col-4" style="margin-top: 2em">
+        <b-btn size="sm" @click="setCurrentConnectionType(element.key)">➕</b-btn>
+        <div style="display: inline-block; margin-left: 7px;">
+         <h6>{{element.key}}</h6>
+        </div>
+          <div v-for="item in element.data" v-bind:key="item.id" class="" style="margin-top: 1em">
+            <b-form-checkbox v-model="item.selected"> {{item.title}} </b-form-checkbox>
+          </div>
+      </div>
       </div>
     </div>
     <b-modal id="modalnew"
@@ -16,6 +28,7 @@
               centered
               @ok="handleNewConnections()"
               ok-title="Add selected"
+              ref="modalnew"
               >
        <b-form-group label="Filter" size="sm" class="col-6 mb-2">
           <b-input-group>
@@ -31,7 +44,6 @@
                 :items="connectionTable"
                 :fields="connectionsFieldToAdd"
                 :filter="filter"
-                thead-class="hidden_header"
                 :current-page="currentPage"
                 :per-page="perPage"
                 >
@@ -41,20 +53,34 @@
       </b-table>
       <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
     </b-modal>
+    <b-modal id="delete"
+                    button-size="sm"
+                    title="Delete connections?"
+                    size="sm"
+                    centered
+                    ok-variant="warning"
+                    ok-title="Delete"
+                    @ok="handleDeleteConnections()"
+          >
+    </b-modal>
 
   </b-card>
 </template>
 
 <script>
 import _get from 'lodash/get';
+import _ from 'lodash';
 export default {
   name: 'connections',
   props: ['toConnectionData'],
   data() {
     return {
       relations: [],
-      connectionsField: ['Title'],
-      connectionsFieldToAdd: ['title', 'description'],
+      connectionsFieldToAdd:
+      [
+        { key: 'title', sortable: true },
+        { key: 'description', sortable: true }
+      ],
       currentConnectionType: '',
       connectionTable: [],
       filter: '',
@@ -74,20 +100,27 @@ export default {
       this.toConnectionData.connects.forEach(element => {
         this.getConnection(element);
       });
-    },
-    handleSelect(element) {
-      if (element) {
-        element.selected = !element.selected;
-        return element;
-      }
+      this.relations.sort();
     },
     async setCurrentConnectionType(element) {
       this.currentConnectionType = element;
       if (element === 'backlog') {
-        await this.loadOrgBacklogs();
+        await this.loadOrgBacklogs(element);
       } else if (element === 'initiative') {
-        await this.loadOrgInitiatives();
+        await this.loadOrgInitiatives(element);
+      } else if (element === 'item') {
+        // await this.loadOrgItems(element);
       };
+      this.$refs.modalnew.show();
+    },
+    async deleteConnected(element, table) {
+      const connected = this.relations.find(n => n.key === element);
+      console.log(connected);
+      connected.data.forEach(element => {
+        table = _.pull(table, table.find(n => n.id === element.id));
+      });
+      this.totalRows = table.lenght;
+      return table;
     },
     async loadOrgBacklogs() {
       try {
@@ -101,7 +134,7 @@ export default {
         backlogs.forEach(element => {
           element.selected = false;
         });
-        this.totalRows = backlogs.lenght;
+        backlogs = await this.deleteConnected('backlog', backlogs);
         this.connectionTable = backlogs;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -121,7 +154,7 @@ export default {
         initiatives.forEach(element => {
           element.selected = false;
         });
-        this.totalRows = initiatives.lenght;
+        initiatives = await this.deleteConnected('initiative', initiatives);
         this.connectionTable = initiatives;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -141,9 +174,7 @@ export default {
         let newObj = {};
         newObj.key = element;
         newObj.data = connections;
-        newObj.options = [];
         connections.forEach(element => {
-          newObj.options.push({text: element.title, value: element});
           element.selected = false;
         });
 
@@ -155,7 +186,69 @@ export default {
       }
     },
     async handleNewConnections() {
-      console.log(this.connectionTable);
+      try {
+        this.$loading(true);
+        let arrItems = [];
+        let arrBacklogs = [];
+        let arrInitiatives = [];
+
+        if (this.currentConnectionType === 'backlog') {
+          this.connectionTable.forEach(element => {
+            if (element.selected) arrBacklogs.push(element.id);
+          });
+        } else if (this.currentConnectionType === 'initiative') {
+          this.connectionTable.forEach(element => {
+            if (element.selected) arrInitiatives.push(element.id);
+          });
+        } else if (this.currentConnectionType === 'item') {
+          this.connectionTable.forEach(element => {
+            if (element.selected) arrItems.push(element.id);
+          });
+        };
+
+        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, delete: false });
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to add connection.`);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.relations = [];
+        await this.loadRelaitedList();
+        this.$loading(false);
+      }
+    },
+    async handleDeleteConnections() {
+      try {
+        this.$loading(true);
+        let arrItems = [];
+        let arrBacklogs = [];
+        let arrInitiatives = [];
+
+        this.relations.forEach(element => {
+          if (element.key === 'backlog') {
+            element.data.forEach(el => {
+              if (el.selected) arrBacklogs.push(el.id);
+            });
+          } else if (element.key === 'initiative') {
+            element.data.forEach(el => {
+              if (el.selected) arrInitiatives.push(el.id);
+            });
+          } else if (element.key === 'item') {
+            element.data.forEach(el => {
+              if (el.selected) arrItems.push(el.id);
+            });
+          };
+        });
+        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, delete: true });
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to add connection.`);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.relations = [];
+        await this.loadRelaitedList();
+        this.$loading(false);
+      }
     }
   },
 

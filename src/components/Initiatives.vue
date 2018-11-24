@@ -33,7 +33,7 @@
             {{ data.item.author }}
           </a>
           <div style="float: right;">
-            <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'initiatives/?orgId='+$store.state.organization.id +'&initiativeid='+ data.item.id"><font-awesome-icon icon="pencil-alt" /> </b-button>
+            <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ data.item.id"><font-awesome-icon icon="pencil-alt" /> </b-button>
           </div>
         </template>
         <template slot="importance" slot-scope="data" class="col-4">

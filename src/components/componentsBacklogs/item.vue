@@ -127,12 +127,13 @@
                   </div>
 
               </b-collapse>
+              <div>
+                <Connections :toConnectionData='toConnectionData'>
+                </Connections>
+              </div>
+
             </div>
           </div>
-        </div>
-        <div>
-          <Connections :toConnectionData='toConnectionData'>
-          </Connections>
         </div>
     </b-card>
   </div>
@@ -149,7 +150,7 @@ export default {
   name: 'Item',
   data() {
     return {
-      toConnectionData: {name: 'item', id: this.$route.query.itemId, connects: ['initiative', 'backlog']},
+      toConnectionData: {name: 'item', id: this.$route.query.itemId, connects: ['initiative']},
       objStatuses: [],
       currentStatus: '',
       users: [],
