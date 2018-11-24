@@ -120,7 +120,7 @@ export default {
         const response = await this.axios.get(`/api/backlogs/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to load user's organizations.`);
+        if (!success) throw new Error(`Unable to load user's backlogs.`);
 
         const backlogs = _get(response, 'data.backlogs');
         backlogs.forEach(element => {

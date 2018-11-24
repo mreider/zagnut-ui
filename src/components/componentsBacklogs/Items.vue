@@ -191,8 +191,9 @@ export default {
     await this.loadOrgUsers();
     await this.loadOrgStatuses(true);
     this.selected.forEach(element => {
-      this.options.push({text: element.name, value: element});
+      this.options.push({ text: element.name, value: element });
     });
+    console.log({options: this.options, selected: this.selected});
   },
 
   computed: {

@@ -130,8 +130,10 @@
             </div>
           </div>
         </div>
-        <Connections :toConnectionData=toConnectionData>
-        </Connections>
+        <div>
+          <Connections :toConnectionData='toConnectionData'>
+          </Connections>
+        </div>
     </b-card>
   </div>
 </template>
@@ -147,7 +149,7 @@ export default {
   name: 'Item',
   data() {
     return {
-      toConnectionData: {name: 'item', id: this.$route.query.itemId, connects: ['initiative']},
+      toConnectionData: {name: 'item', id: this.$route.query.itemId, connects: ['initiative', 'backlog']},
       objStatuses: [],
       currentStatus: '',
       users: [],

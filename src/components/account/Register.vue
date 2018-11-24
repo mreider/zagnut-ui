@@ -49,7 +49,7 @@
       </b-row>
 
       <b-row class="tos">
-          <b-form-checkbox value="Y">I accept <a href="#" class="small" @click="openTerms">Terms of Service</a> </b-form-checkbox>
+          <b-form-checkbox v-model="form.tosAccepted">I accept <a href="#" class="small" @click="openTerms">Terms of Service</a> </b-form-checkbox>
       </b-row>
 
       <div class="button-box center">
@@ -133,6 +133,8 @@ export default {
       event.preventDefault();
 
       try {
+        console.log(this.form);
+        if (this.form.tosAccepted) this.form.tosAccepted = 'Y';
         let response = await this.axios.post('/api/account/register', this.form);
 
         const success = _get(response, 'data.userId');

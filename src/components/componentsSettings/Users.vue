@@ -79,7 +79,6 @@ export default {
         const indexel = this.users.findIndex(el => el.selected === this.selectAllUsers);
         if (indexel === -1) this.selectAllUsers = !this.selectAllUsers;
       }
-
       return user.selected;
     },
 
