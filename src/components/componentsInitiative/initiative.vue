@@ -16,10 +16,13 @@
             </b-form-group>
           </div>
        <div class="col-4" >
-            <b-form-group label = "Vote: ">
+            <b-form-group label = "Vote:">
               <template>
-                <b-button v-model="vote" style="vertical-align: right;" size="lg" :variant.sync="btntrue" v-on:click="handleInitiativeSetField(true, 'vote')"><font-awesome-icon icon="thumbs-up"/> </b-button>
-                <b-button v-model="vote" style="vertical-align: right;" size="lg" :variant.sync="btnfalse" v-on:click="handleInitiativeSetField(false, 'vote')"><font-awesome-icon icon="thumbs-down"/> </b-button>
+                <div style="display: inline-block; margin-left: 7px;">
+                  <b-button v-model="vote" style="vertical-align: right;" size="lg" :variant.sync="btntrue" v-on:click="handleInitiativeSetField(true, 'vote')"><font-awesome-icon icon="thumbs-up"/> </b-button>
+                  <b-button v-model="vote" style="vertical-align: right;" size="lg" :variant.sync="btnfalse" v-on:click="handleInitiativeSetField(false, 'vote')"><font-awesome-icon icon="thumbs-down"/> </b-button>
+                  <label class="center" style="margin-left: 2em"> <h5> votes: {{  vote > 0 ? '+' : '' }}{{vote}}  </h5> </label>
+                </div>
               </template>
             </b-form-group>
             <b-form-group label = "Horizon: " label-for = "InitiativeHorizon">
@@ -57,6 +60,15 @@
             <Connections :toConnectionData='toConnectionData'>
             </Connections>
           </div>
+          <div class="button-box col-12"  style="margin-top:20px;">
+            <div class="float-right">
+              <b-btn type="submit" variant="primary" @click="handleSaveInitiative()">Save</b-btn>
+              <b-btn @click="$router.go(-1)"> Back </b-btn>
+            </div>
+            <Comments :toCommentsData='toCommentsData'>
+            </Comments>
+
+          </div>
       </div>
     </b-card>
   </div>
@@ -67,23 +79,28 @@
 import _get from 'lodash/get';
 import _ from 'lodash';
 import Connections from '../common/connections.vue';
+import Comments from '../common/comments.vue';
 export default {
   name: 'Initiative',
   data() {
     return {
-      toConnectionData: {name: 'initiative', id: this.$route.query.initiativeid, connects: ['backlog']},
+      toConnectionData: {name: 'initiative', id: this.$route.query.initiativeid, connects: ['item']},
+      toCommentsData: {name: 'initiatives', id: this.$route.query.initiativeid, admin: false},
       objStatuses: [],
       horizonList: [],
       vote: '',
       btntrue: '',
       btnfalse: '',
-      form: { title: '', description: '', popularity: 0, status: { id: 12, name: "Won't have" }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null }
+      form: { title: '', description: '', status: { id: 12, name: "Won't have" }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null },
+      admin: false
     };
   },
   async mounted() {
     await this.loadOrgStatuses();
     await this.loadOrgInitiative();
     this.horizonLoadList();
+    await this.loadVotes();
+    this.btnfalse = '';
   },
 
   computed: {
@@ -107,7 +124,7 @@ export default {
         this.$loading(false);
       }
     },
-    handleInitiativeSetField(element, name) {
+    async handleInitiativeSetField(element, name) {
       this.form[name] = element;
       if (name === 'vote') {
         this.vote = element;
@@ -116,8 +133,9 @@ export default {
           this.btnfalse = '';
         } else {
           this.btntrue = '';
-          this.btnfalse = 'success';
+          this.btnfalse = 'danger';
         };
+        await this.doVote(element);
        //  this.$nextTick();
       };
     },
@@ -202,6 +220,7 @@ export default {
           date: new Date(initiative.horizon),
           horizon: this.getHorizonName(new Date(initiative.horizon))
         };
+        this.toCommentsData.admin = _get(response, 'data.admin');
 
         this.form = initiative;
       } catch (error) {
@@ -209,11 +228,84 @@ export default {
       } finally {
         this.$loading(false);
       }
-    }
+    },
+    async handleSaveInitiative() {
+      try {
+        this.$loading(true);
+        const orgId = this.$route.query.orgId;
+        const initiativeId = this.$route.query.initiativeid;
 
+        let data = JSON.parse(JSON.stringify(this.form));
+        delete data['createdAt'];
+        delete data['updatedAt'];
+        delete data['createdBy'];
+        delete data['popularity'];
+        delete data['author'];
+        delete data['id'];
+        delete data.vote;
+
+        data.horizon = this.formatDate(new Date(data.horizon.date));
+        data.statusId = String(data.status.id);
+
+        delete data.status;
+
+        data.organizationId = String(data.organizationId);
+        const response = await this.axios.put(`/api/initiatives/edit/${orgId}/${initiativeId}`, data);
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to update initiative.`);
+
+        this.$notify({group: 'app', type: 'success', text: 'Item updated'});
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+      }
+    },
+    async doVote(result) {
+      try {
+        // this.$loading(true);
+
+        const initiativeId = this.$route.query.initiativeid;
+        const response = await this.axios.post(`/api/votes/initiatives/` + initiativeId + '/' + String(result));
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to vote.`);
+
+        let vote = _get(response, 'data.votes');
+
+        this.vote = vote;
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        // this.$loading(false);
+      }
+    },
+    async loadVotes() {
+      try {
+        // this.$loading(true);
+
+        const initiativeId = this.$route.query.initiativeid;
+        const response = await this.axios.get(`/api/votes/initiatives/` + initiativeId);
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable load votes.`);
+
+        let vote = _get(response, 'data.votes');
+        this.vote = vote;
+        let myVote = _get(response, 'data.myVote');
+
+        this.handleInitiativeSetField(myVote, 'vote');
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        // this.$loading(false);
+      }
+    }
   },
   components: {
-    Connections
+    Connections,
+    Comments
   }
 };
 </script>

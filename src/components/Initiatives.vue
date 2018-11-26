@@ -140,7 +140,7 @@ export default {
       currentPage: 0,
       totalRows: 0,
       perPage: 10,
-      newInitiative: { title: '', description: '', popularity: 0, status: { id: 12, name: "Won't have" }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null },
+      newInitiative: { title: '', description: '', status: { id: 12, name: "Won't have" }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null },
       horizonList: [],
       vote: '',
       btntrue: '',
@@ -246,14 +246,13 @@ export default {
         data.description = this.newInitiative.description;
         data.title = this.newInitiative.title;
         data.horizon = this.formatDate(this.newInitiative.horizon.date);
-        data.popularity = String(this.newInitiative.popularity);
         const response = await this.axios.post(`/api/initiatives/new/${this.$store.state.organization.id}`, data);
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to create new item.`);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.newInitiative = { title: '', description: '', popularity: 0, status: { id: 12, name: "Won't have" }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null };
+        this.newInitiative = { title: '', description: '', status: { id: 12, name: "Won't have" }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null };
         this.loadOrgInitiatives();
       }
     },
@@ -307,9 +306,8 @@ export default {
     .header {
       margin-top:10px;
     }
-    .hidden_header {
-      // display: none;
-    }
-
+  // .hidden_header {
+  //     // display: none;
+  //   }
   };
 </style>

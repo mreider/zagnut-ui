@@ -109,18 +109,40 @@ export default {
       } else if (element === 'initiative') {
         await this.loadOrgInitiatives(element);
       } else if (element === 'item') {
-        // await this.loadOrgItems(element);
+        await this.loadOrgItems(element);
       };
       this.$refs.modalnew.show();
     },
     async deleteConnected(element, table) {
       const connected = this.relations.find(n => n.key === element);
-      console.log(connected);
+
       connected.data.forEach(element => {
         table = _.pull(table, table.find(n => n.id === element.id));
       });
       this.totalRows = table.lenght;
       return table;
+    },
+    async loadOrgItems() {
+      const orgId = this.$route.query.orgId;
+      try {
+        this.$loading(true);
+        const response = await this.axios.get(`/api/items/all/backlogs/${orgId}`);
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to load user's organizations.`);
+
+        let items = _get(response, 'data.items');
+        items.forEach(element => {
+          element.selected = false;
+        });
+        items = await this.deleteConnected('item', items);
+        console.log(items);
+        this.connectionTable = items;
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+      }
     },
     async loadOrgBacklogs() {
       try {
