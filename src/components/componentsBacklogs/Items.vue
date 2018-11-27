@@ -6,21 +6,18 @@
         <h2>{{ this.title }}</h2>
       </label>
 
-      <div class="col-4">
-        <b-form-group label = "Group by:" label-for = "checkboxGroup" :label-cols="4">
-          <b-dropdown :text="currentGroupBy" name="groupBy" size="sm" class="m-2" >
-            <b-dropdown-item
-            v-for="element in groupByList" v-if="groupByList"
-            v-bind:key="element"
-            @click="handleChangeGroupBy(element)"
-            size = "sm"
-            >{{ element }}
-            </b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
+      <div class="col-6">
+        <b-form-group label="Filter" class="mb-2">
+        <b-input-group>
+          <b-form-input v-model="filter" placeholder="Type to Search" />
+          <b-input-group-append>
+            <b-btn size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
+          </b-input-group-append>
+        </b-input-group>
+       </b-form-group>
       </div>
 
-      <div class="col-8">
+      <div class="col-6">
         <b-form-group label = "Show: " label-for = "statuses" class="float-right">
           <b-form-checkbox-group id="statuses" name="statuses" v-model="selected" :options="options" class="float-right">
           </b-form-checkbox-group>
@@ -30,15 +27,6 @@
           </div>
         </b-form-group>
       </div>
-
-      <b-form-group label="Filter" class="col-6 mb-2">
-        <b-input-group>
-          <b-form-input v-model="filter" placeholder="Type to Search" />
-          <b-input-group-append>
-            <b-btn size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-          </b-input-group-append>
-        </b-input-group>
-      </b-form-group>
     </div>
     <div v-for="element in selected" v-bind:key="element.id" class="container-fluid row"> <h6>{{ element.name }}</h6>
       <b-table  bordered

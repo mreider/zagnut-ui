@@ -16,7 +16,7 @@
          <h6>{{element.key}}</h6>
         </div>
           <div v-for="item in element.data" v-bind:key="item.id" class="" style="margin-top: 1em">
-            <b-form-checkbox v-model="item.selected"> {{item.title}} </b-form-checkbox>
+            <b-form-checkbox v-model="item.selected"> <a :href="item.href">{{item.title}} </a> </b-form-checkbox>
           </div>
       </div>
       </div>
@@ -48,7 +48,10 @@
                 :per-page="perPage"
                 >
           <template slot="title" slot-scope="data">
-            <b-form-checkbox v-model="data.item.selected"> {{data.item.title}} </b-form-checkbox>
+            <b-form-checkbox v-model="data.item.selected"> <a :href="data.item.href">{{data.item.title}} </a> </b-form-checkbox>
+          </template>
+          <template slot="description" slot-scope="data">
+            <a :href="data.item.href">{{data.item.description}} </a>
           </template>
       </b-table>
       <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -134,10 +137,12 @@ export default {
         let items = _get(response, 'data.items');
         items.forEach(element => {
           element.selected = false;
+          element.href = '/item/?orgId=' + this.$store.state.organization.id + '&itemId=' + element.id;
         });
         items = await this.deleteConnected('item', items);
-        console.log(items);
+
         this.connectionTable = items;
+        console.log(items);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -196,8 +201,14 @@ export default {
         let newObj = {};
         newObj.key = element;
         newObj.data = connections;
-        connections.forEach(element => {
-          element.selected = false;
+
+        connections.forEach(el => {
+          el.selected = false;
+          if (element === 'initiative') {
+            el.href = '/initiative/?orgId=' + this.$store.state.organization.id + '&initiativeid=' + el.id;
+          } else if (element === 'item') {
+            el.href = '/items/item/?orgId=' + this.$store.state.organization.id + '&itemId=' + el.id;
+          };
         });
 
         this.relations.push(newObj);

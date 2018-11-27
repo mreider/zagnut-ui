@@ -55,6 +55,9 @@
               @ok="handleNewInitiative()"
               size="lg"
               centered
+              v-model="show"
+              ref="modalnew"
+              :hide-footer="true"
               >
         <div class="container-fluid  row">
           <div class="col-8">
@@ -104,11 +107,13 @@
               </div>
             </div>
           </div>
-          <div class="col-8">
+          <div class="col-12">
+            <div style="float: left">
+              <b-button slot="modal-ok" style="vertical-align: right;" variant="primary" size="sm" @click="handleNewInitiative(false)">Save and close</b-button>
+              <b-button style="vertical-align: right;" variant="link" size="sm" @click="handleNewInitiative(true)">Save and open</b-button>
+              <b-button style="vertical-align: right;" variant="warning" size="sm" @click="show = false">Cancel</b-button>
+            </div>
           </div>
-          <div class="col-4">
-          </div>
-
         </div>
       </b-modal>
 
@@ -144,7 +149,8 @@ export default {
       horizonList: [],
       vote: '',
       btntrue: '',
-      btnfalse: ''
+      btnfalse: '',
+      show: false
     };
   },
 
@@ -157,6 +163,9 @@ export default {
   },
 
   methods: {
+    handleCloseNew() {
+      this.$refs.modalnew.hide();
+    },
     horizonLoadList() {
       let newDate = new Date();
       let obj = {
@@ -239,7 +248,7 @@ export default {
         this.$loading(false);
       }
     },
-    async handleNewInitiative() {
+    async handleNewInitiative(go) {
       try {
         let data = {};
         data.statusId = String(this.newInitiative.status.id);
@@ -248,11 +257,22 @@ export default {
         data.horizon = this.formatDate(this.newInitiative.horizon.date);
         const response = await this.axios.post(`/api/initiatives/new/${this.$store.state.organization.id}`, data);
         const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to create new item.`);
+        if (success) {
+          const createdInitiative = _get(response, 'data.initiative');
+          if (this.vote !== '') this.doVote(this.vote, createdInitiative.id);
+          if (go === true) {
+            window.location.href = 'initiative/?orgId=' + this.$store.state.organization.id + '&initiativeid=' + createdInitiative.id;
+          };
+        };
+        if (!success) throw new Error(`Unable to create new initiative.`);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
         this.newInitiative = { title: '', description: '', status: { id: 12, name: "Won't have" }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null };
+        this.vote = '';
+        this.btntrue = '';
+        this.btnfalse = '';
+        this.show = false;
         this.loadOrgInitiatives();
       }
     },
@@ -269,6 +289,19 @@ export default {
         };
        //  this.$nextTick();
       };
+    },
+    async doVote(result, initiativeId) {
+      try {
+        // this.$loading(true);
+        const response = await this.axios.post(`/api/votes/initiatives/` + initiativeId + '/' + String(result));
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to vote.`);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        // this.$loading(false);
+      }
     },
     getHorizonName(d) {
       const month = d.getMonth();

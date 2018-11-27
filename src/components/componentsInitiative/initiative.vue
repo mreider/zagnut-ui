@@ -100,7 +100,7 @@ export default {
     await this.loadOrgInitiative();
     this.horizonLoadList();
     await this.loadVotes();
-    this.btnfalse = '';
+    // this.btnfalse = '';
   },
 
   computed: {
@@ -133,7 +133,7 @@ export default {
           this.btnfalse = '';
         } else {
           this.btntrue = '';
-          this.btnfalse = 'danger';
+          this.btnfalse = 'success';
         };
         await this.doVote(element);
        //  this.$nextTick();
@@ -294,8 +294,7 @@ export default {
         let vote = _get(response, 'data.votes');
         this.vote = vote;
         let myVote = _get(response, 'data.myVote');
-
-        this.handleInitiativeSetField(myVote, 'vote');
+        if (myVote !== 0) this.handleInitiativeSetField(myVote, 'vote');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {

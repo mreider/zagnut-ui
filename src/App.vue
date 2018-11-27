@@ -32,8 +32,7 @@ import { isCookieEnabled, getCookie } from 'tiny-cookie';
 import _get from 'lodash/get';
 export default {
   name: 'App',
-
-  async mounted() {
+  async created() {
     let token = this.$store.state.token;
 
     if (!token && isCookieEnabled()) token = getCookie('token');
@@ -63,6 +62,8 @@ export default {
       return Promise.reject(error);
     });
     this.$loading(false);
+  },
+  async mounted() {
   },
 
   data() {

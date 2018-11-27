@@ -35,7 +35,7 @@
             {{ data.item.author }}
           </a>
           <div style="float: right;">
-            <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id"><font-awesome-icon icon="pencil-alt" /> </b-button>
+            <b-button style="vertical-align: right;" variant="primary" size="sm" v-b-modal.edit @click="setCurrentBacklog(data.item)"><font-awesome-icon icon="pencil-alt" /> </b-button>
             <b-button style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentBacklog(data.item)"><font-awesome-icon icon="trash-alt" /></b-button>
           </div>
         </template>

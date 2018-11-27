@@ -184,7 +184,6 @@ export default {
 
         data.points = String(data.points);
 
-        this.mailers.length = 0;
         const response = await this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
 
         const success = _get(response, 'data.success');

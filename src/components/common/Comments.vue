@@ -1,11 +1,11 @@
 <template>
   <div>
-    <b-btn @click="showComments = !showComments"
+    <!-- <b-btn @click="showComments = !showComments"
                     :class="showComments ? 'collapsed' : null"
                     aria-controls="collapse4"
                     :aria-expanded="showComments ? 'true' : 'false'">
                 Show comments
-    </b-btn>
+    </b-btn> -->
     <b-btn @click="addComment = !addComment"
                 :class="addComment ? 'collapsed' : null"
                 aria-controls="collapse4"
@@ -61,7 +61,7 @@ export default {
   data() {
     return {
       comments: [{ comment: '', readOnly: true }],
-      showComments: false,
+      showComments: true,
       addComment: false,
       newComment: '',
       mailers: [],
