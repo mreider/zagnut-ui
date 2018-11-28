@@ -18,7 +18,7 @@
       </b-container>
     </div>
 
-    <account v-if="!$store.state.token" />
+    <account v-if="!$store.state.token && !$store.state.loading"/>
   </b-container>
 </template>
 

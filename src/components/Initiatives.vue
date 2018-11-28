@@ -34,6 +34,7 @@
           </a>
           <div style="float: right;">
             <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ data.item.id"><font-awesome-icon icon="pencil-alt" /> </b-button>
+            <b-button v-if="$store.state.user.id ===  data.item.createdBy || admin" style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentInitiative(data.item)"><font-awesome-icon icon="trash-alt" /></b-button>
           </div>
         </template>
         <template slot="importance" slot-scope="data" class="col-4">
@@ -49,6 +50,17 @@
       </b-table>
       <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
 
+       <b-modal id="delete"
+              :title="'Delete ' + currentInitiative.title + '?'"
+              button-size="sm"
+              size="sm"
+              centered
+              body-class="zero-size"
+              ok-variant="danger"
+              @ok="handleInitiativeDelete(currentInitiative)"
+              ok-title="delete"
+              >
+      </b-modal>
       <b-modal id="modalnew"
               button-size="sm"
               title="New initiative"
@@ -150,7 +162,9 @@ export default {
       vote: '',
       btntrue: '',
       btnfalse: '',
-      show: false
+      show: false,
+      currentInitiative: '',
+      admin: false
     };
   },
 
@@ -163,6 +177,9 @@ export default {
   },
 
   methods: {
+    setCurrentInitiative(element) {
+      this.currentInitiative = element;
+    },
     handleCloseNew() {
       this.$refs.modalnew.hide();
     },
@@ -223,12 +240,31 @@ export default {
           element.importance = _.find(this.objStatuses, { 'id': element.statusId }).name;
           element.horizon = this.getHorizonName(new Date(element.horizon));
         });
-        this.totalRows = initiatives.lenght;
+        console.log(initiatives);
+        this.totalRows = initiatives.length;
+        console.log(this.totalRows);
         this.initiatives = initiatives;
+        this.admin = _get(response, 'data.admin');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
         this.$loading(false);
+      }
+    },
+    async handleInitiativeDelete(initiative) {
+      if (!initiative || !this.$store.state.user.id) {
+        // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
+      }
+      try {
+        const response = await this.axios.delete(`/api/initiatives/${this.$store.state.organization.id}/${initiative.id}`);
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to create new organization.`);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.loadOrgInitiatives();
+        this.$notify({group: 'app', type: 'success', text: `Item ${initiative.title} was deleted`});
+        this.currentInitiative = '';
       }
     },
     async loadOrgStatuses() {
