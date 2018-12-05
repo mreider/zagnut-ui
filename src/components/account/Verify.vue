@@ -42,7 +42,7 @@ export default {
 
       if (token) {
         this.invited = true;
-        this.$loading(true);
+        // this.$loading(true);
 
         try {
           const response = await this.axios.get('/api/account/verify', { params: { token } });
@@ -57,7 +57,7 @@ export default {
         } catch (error) {
           return this.$errorMessage.show(error);
         } finally {
-          this.$loading(false);
+          // this.$loading(false);
         }
       }
     }

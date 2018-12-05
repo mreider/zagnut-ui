@@ -1,45 +1,41 @@
 <template>
 <b-card bg-variant="light" class="card col-lg-12">
   <div class="backlogs">
-    <div class="container-fluid row">
-      <label class="header col-12"><h2>Backlogs</h2></label>
-      <b-form-group label="Filter" size="sm" class="col-6 mb-2">
-        <b-input-group>
-          <b-form-input size="sm" v-model="filter" placeholder="Type to Search" />
-          <b-input-group-append>
-            <b-btn size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-          </b-input-group-append>
-        </b-input-group>
-      </b-form-group>
-      <div class="col-6">
-        <div>
-          <b-btn class="float-right" style="margin-top: 2em" variant="success" size="sm" v-b-modal.modalnew>➕ New backlog</b-btn>
-        </div>
+    <div class="row">
+      <div class="col-12">
+        <b-btn class="float-right" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
       </div>
+      <div class="col-8">
+      </div>
+      <b-form-group size="sm" class="col-4 mb-2" style="margin-top: 1em">
+
+          <b-form-input size="sm" v-model="filter" placeholder="Type to filter results" />
+          <b-btn class="float-right" size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
+      </b-form-group>
     </div>
 
-      <b-table  bordered
-                fixed
-                responsive
-                :items="backlogs"
-                :fields="backlogsFields"
-                :filter="filter"
-                >
-        <template slot="title" slot-scope="data" class="col-8">
-          <a :href="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id">
-            {{  data.item.title }}
-          </a>
-        </template>
-        <template slot="author" slot-scope="data" class="col-4">
-          <a :href="`#`" v-on:click="filter = data.item.author">
-            {{ data.item.author }}
-          </a>
-          <div style="float: right;">
-            <b-button style="vertical-align: right;" variant="primary" size="sm" v-b-modal.edit @click="setCurrentBacklog(data.item)"><font-awesome-icon icon="pencil-alt" /> </b-button>
-            <b-button style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentBacklog(data.item)"><font-awesome-icon icon="trash-alt" /></b-button>
-          </div>
-        </template>
-      </b-table>
+    <b-table  bordered
+              fixed
+              responsive
+              :items="backlogs"
+              :fields="backlogsFields"
+              :filter="filter"
+              >
+      <template slot="title" slot-scope="data" class="col-8">
+        <a :href="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id">
+          {{  data.item.title }}
+        </a>
+      </template>
+      <template slot="author" slot-scope="data" class="col-4">
+        <a :href="`#`" v-on:click="filter = data.item.author">
+          {{ data.item.author }}
+        </a>
+        <div style="float: right;">
+          <b-button style="vertical-align: right;" variant="primary" size="sm" v-b-modal.edit @click="setCurrentBacklog(data.item)"><font-awesome-icon icon="pencil-alt" /> </b-button>
+          <b-button style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentBacklog(data.item)"><font-awesome-icon icon="trash-alt" /></b-button>
+        </div>
+      </template>
+    </b-table>
 
     <b-modal id="edit"
               title="Edit"
@@ -99,7 +95,7 @@ export default {
       newBacklog: { title: '' },
       backlogs: [],
       pointsVar: ['0', '1', '2', '3', '5', '8', '13', '21'],
-      backlogsFields: [{ key: 'title', sortable: true }, { key: 'author', sortable: true }],
+      backlogsFields: [{ key: 'title', sortable: true, label: 'Backlog' }, { key: 'author', sortable: true }],
       newNameOldBacklog: '',
       currentBacklog: '',
       filter: null,

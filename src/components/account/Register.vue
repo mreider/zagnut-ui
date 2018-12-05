@@ -1,17 +1,17 @@
 <template>
   <b-form @submit="handleSubmit" class="register">
-    <h2 class="center">Welcome to</h2>
-    <h1 class="center">PM415</h1>
+    <h2 class="center" v-if="!registered">Welcome to</h2>
+    <h1 class="center" v-if="!registered">PM415</h1>
 
     <div class="not-registered" v-if="!registered">
       <b-row>
-        <b-col md="6" sm="12">
+        <b-col md="12" sm="12">
           <b-form-group>
             <b-form-input type="text" v-model="form.firstName" placeholder="First Name"></b-form-input>
           </b-form-group>
         </b-col>
 
-        <b-col md="6" sm="12">
+        <b-col md="12" sm="12">
           <b-form-group>
             <b-form-input type="text" v-model="form.lastName" placeholder="Last Name"></b-form-input>
           </b-form-group>
@@ -19,7 +19,7 @@
       </b-row>
 
       <b-row>
-        <b-col md="6" sm="12">
+        <b-col md="12" sm="12">
           <b-form-group>
             <b-form-input type="email" required v-model="form.email" placeholder="Email" :readonly="invited"></b-form-input>
           </b-form-group>
@@ -27,13 +27,13 @@
       </b-row>
 
       <b-row>
-        <b-col md="6" sm="12">
+        <b-col md="12" sm="12">
           <b-form-group>
             <b-form-input type="password" v-model="form.password" placeholder="Password"></b-form-input>
           </b-form-group>
         </b-col>
 
-        <b-col md="6" sm="12">
+        <b-col md="12" sm="12">
           <b-form-group>
             <b-form-input type="password" v-model="form.confirmation" placeholder="Confrmation"></b-form-input>
           </b-form-group>
@@ -41,7 +41,7 @@
       </b-row>
 
       <b-row>
-        <b-col md="6" sm="12">
+        <b-col md="12" sm="12">
           <b-form-group>
             <b-form-input type="text" required v-model="form.organization" placeholder="Organization" :readonly="invited"></b-form-input>
           </b-form-group>
@@ -59,8 +59,8 @@
     </div>
 
     <div class="registered" v-if="registered">
-      <h3>Thank you for regstration</h3>
-      <h4>Please check your inbox for verification email and <router-link tag="a" to="/account/login"><a>process to login</a></router-link>.</h4>
+      <h3>Thank you for registering</h3>
+      <h4>Please check your inbox for a verification email.</h4>
     </div>
 
   </b-form>
