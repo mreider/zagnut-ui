@@ -1,24 +1,18 @@
 <template>
   <b-card class="connections" bg-variant="light">
-    <div class="container-fluid col-lg-12 col-md-8 col-sm-6 col-xs-4">
+    <div class=" col-lg-12 col-md-8 col-sm-6 col-xs-4">
 
-    <div class="row">
-      <div class="col-lg-12 col-md-8 col-sm-6 col-xs-4">
-        <div style="display: inline-block; margin-left: 7px;">
-          <h6>Remove seleted</h6>
-        </div>
-        <b-btn class="float-left" variant="danger" size="sm" v-b-modal.delete><font-awesome-icon icon="trash-alt" /></b-btn>
-      </div>
-
-      <div v-for="element in relations" v-bind:key="element.key" class="col-4" style="margin-top: 2em">
-        <b-btn size="sm" @click="setCurrentConnectionType(element.key)">➕</b-btn>
-        <div style="display: inline-block; margin-left: 7px;">
-         <h6>{{element.key}}</h6>
-        </div>
+      <div class="row">
+        <div v-for="element in relations" v-bind:key="element.key" class="col-12" style="margin-top: 0.5em">
+          <div class="float-right">
+            <b-btn size="sm" style="width: 10em" @click="setCurrentConnectionType(element.key)">Link {{element.key}}</b-btn>
+          <br>
+            <b-btn style="margin-top: 0.5em; width: 10em;" variant="danger" size="sm" v-b-modal.delete>Remove seleted</b-btn>
+          </div>
           <div v-for="item in element.data" v-bind:key="item.id" class="" style="margin-top: 1em">
             <b-form-checkbox v-model="item.selected"> <a :href="item.href">{{item.title}} </a> </b-form-checkbox>
           </div>
-      </div>
+        </div>
       </div>
     </div>
     <b-modal id="modalnew"

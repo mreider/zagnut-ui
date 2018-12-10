@@ -1,22 +1,12 @@
 <template>
   <div class="item col-lg-12 col-md-8 col-sm-6 col-xs-4">
      <b-card bg-variant="light" class="card col-lg-12">
-
-      <b-form-group horizontal
-                    breakpoint="lg"
-                    label="<h2>Item</h2>"
-                    label-size="lg"
-                    label-class="font-weight-bold pt-0"
-                    class="container-fluid">
-      </b-form-group>
         <div class="container-fluid row">
-          <div class="col-12">
-            <div>
-              <label class="left">Created by: {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
-            </div>
-            <!-- <div>
-              <label class="left" v-if="form.plannedOn" >Planned on: {{new Date(form.plannedOn).toLocaleString()}}</label>
-            </div> -->
+          <div class="col-8">
+            <b-form-input placeholder="Enter title" v-model="form.title" id="title" class="text-left description"></b-form-input>
+            <label class="left">Created by  {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
+          </div>
+          <div class="col-4">
           </div>
           <div class="col-2" >
             <b-form-group label = "Status: " label-for = "labelStatus" label-size="sm" :label-cols="2">
@@ -30,6 +20,8 @@
                 </b-dropdown-item>
               </b-dropdown>
             </b-form-group>
+          </div>
+          <div class="col-2" >
             <b-form-group label = "Assignee: " label-for = "ItemAssignee" label-size="sm" :label-cols="2">
               <b-dropdown :text="handleUsername(form.assignee)" name="ItemAssignee" size="sm" class="users m-2" >
                 <b-dropdown-item
@@ -41,6 +33,8 @@
                 </b-dropdown-item>
               </b-dropdown>
             </b-form-group>
+          </div>
+          <div class="col-2" >
             <b-form-group label = "Points: " label-for = "ItemPoints" label-size="sm" :label-cols="2">
               <b-dropdown :text="String(form.points)" name="ItemPoints" size="sm" class="points m-2" >
                 <b-dropdown-item
@@ -54,26 +48,15 @@
             </b-form-group>
 
           </div>
-          <div class="col-10">
-            <b-form-group horizontal
-                        label="Title:"
-                        label-class="text-sm-right"
-                        label-for="Title">
-            <b-form-input v-model="form.title" id="Title" class="text-center"></b-form-input>
-            </b-form-group>
-            <b-form-group horizontal
-                        label="Title description:"
-                        label-class="text-sm-right"
-                        label-for="description"
-                      >
-              <b-form-textarea v-model="form.description"
+          <div class="col-12">
+            <b-form-textarea v-model="form.description"
                               id="description"
                               :rows="6"
                               :max-rows="8"
-                              class="description text-center"
+                              class="description text-left"
+                              placeholder="Enter description"
                               >
-              </b-form-textarea>
-            </b-form-group>
+            </b-form-textarea>
           </div>
           <div class="col-12">
             <Connections :toConnectionData='toConnectionData'>
@@ -81,10 +64,10 @@
           </div>
           <div class="button-box" style="margin-top:20px;">
             <div class="float-right">
-              <b-btn type="submit" variant="primary" @click="handleSaveItem()">Save</b-btn>
-              <b-btn @click="$router.go(-1)"> Back </b-btn>
+              <b-btn size="sm" type="submit" variant="primary" @click="handleSaveItem()">Save & close</b-btn>
+              <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
             </div>
-            <Comments :toCommentsData='toCommentsData'>
+            <Comments :toCommentsData='toCommentsData' ref="comments_ref">
             </Comments>
           </div>
         </div>
@@ -159,7 +142,7 @@ export default {
 
     async handleSaveItem() {
       try {
-        this.$loading(true);
+        // this.$loading(true);
         const orgId = this.$route.query.orgId;
         const id = this.$route.query.itemId;
 
@@ -189,11 +172,14 @@ export default {
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update item.`);
 
-        this.$notify({group: 'app', type: 'success', text: 'Item updated'});
+        // this.$notify({group: 'app', type: 'success', text: 'Item updated'});
+        const newComment = this.$refs['comments_ref'].newComment;
+        if (newComment) this.$refs['comments_ref'].handleNewComment(this.$refs['comments_ref'].newComment);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
+        // this.$loading(false);
+        this.$router.go(-1);
       }
     },
     async loadOrgUsers() {
@@ -253,5 +239,7 @@ export default {
   .description {
     outline: 0in;
     border: 1px solid lightblue;
+    padding-left: 10px;
   }
+
 </style>

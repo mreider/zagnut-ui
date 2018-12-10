@@ -1,34 +1,36 @@
 <template>
 <b-card bg-variant="light" class="card col-lg-12">
   <div class="Items">
-    <div class="container-fluid row">
-      <label class="header col-12">
+    <div class="row">
+      <label class="header col-10">
         <h2>{{ this.title }}</h2>
       </label>
+      <div class = "col-2">
+        <b-btn class="float-right" variant="primary" size="sm"  v-b-modal.modalnew>New</b-btn>
+        <b-btn class="float-right" style="margin-right:0.5em" variant="secondary"  size="sm"  @click="$router.go(-1)"> close </b-btn>
+      </div>
 
       <div class="col-6">
-        <b-form-group label="Filter" class="mb-2">
-        <b-input-group>
-          <b-form-input v-model="filter" placeholder="Type to Search" />
-          <b-input-group-append>
-            <b-btn size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-          </b-input-group-append>
-        </b-input-group>
-       </b-form-group>
       </div>
 
       <div class="col-6">
         <b-form-group label = "Show: " label-for = "statuses" class="float-right">
           <b-form-checkbox-group id="statuses" name="statuses" v-model="selected" :options="options" class="float-right">
           </b-form-checkbox-group>
-          <div>
-            <b-btn class="float-right" style="margin-top: 2em" variant="success" size="sm"  v-b-modal.modalnew>➕ New item</b-btn>
-            <b-btn class="float-right" style="margin-top: 2em" variant="secondary" size="sm"  @click="$router.go(-1)"> Back </b-btn>
-          </div>
         </b-form-group>
       </div>
+
+      <div class="col-8">
+      </div>
+      <div class="col-4" style="margin-top:0.5em">
+        <b-form-group size="sm" class="mb-2">
+            <b-form-input size="sm" v-model="filter" placeholder="Type to filter results" />
+            <b-btn class="float-right" size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
+        </b-form-group>
+      </div>
+
     </div>
-    <div v-for="element in selected" v-bind:key="element.id" class="container-fluid row"> <h6>{{ element.name }}</h6>
+    <div v-for="element in selected" v-bind:key="element.id" class="row"> <h6>{{ element.name }}</h6>
       <b-table  bordered
                 fixed
                 responsive
@@ -38,7 +40,7 @@
                 :filter="filter"
                 >
         <template slot="title" slot-scope="data" class="col-8">
-          <a :href="`#`" v-b-modal.edit @click="setCurrentItem(data.item)">
+          <a :href="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id" @click="setCurrentItem(data.item)">
             {{  data.item.title }}
           </a>
         </template>
@@ -181,7 +183,6 @@ export default {
     this.selected.forEach(element => {
       this.options.push({ text: element.name, value: element });
     });
-    console.log({options: this.options, selected: this.selected});
   },
 
   computed: {
@@ -307,7 +308,7 @@ export default {
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update item.`);
 
-        this.$notify({group: 'app', type: 'success', text: 'item updated'});
+        this.$notify({group: 'app', type: 'success', text: 'Saved'});
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
