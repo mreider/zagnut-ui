@@ -8,8 +8,8 @@
           </div>
           <div class="col-4">
           </div>
-          <div class="col-2" >
-            <b-form-group label = "Status: " label-for = "labelStatus" label-size="sm" :label-cols="2">
+          <div class="col-3" >
+            <b-form-group label = "Status: " label-for = "labelStatus" label-size="sm" :label-cols="3" horizontal>
               <b-dropdown :text="currentStatus" name="itemStatus" size="sm" class="statuses m-2" >
                 <b-dropdown-item
                 v-for="element in objStatuses" v-if="objStatuses"
@@ -21,10 +21,11 @@
               </b-dropdown>
             </b-form-group>
           </div>
-          <div class="col-2" >
-            <b-form-group label = "Assignee: " label-for = "ItemAssignee" label-size="sm" :label-cols="2">
+          <div class="col-3" >
+            <b-form-group label = "Assignee: " label-for = "ItemAssignee" label-size="sm" :label-cols="4" horizontal>
               <b-dropdown :text="handleUsername(form.assignee)" name="ItemAssignee" size="sm" class="users m-2" >
                 <b-dropdown-item
+                class="float-right"
                 v-for="element in users"
                 v-bind:key="element.userId"
                 @click="handleItemSetField(element, 'assignee')"
@@ -34,8 +35,8 @@
               </b-dropdown>
             </b-form-group>
           </div>
-          <div class="col-2" >
-            <b-form-group label = "Points: " label-for = "ItemPoints" label-size="sm" :label-cols="2">
+          <div class="col-3" >
+            <b-form-group label = "Points: " label-for = "ItemPoints" label-size="sm" :label-cols="3" horizontal>
               <b-dropdown :text="String(form.points)" name="ItemPoints" size="sm" class="points m-2" >
                 <b-dropdown-item
                 v-for="element in pointsVar"

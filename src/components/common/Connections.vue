@@ -17,21 +17,24 @@
     </div>
     <b-modal id="modalnew"
               button-size="sm"
-              :title="'Add connections to ' + currentConnectionType"
+              :title="'Link ' + currentConnectionType + 's'"
               size="lg"
               centered
               @ok="handleNewConnections()"
-              ok-title="Add selected"
+              ok-title="Link selected"
               ref="modalnew"
               >
-       <b-form-group label="Filter" size="sm" class="col-6 mb-2">
-          <b-input-group>
-            <b-form-input size="sm" v-model="filter" placeholder="Type to Search" />
-            <b-input-group-append>
-              <b-btn size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
+       <div class="row" style="margin-top:0.5em">
+        <div class="col-7">
+        </div>
+        <div class="col-5">
+          <b-form-group size="sm" class="mb-2">
+              <b-form-input size="sm" v-model="filter" placeholder="Type to filter results" />
+              <b-btn class="float-right" size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
+          </b-form-group>
+        </div>
+        </div>
+
       <b-table  bordered
                 fixed
                 responsive
@@ -40,6 +43,7 @@
                 :filter="filter"
                 :current-page="currentPage"
                 :per-page="perPage"
+                @filtered="onFiltered"
                 >
           <template slot="title" slot-scope="data">
             <b-form-checkbox v-model="data.item.selected"> <a :href="data.item.href">{{data.item.title}} </a> </b-form-checkbox>
@@ -75,7 +79,7 @@ export default {
       relations: [],
       connectionsFieldToAdd:
       [
-        { key: 'title', sortable: true },
+        { key: 'title', sortable: true, label: '' },
         { key: 'description', sortable: true }
       ],
       currentConnectionType: '',
@@ -108,7 +112,15 @@ export default {
       } else if (element === 'item') {
         await this.loadOrgItems(element);
       };
+      this.connectionsFieldToAdd.forEach(el => {
+        if (el.key === 'title') el.label = element;
+      });
       this.$refs.modalnew.show();
+    },
+    onFiltered (filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
     },
     async deleteConnected(element, table) {
       const connected = this.relations.find(n => n.key === element);

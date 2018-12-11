@@ -85,8 +85,8 @@ export default {
     // init change for vue-tribute
     },
     labelComment(element) {
-      let label = 'Created: ' + username(_.find(this.users, { 'userId': element.createdBy }));
-      label = label + ' ' + 'on ' + new Date(element.createdAt).toLocaleString();
+      let label = username(_.find(this.users, { 'userId': element.createdBy }));
+      label = label + ' ' + new Date(element.createdAt).toLocaleString();
       return label;
     },
     async loadOrgUsers() {
@@ -118,24 +118,26 @@ export default {
       this.$refs['comment' + element.id][0].focus();
     },
     async loadComments() {
-      this.$loading(true);
       const orgId = this.$route.query.orgId;
-      try {
-        const response = await this.axios.get('/api/comments/get/' + this.toCommentsData.name + '/' + orgId + '/' + this.toCommentsData.id);
+      if (orgId) {
+        this.$loading(true);
+        try {
+          const response = await this.axios.get('/api/comments/get/' + this.toCommentsData.name + '/' + orgId + '/' + this.toCommentsData.id);
 
-        let success = _get(response, 'data.success');
-        if (!success) this.$errorMessage.show('Unable to load comments');
-        let comments = _get(response, 'data.comments');
-        comments.forEach(element => {
-          element.readOnly = true;
-        });
-        this.comments = comments;
-        // if (this.users) this.form.assignee = _.find(this.users, { 'id': this.form.assignee });
-      } catch (error) {
-        return this.$errorMessage.show(error);
-      } finally {
-        this.$loading(false);
-      }
+          let success = _get(response, 'data.success');
+          if (!success) this.$errorMessage.show('Unable to load comments');
+          let comments = _get(response, 'data.comments');
+          comments.forEach(element => {
+            element.readOnly = true;
+          });
+          this.comments = comments;
+          // if (this.users) this.form.assignee = _.find(this.users, { 'id': this.form.assignee });
+        } catch (error) {
+          return this.$errorMessage.show(error);
+        } finally {
+          this.$loading(false);
+        }
+      };
     },
     async handleUpdateComment(element) {
       try {

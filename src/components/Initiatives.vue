@@ -1,22 +1,18 @@
 <template>
   <b-card bg-variant="light" class="card col-lg-12">
     <div class="initiatives">
-      <div class="container-fluid row">
-        <label class="header col-12"><h2>Initiatives</h2></label>
-        <b-form-group label="Filter" size="sm" class="col-6 mb-2">
-          <b-input-group>
-            <b-form-input size="sm" v-model="filter" placeholder="Type to Search" />
-            <b-input-group-append>
-              <b-btn size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <div class="col-6">
-          <div>
-            <b-btn class="float-right" style="margin-top: 2em" variant="success" size="sm" v-b-modal.modalnew>➕ Add an initiative</b-btn>
-          </div>
-        </div>
+     <div class="row">
+      <div class="col-12">
+        <b-btn class="float-right" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
       </div>
+      <div class="col-8">
+      </div>
+      <b-form-group size="sm" class="col-4 mb-2" style="margin-top: 1em">
+
+          <b-form-input size="sm" v-model="filter" placeholder="Type to filter results" />
+          <b-btn class="float-right" size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
+      </b-form-group>
+    </div>
       <b-table  bordered
                 :fixed="false"
                 :items="initiatives"
@@ -24,9 +20,11 @@
                 :filter="filter"
                 :current-page="currentPage"
                 :per-page="perPage"
-                class="col-lg-12">
+                class="col-lg-12"
+                sort-by="horizon"
+                @filtered="onFiltered">
         <template slot="title" slot-scope="data">
-            {{  data.item.title }}
+            <router-link :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ data.item.id">{{  data.item.title }}</router-link>
         </template>
         <template slot="author" slot-scope="data" class="col-4">
           <a :href="`#`" v-on:click="filter = data.item.author">
@@ -43,8 +41,8 @@
           </a>
         </template>
         <template slot="horizon" slot-scope="data">
-          <a :href="`#`" v-on:click="filter = data.item.horizon">
-            {{  data.item.horizon }}
+          <a :href="`#`" v-on:click="filter = data.item.horizon.horizon">
+            {{  data.item.horizon.horizon }}
           </a>
         </template>
       </b-table>
@@ -72,27 +70,27 @@
               :hide-footer="true"
               >
         <div class="container-fluid  row">
-          <div class="col-8">
-            <b-form-group label = "Title: " label-for = "title">
-              <b-form-input v-model="newInitiative.title" placeholder="Title initiative" id="title">></b-form-input>
+          <div class="col-7">
+            <b-form-group label-for = "title">
+              <b-form-input v-model="newInitiative.title" placeholder="Enter initiative" id="title">></b-form-input>
             </b-form-group>
-            <b-form-group label = "Highlights: " label-for = "description">
+            <b-form-group  label-for = "description">
               <b-form-textarea id="description"
                   v-model="newInitiative.description"
-                  placeholder="Highlights"
+                  placeholder="Enter highlights"
                   :rows="3"
                   :max-rows="6">
               </b-form-textarea>
             </b-form-group>
           </div>
-          <div class="col-4" >
-            <b-form-group label = "Vote: ">
+          <div class="col-5 row" >
+            <b-form-group label = "Vote: " horizontal label-size="md" :label-cols="3" class="col-12">
               <template>
                 <b-button v-model="vote" style="vertical-align: right;" size="lg" :variant.sync="btntrue" v-on:click="handleNewInitiativeSetField(true, 'vote')"><font-awesome-icon icon="thumbs-up"/> </b-button>
                 <b-button v-model="vote" style="vertical-align: right;" size="lg" :variant.sync="btnfalse" v-on:click="handleNewInitiativeSetField(false, 'vote')"><font-awesome-icon icon="thumbs-down"/> </b-button>
               </template>
             </b-form-group>
-            <b-form-group label = "Horizon: " label-for = "newInitiativeHorizon">
+            <b-form-group label = "Horizon:" label-for = "InitiativeHorizon" horizontal :label-cols="6" label-size="sm" class="col-12" style="margin-left: 1px;">
                 <b-dropdown :text="newInitiative.horizon.horizon" name="newInitiativeHorizon" size="sm" class="horizon m-2" >
                 <b-dropdown-item
                 v-for="element in horizonList" v-if="horizonList"
@@ -103,27 +101,23 @@
                 </b-dropdown-item>
               </b-dropdown>
             </b-form-group>
-            <div class="newInitiativetable row" >
-              <div class="col-6">
-                <b-form-group label = "Status: " label-for = "newInitiativeStatuses">
-                  <b-dropdown :text="newInitiative.status.name" name="newInitiativeStatuses" size="sm" class="statuses m-2" >
-                    <b-dropdown-item
-                    v-for="element in objStatuses" v-if="objStatuses"
-                    v-bind:key="element.id"
-                    @click="handleNewInitiativeSetField(element, 'status')"
-                    size = "sm"
-                    >{{ element.name }}
-                    </b-dropdown-item>
-                  </b-dropdown>
-                </b-form-group>
-              </div>
-            </div>
+            <b-form-group label = "Priority:" label-for = "newInitiativeStatuses" horizontal :label-cols="6" label-size="sm" class="col-12" style="margin-left: 1px;">
+              <b-dropdown :text="newInitiative.status.name" name="newInitiativeStatuses" size="sm" class="statuses m-2" >
+                <b-dropdown-item
+                v-for="element in objStatuses" v-if="objStatuses"
+                v-bind:key="element.id"
+                @click="handleNewInitiativeSetField(element, 'status')"
+                size = "sm"
+                >{{ element.name }}
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-form-group>
           </div>
           <div class="col-12">
             <div style="float: left">
               <b-button slot="modal-ok" style="vertical-align: right;" variant="primary" size="sm" @click="handleNewInitiative(false)">Save and close</b-button>
-              <b-button style="vertical-align: right;" variant="link" size="sm" @click="handleNewInitiative(true)">Save and open</b-button>
-              <b-button style="vertical-align: right;" variant="warning" size="sm" @click="show = false">Cancel</b-button>
+              <b-button style="vertical-align: right;" variant="primary" size="sm" @click="handleNewInitiative(true)">Save and open</b-button>
+              <b-button style="vertical-align: right;" variant="primary" size="sm" @click="show = false">Cancel</b-button>
             </div>
           </div>
         </div>
@@ -145,11 +139,11 @@ export default {
       initiatives: [],
       initiativesFields:
       [
-        { key: 'title', sortable: true },
-        { key: 'description', label: 'highlihts', sortable: true, thStyle: { width: '35%' } },
+        { key: 'title', sortable: true, thStyle: {width: '15%'}, label: 'Initiative' },
+        { key: 'description', label: 'Highlights', sortable: true, thStyle: { width: '35%' } },
         { key: 'popularity', sortable: true },
         { key: 'importance', sortable: true },
-        { key: 'horizon', sortable: false },
+        { key: 'horizon', sortable: true },
         { key: 'author', sortable: true }
       ],
       filter: null,
@@ -157,7 +151,7 @@ export default {
       currentPage: 0,
       totalRows: 0,
       perPage: 10,
-      newInitiative: { title: '', description: '', status: { id: 12, name: "Won't have" }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null },
+      newInitiative: { title: '', description: '', status: { id: 10, name: 'Should have' }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null },
       horizonList: [],
       vote: '',
       btntrue: '',
@@ -179,6 +173,11 @@ export default {
   methods: {
     setCurrentInitiative(element) {
       this.currentInitiative = element;
+    },
+    onFiltered (filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.totalRows = filteredItems.length;
+      this.currentPage = 1;
     },
     handleCloseNew() {
       this.$refs.modalnew.hide();
@@ -238,11 +237,13 @@ export default {
         initiatives.forEach(element => {
           element.author = username(element);
           element.importance = _.find(this.objStatuses, { 'id': element.statusId }).name;
-          element.horizon = this.getHorizonName(new Date(element.horizon));
+          element.horizon = {
+            date: element.horizon,
+            horizon: this.getHorizonName(new Date(element.horizon))
+          };
         });
-        console.log(initiatives);
         this.totalRows = initiatives.length;
-        console.log(this.totalRows);
+
         this.initiatives = initiatives;
         this.admin = _get(response, 'data.admin');
       } catch (error) {
@@ -321,7 +322,7 @@ export default {
           this.btnfalse = '';
         } else {
           this.btntrue = '';
-          this.btnfalse = 'success';
+          this.btnfalse = 'danger';
         };
        //  this.$nextTick();
       };
