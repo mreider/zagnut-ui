@@ -1,17 +1,19 @@
 <template>
-<b-card bg-variant="light" class="card col-lg-12">
+<b-card bg-variant="light" class="card ">
   <div class="backlogs">
     <div class="row">
       <div class="col-12">
-        <b-btn class="float-right" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
+        <b-btn class="btnHeader" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
       </div>
-      <div class="col-8">
-      </div>
-      <b-form-group size="sm" class="col-4 mb-2" style="margin-top: 1em">
+      <div class="col-6">
 
-          <b-form-input size="sm" v-model="filter" placeholder="Type to filter results" />
-          <b-btn class="float-right" size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-      </b-form-group>
+      </div>
+      <b-input-group  class="col-6">
+        <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
+        <b-input-group-append>
+          <b-btn size="sm" class="btnHeader "  :disabled="!filter" @click="filter = ''">Clear</b-btn>
+        </b-input-group-append>
+      </b-input-group >
     </div>
 
     <b-table  bordered
@@ -20,6 +22,7 @@
               :items="backlogs"
               :fields="backlogsFields"
               :filter="filter"
+              style="margin-top: 0.5em"
               >
       <template slot="title" slot-scope="data" class="col-8">
         <a :href="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id">
@@ -213,6 +216,12 @@ export default {
     margin-top:50px;
   }
   .backlogs {
+    .btnHeader {
+      width: 4.5em;
+      height: 2em;
+      float: right;
+      margin-top:5px;
+    }
     .header {
       margin-top:10px;
     }

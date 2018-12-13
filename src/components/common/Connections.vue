@@ -27,12 +27,13 @@
        <div class="row" style="margin-top:0.5em">
         <div class="col-7">
         </div>
-        <div class="col-5">
-          <b-form-group size="sm" class="mb-2">
-              <b-form-input size="sm" v-model="filter" placeholder="Type to filter results" />
-              <b-btn class="float-right" size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-          </b-form-group>
-        </div>
+
+        <b-input-group  class="col-5">
+          <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
+          <b-input-group-append>
+            <b-btn size="sm" class="btnHeader "  :disabled="!filter" @click="filter = ''">Clear</b-btn>
+          </b-input-group-append>
+        </b-input-group >
         </div>
 
       <b-table  bordered
@@ -44,6 +45,7 @@
                 :current-page="currentPage"
                 :per-page="perPage"
                 @filtered="onFiltered"
+                style="margin-top:5px;"
                 >
           <template slot="title" slot-scope="data">
             <b-form-checkbox v-model="data.item.selected"> <a :href="data.item.href">{{data.item.title}} </a> </b-form-checkbox>
@@ -148,7 +150,6 @@ export default {
         items = await this.deleteConnected('item', items);
 
         this.connectionTable = items;
-        console.log(items);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -299,6 +300,12 @@ export default {
 </script>
 
 <style lang="scss">
+.btnHeader {
+      width: 4.5em;
+      height: 2em;
+      float: right;
+      margin-top:5px;
+    }
 .hidden_header {
       display: none;
     }

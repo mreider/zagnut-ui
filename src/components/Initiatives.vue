@@ -1,18 +1,19 @@
 <template>
-  <b-card bg-variant="light" class="card col-lg-12">
+  <b-card bg-variant="light" class="card col-12">
     <div class="initiatives">
      <div class="row">
       <div class="col-12">
-        <b-btn class="float-right" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
+        <b-btn class="float-right btnHeader" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
       </div>
-      <div class="col-8">
+      <div class="col-6">
       </div>
-      <b-form-group size="sm" class="col-4 mb-2" style="margin-top: 1em">
+      <b-input-group  class="col-6">
+        <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
+        <b-input-group-append>
+          <b-btn size="sm" class="btnHeader "  :disabled="!filter" @click="filter = ''">Clear</b-btn>
+        </b-input-group-append>
+      </b-input-group >
 
-          <b-form-input size="sm" v-model="filter" placeholder="Type to filter results" />
-          <b-btn class="float-right" size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-      </b-form-group>
-    </div>
       <b-table  bordered
                 :fixed="false"
                 :items="initiatives"
@@ -20,9 +21,10 @@
                 :filter="filter"
                 :current-page="currentPage"
                 :per-page="perPage"
-                class="col-lg-12"
+                class="col-12"
                 sort-by="horizon"
-                @filtered="onFiltered">
+                @filtered="onFiltered"
+                style="margin-top: 0.5em">
         <template slot="title" slot-scope="data">
             <router-link :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ data.item.id">{{  data.item.title }}</router-link>
         </template>
@@ -47,6 +49,7 @@
         </template>
       </b-table>
       <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+    </div>
 
        <b-modal id="delete"
               :title="'Delete ' + currentInitiative.title + '?'"
@@ -140,7 +143,7 @@ export default {
       initiativesFields:
       [
         { key: 'title', sortable: true, thStyle: {width: '15%'}, label: 'Initiative' },
-        { key: 'description', label: 'Highlights', sortable: true, thStyle: { width: '35%' } },
+       // { key: 'description', label: 'Highlights', sortable: true, thStyle: { width: '35%' } },
         { key: 'popularity', sortable: true },
         { key: 'importance', sortable: true },
         { key: 'horizon', sortable: true },
@@ -376,8 +379,11 @@ export default {
     .header {
       margin-top:10px;
     }
-  // .hidden_header {
-  //     // display: none;
-  //   }
+  .btnHeader {
+      width: 4.5em;
+      height: 2em;
+      float: right;
+      margin-top:5px;
+    }
   };
 </style>

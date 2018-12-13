@@ -6,8 +6,8 @@
         <h2>{{ this.title }}</h2>
       </label>
       <div class = "col-2">
-        <b-btn class="float-right" variant="primary" size="sm"  v-b-modal.modalnew>New</b-btn>
-        <b-btn class="float-right" style="margin-right:0.5em" variant="secondary"  size="sm"  @click="$router.go(-1)"> close </b-btn>
+        <b-btn class="float-right btnHeader" variant="primary" size="sm"  v-b-modal.modalnew>New</b-btn>
+        <b-btn class="float-right btnHeader" variant="secondary"  size="sm"  @click="$router.go(-1)"> close </b-btn>
       </div>
 
       <div class="col-6">
@@ -20,14 +20,14 @@
         </b-form-group>
       </div>
 
-      <div class="col-8">
+     <div class="col-6">
       </div>
-      <div class="col-4" style="margin-top:0.5em">
-        <b-form-group size="sm" class="mb-2">
-            <b-form-input size="sm" v-model="filter" placeholder="Type to filter results" />
-            <b-btn class="float-right" size="sm" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-        </b-form-group>
-      </div>
+      <b-input-group  class="col-6">
+        <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
+        <b-input-group-append>
+          <b-btn size="sm" class="btnHeader "  :disabled="!filter" @click="filter = ''">Clear</b-btn>
+        </b-input-group-append>
+      </b-input-group >
 
     </div>
     <div v-for="element in selected" v-bind:key="element.id" class="row"> <h6>{{ element.name }}</h6>
@@ -381,6 +381,12 @@ export default {
  .card {
     margin-top:50px;
   }
+  .btnHeader {
+      width: 4.5em;
+      height: 2em;
+      float: right;
+      margin-top:5px;
+    }
   .items {
     .header {
       margin-top:10px;
@@ -388,6 +394,5 @@ export default {
     .hidden_header {
       display: none;
     }
-
   };
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="initiative col-lg-12 col-md-8 col-sm-6 col-xs-4">
+  <div class="initiative col-12">
      <b-card bg-variant="light" class="card col-lg-12">
        <div class="container-fluid  row">
           <div class="col-8">
