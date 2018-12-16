@@ -261,7 +261,6 @@ export default {
     async doVote(result) {
       try {
         // this.$loading(true);
-
         const initiativeId = this.$route.query.initiativeid;
         const response = await this.axios.post(`/api/votes/initiatives/` + initiativeId + '/' + String(result));
 

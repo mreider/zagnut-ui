@@ -246,7 +246,7 @@ export default {
           });
         };
 
-        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, delete: false });
+        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, bugs: [], delete: false });
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to add connection.`);
       } catch (error) {
@@ -279,7 +279,7 @@ export default {
             });
           };
         });
-        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, delete: true });
+        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, bugs: [], delete: true });
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to add connection.`);
       } catch (error) {

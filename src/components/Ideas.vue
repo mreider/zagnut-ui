@@ -23,5 +23,8 @@ export default {
 
 <style lang="scss">
   .ideas {
+    .tab-content {
+      padding: 10px;
+    }
   }
 </style>

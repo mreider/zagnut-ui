@@ -9,6 +9,7 @@ import Items from '@/components/componentsBacklogs/items';
 import Item from '@/components/componentsBacklogs/item';
 import Initiative from '@/components/componentsInitiative/initiative';
 import Bugs from '@/components/Bugs';
+import Bug from '@/components/componentsBugs/Bug';
 import Settings from '@/components/Settings';
 
 Vue.use(Router);
@@ -47,7 +48,7 @@ export default new Router({
       component: Item
     },
     {
-      path: '/initiative',
+      path: '/initiative/',
       name: 'Initiative',
       component: Initiative
     },
@@ -55,6 +56,11 @@ export default new Router({
       path: '/bugs',
       name: 'bugs',
       component: Bugs
+    },
+    {
+      path: '/bug/',
+      name: 'bug',
+      component: Bug
     },
     {
       path: '/settings',

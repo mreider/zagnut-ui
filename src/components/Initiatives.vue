@@ -134,7 +134,6 @@
 import _get from 'lodash/get';
 import _ from 'lodash';
 import { username } from '@/utils';
-import Connections from './common/connections.vue';
 export default {
   name: 'Initiatives',
   data() {
@@ -262,7 +261,7 @@ export default {
       try {
         const response = await this.axios.delete(`/api/initiatives/${this.$store.state.organization.id}/${initiative.id}`);
         const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to create new organization.`);
+        if (!success) throw new Error(`Unable delete initiative.`);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -301,7 +300,7 @@ export default {
           const createdInitiative = _get(response, 'data.initiative');
           if (this.vote !== '') this.doVote(this.vote, createdInitiative.id);
           if (go === true) {
-            window.location.href = 'initiative/?orgId=' + this.$store.state.organization.id + '&initiativeid=' + createdInitiative.id;
+            this.$router.push({ name: 'Initiative', query: {orgId: this.$store.state.organization.id, initiativeid: createdInitiative.id} });
           };
         };
         if (!success) throw new Error(`Unable to create new initiative.`);
@@ -366,7 +365,6 @@ export default {
     }
   },
   components: {
-    connections: Connections
   }
 };
 </script>
