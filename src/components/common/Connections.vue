@@ -47,7 +47,7 @@
                 style="margin-top:5px;"
                 >
           <template slot="title" slot-scope="data">
-            <b-form-checkbox v-model="data.item.selected">   <router-link :to="data.item.href">{{data.item.title}}</router-link> </b-form-checkbox>
+            <b-form-checkbox v-model="data.item.selected">  <router-link :to="data.item.href"> {{data.item.title}} </router-link> </b-form-checkbox>
           </template>
           <template slot="description" slot-scope="data">
             <router-link :to="data.item.href">{{data.item.title}}</router-link>
@@ -137,7 +137,6 @@ export default {
     async loadOrgItems() {
       const orgId = this.$route.query.orgId;
       try {
-        this.$loading(true);
         const response = await this.axios.get(`/api/items/all/backlogs/${orgId}`);
 
         const success = _get(response, 'data.success');
@@ -154,13 +153,11 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
       }
     },
     async loadOrgBugs() {
       const orgId = this.$route.query.orgId;
       try {
-        this.$loading(true);
         const response = await this.axios.get(`/api/bugs/full/${orgId}` + '/false');
 
         const success = _get(response, 'data.success');
@@ -178,12 +175,10 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
       }
     },
     async loadOrgBacklogs() {
       try {
-        this.$loading(true);
         const response = await this.axios.get(`/api/backlogs/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
@@ -198,12 +193,10 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
       }
     },
     async loadOrgInitiatives() {
       try {
-        this.$loading(true);
         const response = await this.axios.get(`/api/initiatives/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
@@ -211,6 +204,7 @@ export default {
 
         let initiatives = _get(response, 'data.initiatives');
         initiatives.forEach(element => {
+          element.href = '/initiative/?orgId=' + this.$store.state.organization.id + '&initiativeid=' + element.id;
           element.selected = false;
         });
         initiatives = await this.deleteConnected('initiative', initiatives);
@@ -218,7 +212,6 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
       }
     },
     async getConnection(element) {
@@ -249,12 +242,10 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
       }
     },
     async handleNewConnections() {
       try {
-        this.$loading(true);
         let arrItems = [];
         let arrBacklogs = [];
         let arrInitiatives = [];
@@ -285,12 +276,10 @@ export default {
       } finally {
         this.relations = [];
         await this.loadRelaitedList();
-        this.$loading(false);
       }
     },
     async handleDeleteConnections() {
       try {
-        this.$loading(true);
         let arrItems = [];
         let arrBacklogs = [];
         let arrInitiatives = [];
@@ -323,7 +312,6 @@ export default {
       } finally {
         this.relations = [];
         await this.loadRelaitedList();
-        this.$loading(false);
       }
     }
   },

@@ -94,7 +94,6 @@ export default {
       toConnectionData: {name: 'bug', id: this.$route.query.bugid, connects: ['initiative', 'item']},
       toCommentsData: {name: 'bugs', id: this.$route.query.bugid, admin: false},
       objStatuses: [],
-      horizonList: [],
       severityArray: ['P0', 'P1', 'P2', 'P3'],
       users: [],
       form: { title: '', description: '', severity: 'P2', status: {name: 'None', id: 0}, reportedBy: {}, assignee: {} },
@@ -154,7 +153,7 @@ export default {
         data.description = this.form.description;
         data.title = this.form.title;
         data.severity = this.form.severity;
-        if (this.form.reportedBy) data.reportedBy = String(this.form.reportedBy.userId);
+        if (this.form.reportedBy) data.createdBy = String(this.form.reportedBy.userId);
         if (this.form.status.id !== 0) data.statusId = String(this.form.status.id);
 
         delete data.status;

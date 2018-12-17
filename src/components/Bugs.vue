@@ -166,7 +166,7 @@ export default {
       bugs: [],
       bugsFields:
       [
-        { key: 'title', sortable: true, thStyle: {width: '15%'}, label: 'bug' },
+        { key: 'title', sortable: true, thStyle: {width: '15%'}, label: 'Bug' },
        // { key: 'description', label: 'Highlights', sortable: true, thStyle: { width: '35%' } },
         { key: 'severity', sortable: true },
         { key: 'status', sortable: true },
@@ -254,7 +254,7 @@ export default {
         data.description = this.newBug.description;
         data.title = this.newBug.title;
         data.severity = this.newBug.severity;
-        data.reportedBy = String(this.newBug.reportedBy.userId);
+        data.createdBy = String(this.newBug.reportedBy.userId);
         if (this.newBug.status.id !== 0) data.statusId = String(this.newBug.status.id);
 
         const response = await this.axios.post(`/api/bugs/new/${orgId}`, data);
