@@ -1,18 +1,17 @@
 <template>
   <b-card class="connections" bg-variant="light">
     <div class=" col-lg-12 col-md-8 col-sm-6 col-xs-4">
-
       <div class="row">
-        <div v-for="element in relations" v-bind:key="element.key" class="col-12" style="margin-top: 0.5em">
+        <b-card v-for="element in relations" v-bind:key="element.key" class="col-12" style="margin-top: 1em">
           <div class="float-right">
             <b-btn size="sm" style="width: 10em" @click="setCurrentConnectionType(element.key)">Link {{element.key}}</b-btn>
           <br>
             <b-btn style="margin-top: 0.5em; width: 10em;" variant="danger" size="sm" v-b-modal.delete>Remove seleted</b-btn>
           </div>
           <div v-for="item in element.data" v-bind:key="item.id" class="" style="margin-top: 1em">
-            <b-form-checkbox v-model="item.selected"> <a :href="item.href">{{item.title}} </a> </b-form-checkbox>
+            <b-form-checkbox v-model="item.selected">   <router-link :to="item.href">{{item.title}}</router-link>  </b-form-checkbox>
           </div>
-        </div>
+        </b-card>
       </div>
     </div>
     <b-modal id="modalnew"
@@ -48,10 +47,10 @@
                 style="margin-top:5px;"
                 >
           <template slot="title" slot-scope="data">
-            <b-form-checkbox v-model="data.item.selected"> <a :href="data.item.href">{{data.item.title}} </a> </b-form-checkbox>
+            <b-form-checkbox v-model="data.item.selected">   <router-link :to="data.item.href">{{data.item.title}}</router-link> </b-form-checkbox>
           </template>
           <template slot="description" slot-scope="data">
-            <a :href="data.item.href">{{data.item.description}} </a>
+            <router-link :to="data.item.href">{{data.item.title}}</router-link>
           </template>
       </b-table>
       <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -113,6 +112,8 @@ export default {
         await this.loadOrgInitiatives(element);
       } else if (element === 'item') {
         await this.loadOrgItems(element);
+      } else if (element === 'bug') {
+        await this.loadOrgBugs(element);
       };
       this.connectionsFieldToAdd.forEach(el => {
         if (el.key === 'title') el.label = element;
@@ -150,6 +151,30 @@ export default {
         items = await this.deleteConnected('item', items);
 
         this.connectionTable = items;
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+      }
+    },
+    async loadOrgBugs() {
+      const orgId = this.$route.query.orgId;
+      try {
+        this.$loading(true);
+        const response = await this.axios.get(`/api/bugs/full/${orgId}` + '/false');
+
+        const success = _get(response, 'data.success');
+        if (!success) throw new Error(`Unable to load user's organizations.`);
+
+        let bugs = _get(response, 'data.bugs');
+        bugs.forEach(element => {
+          element.selected = false;
+          element.href = '/bug/?orgId=' + orgId + '&bugid=' + element.id;
+        });
+
+        bugs = await this.deleteConnected('bug', bugs);
+
+        this.connectionTable = bugs;
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -215,6 +240,8 @@ export default {
             el.href = '/initiative/?orgId=' + this.$store.state.organization.id + '&initiativeid=' + el.id;
           } else if (element === 'item') {
             el.href = '/items/item/?orgId=' + this.$store.state.organization.id + '&itemId=' + el.id;
+          } else if (element === 'bug') {
+            el.href = '/bug/?orgId=' + this.$store.state.organization.id + '&bugid=' + el.id;
           };
         });
 
@@ -231,6 +258,7 @@ export default {
         let arrItems = [];
         let arrBacklogs = [];
         let arrInitiatives = [];
+        let arrBugs = [];
 
         if (this.currentConnectionType === 'backlog') {
           this.connectionTable.forEach(element => {
@@ -244,9 +272,12 @@ export default {
           this.connectionTable.forEach(element => {
             if (element.selected) arrItems.push(element.id);
           });
+        } else if (this.currentConnectionType === 'bug') {
+          this.connectionTable.forEach(element => {
+            if (element.selected) arrBugs.push(element.id);
+          });
         };
-
-        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, bugs: [], delete: false });
+        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, bugs: arrBugs, delete: false });
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to add connection.`);
       } catch (error) {
@@ -263,6 +294,7 @@ export default {
         let arrItems = [];
         let arrBacklogs = [];
         let arrInitiatives = [];
+        let arrBugs = [];
 
         this.relations.forEach(element => {
           if (element.key === 'backlog') {
@@ -277,9 +309,13 @@ export default {
             element.data.forEach(el => {
               if (el.selected) arrItems.push(el.id);
             });
+          } else if (element.key === 'bug') {
+            element.data.forEach(el => {
+              if (el.selected) arrBugs.push(el.id);
+            });
           };
         });
-        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, bugs: [], delete: true });
+        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, bugs: arrBugs, delete: true });
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to add connection.`);
       } catch (error) {

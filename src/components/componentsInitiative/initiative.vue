@@ -79,7 +79,7 @@ export default {
   name: 'Initiative',
   data() {
     return {
-      toConnectionData: {name: 'initiative', id: this.$route.query.initiativeid, connects: ['item']},
+      toConnectionData: {name: 'initiative', id: this.$route.query.initiativeid, connects: ['item', 'bug']},
       toCommentsData: {name: 'initiatives', id: this.$route.query.initiativeid, admin: false},
       objStatuses: [],
       horizonList: [],

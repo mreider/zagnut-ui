@@ -88,7 +88,7 @@ export default {
   name: 'Item',
   data() {
     return {
-      toConnectionData: {name: 'item', id: this.$route.query.itemId, connects: ['initiative']},
+      toConnectionData: {name: 'item', id: this.$route.query.itemId, connects: ['initiative', 'bug']},
       toCommentsData: {name: 'items', id: this.$route.query.itemId, admin: false},
       objStatuses: [],
       currentStatus: '',

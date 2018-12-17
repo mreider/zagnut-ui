@@ -296,7 +296,7 @@ export default {
     async loadOrgBugs() {
       try {
         this.$loading(true);
-        const response = await this.axios.get(`/api/bugs/${this.$store.state.organization.id}` + '/false');
+        const response = await this.axios.get(`/api/bugs/full/${this.$store.state.organization.id}` + '/false');
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
