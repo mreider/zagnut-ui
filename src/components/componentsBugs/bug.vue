@@ -5,7 +5,7 @@
         <div class="col-7">
           <b-form-group label-for = "title">
             <b-form-input v-model="form.title" placeholder="Enter bug" id="title">></b-form-input>
-            <label class="left">Created by  {{handleUsername(form.createdBy)}} on {{form.createdAt}}</label>
+            <label class="left">Created by  {{handleUsername(form.reportedBy)}} on {{form.createdAt}}</label>
           </b-form-group>
         </div>
         <div class="col-5">
