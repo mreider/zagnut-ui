@@ -12,6 +12,14 @@
         <!-- <b-nav-item :to="{ path: '/ideas' }">Ideas</b-nav-item> -->
         <b-nav-item :to="{ path: '/backlogs' }">Backlogs</b-nav-item>
         <b-nav-item :to="{ path: '/bugs' }">Bugs</b-nav-item>
+        <b-nav-item >
+          <b-input-group>
+           <b-form-input size="sm" v-model="searchText" placeholder="Search" style="background-color: white"/>
+           <b-input-group-append>
+              <b-btn size="sm" class="SearchBtn"  @click="goSearch(searchText)"><font-awesome-icon icon="search" aria-hidden="true"/></b-btn>
+           </b-input-group-append>
+          </b-input-group>
+        </b-nav-item>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
@@ -44,6 +52,7 @@ export default {
 
   data() {
     return {
+      searchText: ''
     };
   },
 
@@ -85,6 +94,9 @@ export default {
 
     handleLogout() {
       doLogout(this);
+    },
+    goSearch(text) {
+      this.$router.push({ name: 'search', query: {text: text} });
     }
   },
 

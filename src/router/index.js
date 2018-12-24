@@ -9,6 +9,7 @@ import Items from '@/components/componentsBacklogs/items';
 import Item from '@/components/componentsBacklogs/item';
 import Initiative from '@/components/componentsInitiative/initiative';
 import Bugs from '@/components/Bugs';
+import Search from '@/components/Search';
 import Bug from '@/components/componentsBugs/Bug';
 import Settings from '@/components/Settings';
 
@@ -61,6 +62,11 @@ export default new Router({
       path: '/bug/',
       name: 'bug',
       component: Bug
+    },
+    {
+      path: '/search/',
+      name: 'search',
+      component: Search
     },
     {
       path: '/settings',

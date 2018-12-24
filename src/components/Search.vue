@@ -1,10 +1,10 @@
 <template>
-  <div class="ideas"></div>
+  <div class="search"> search </div>
 </template>
 
 <script>
 export default {
-  name: 'Ideas',
+  name: 'Search',
   data() {
     return {
     };
@@ -14,6 +14,7 @@ export default {
   },
 
   methods: {
+
   },
 
   components: {

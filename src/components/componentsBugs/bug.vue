@@ -122,6 +122,7 @@ export default {
         if (!success) throw new Error(`Unable to load bugs's.`);
 
         let bug = _get(response, 'data.bug');
+
         bug.status = _.find(this.objStatuses, { 'id': bug.statusId });
         this.toCommentsData.admin = _get(response, 'data.admin');
         if (bug.statusId) {
