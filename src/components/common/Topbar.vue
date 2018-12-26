@@ -14,9 +14,9 @@
         <b-nav-item :to="{ path: '/bugs' }">Bugs</b-nav-item>
         <b-nav-item >
           <b-input-group>
-           <b-form-input size="sm" v-model="searchText" placeholder="Search" style="background-color: white"/>
+           <b-form-input size="sm" @keydown.enter.native="goSearch(searchText)"  v-model="searchText" placeholder="Search" style="background-color: white"/>
            <b-input-group-append>
-              <b-btn size="sm" class="SearchBtn"  @click="goSearch(searchText)"><font-awesome-icon icon="search" aria-hidden="true"/></b-btn>
+              <b-btn size="sm" class="success SearchBtn btn btn-default"  @click="goSearch(searchText)"><font-awesome-icon icon="search" aria-hidden="true"/></b-btn>
            </b-input-group-append>
           </b-input-group>
         </b-nav-item>
