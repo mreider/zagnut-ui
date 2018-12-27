@@ -50,8 +50,8 @@
       <template slot="assignee" slot-scope="data" class="col-2">
         {{ handleUsername(data.item.assignee) }}
       </template>
-      <template slot="backlogId" slot-scope="data" class="col-2">
-        <router-link :to="handleGetHref(data.item, true)">{{  data.item.backlogId }}</router-link>
+      <template slot="ownerId" slot-scope="data" class="col-2">
+        <router-link :to="handleGetHref(data.item, (data.item.type === 'items') ? true : false)">{{( data.item.ownerId) }}</router-link>
       </template>
     </b-table>
     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -114,41 +114,47 @@ export default {
       } else if (item.type === 'backlogs' && !backlog) {
         return 'items/?orgId=' + this.$store.state.organization.id + '&backlogid=' + item.id;
       } else if (backlog) {
-        return 'items/?orgId=' + this.$store.state.organization.id + '&backlogid=' + item.backlogId;
+        return 'items/?orgId=' + this.$store.state.organization.id + '&backlogid=' + item.ownerId;
       } else if (item.type === 'comments' && !backlog) {
-        let copyItem = _.clone(item);
+        let copyItem = JSON.parse(JSON.stringify(item));
         copyItem.type = copyItem.ownerTable;
         return this.handleGetHref(copyItem, false);
       };
       return '';
     },
     async search() {
-      try {
-        const orgId = this.$store.state.organization.id;
+      if (this.text) {
+        try {
+          const orgId = this.$store.state.organization.id;
 
-        const response = await this.axios.get(`/api/search/${this.text}/${orgId}`);
+          const response = await this.axios.get(`/api/search/${this.text}/${orgId}`);
 
-        const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to search data.`);
+          const success = _get(response, 'data.success');
+          if (!success) throw new Error(`Unable to search data.`);
 
-        let results = _get(response, 'data.data');
-        let variants = [];
-        results.forEach(element => {
-          if (element.createdOn) {
-            element.createdAt = new Date(element.createdOn).toLocaleString();
-          };
-          variants.push(element.type);
-        });
-        variants = _.union(variants);
-        variants.push('all');
-        this.variants = variants;
+          let results = _get(response, 'data.data');
 
-        this.results = results;
-        this.totalRows = results.length;
-      } catch (error) {
-        return this.$errorMessage.show(error);
-      } finally {
-      }
+          let variants = [];
+          results.forEach(element => {
+            if (element.createdOn) {
+              element.createdAt = new Date(element.createdOn).toLocaleString();
+            };
+            variants.push(element.type);
+          });
+          variants = _.union(variants);
+          variants.push('all');
+          this.variants = variants;
+
+          this.results = results;
+          this.totalRows = results.length;
+        } catch (error) {
+          return this.$errorMessage.show(error);
+        } finally {
+          this.results.forEach(element => {
+            delete element['ownerTable'];
+          });
+        }
+      };
     }
   },
 
