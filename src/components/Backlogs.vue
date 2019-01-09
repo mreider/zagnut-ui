@@ -6,7 +6,7 @@
         <b-btn class="btnHeader" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
       </div>
       <div class="col-6">
-
+        <b-form-checkbox style="float-right" id="checkbox0" v-model="showArhived" @change="reload"> Show archived </b-form-checkbox>
       </div>
       <b-input-group  class="col-6">
         <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
@@ -22,7 +22,10 @@
               :items="backlogs"
               :fields="backlogsFields"
               :filter="filter"
+              :current-page="currentPage"
+              :per-page="perPage"
               style="margin-top: 0.5em"
+              @filtered="onFiltered"
               >
       <template slot="title" slot-scope="data" class="col-8">
         <a :href="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id">
@@ -39,6 +42,7 @@
         </div>
       </template>
     </b-table>
+     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
 
     <b-modal id="edit"
               title="Edit"
@@ -50,6 +54,8 @@
               ok-title="submit"
               >
         <b-form-input v-model=newNameOldBacklog :placeholder="currentBacklog.title"></b-form-input>
+        <br>
+        <b-form-checkbox id="checkbox1" v-model="currentBacklog.archived" v-if="currentBacklog"> Archived </b-form-checkbox>
     </b-modal>
     <b-modal id="delete"
               :title="'Delete ' + currentBacklog.title + '?'"
@@ -82,27 +88,24 @@
 
 <script>
 import _get from 'lodash/get';
-// import _ from 'lodash';
-import Item from './componentsBacklogs/item.vue';
 import { username } from '@/utils';
 export default {
   name: 'Backlogs',
   data() {
     return {
-      objStatuses: [],
-      groupByList: ['Status', 'Stategic initiative'],
-      currentGroupBy: 'Status',
       selected: [],
       options: [],
       users: [],
-      newBacklog: { title: '' },
+      newBacklog: {title: ''},
       backlogs: [],
-      pointsVar: ['0', '1', '2', '3', '5', '8', '13', '21'],
       backlogsFields: [{ key: 'title', sortable: true, label: 'Backlog' }, { key: 'author', sortable: true }],
       newNameOldBacklog: '',
       currentBacklog: '',
       filter: null,
-      perPage: 5
+      perPage: 10,
+      showArhived: false,
+      currentPage: 1,
+      totalRows: 0
     };
   },
   async mounted() {
@@ -113,10 +116,13 @@ export default {
   },
 
   methods: {
+    async reload(checked) {
+      this.showArhived = checked;
+      await this.loadOrgBacklogs();
+    },
     async loadOrgBacklogs() {
       try {
-        this.$loading(true);
-        const response = await this.axios.get(`/api/backlogs/${this.$store.state.organization.id}`);
+        const response = await this.axios.get(`/api/backlogs/${this.showArhived}/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's backlogs.`);
@@ -124,12 +130,18 @@ export default {
         const backlogs = _get(response, 'data.backlogs');
         backlogs.forEach(element => {
           element.author = username(element);
+          if (element.archived === 1) {
+            element.archived = true;
+          } else {
+            element.archived = false;
+          };
         });
         this.backlogs = backlogs;
+        this.totalRows = backlogs.length;
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
+        // this.$loading(false);
       }
     },
     async handleChangeGroupBy(element) {
@@ -142,13 +154,15 @@ export default {
       this.currentBacklog = element;
     },
     async handleBacklogEditTitle(element, newNameOldBacklog) {
-      if (!newNameOldBacklog) {
-        return this.$notify({group: 'error', type: 'err', text: 'Empty backlog title field'});
+      let data = {};
+      if (newNameOldBacklog) {
+        data.title = newNameOldBacklog;
       }
+      data.archived = element.archived;
       try {
         this.$loading(true);
 
-        const response = await this.axios.put(`/api/backlogs/edit/${this.$store.state.organization.id}/${element.id}`, { title: newNameOldBacklog });
+        const response = await this.axios.put(`/api/backlogs/edit/${this.$store.state.organization.id}/${element.id}`, data);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update backlog.`);
@@ -206,7 +220,6 @@ export default {
   watch: {
   },
   components: {
-    item: Item
   }
 };
 </script>
