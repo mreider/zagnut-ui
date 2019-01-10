@@ -28,7 +28,7 @@
             <b-form-group label = "Horizon: " label-for = "InitiativeHorizon" horizontal :label-cols="6" label-size="sm" class="col-6" style="padding-left: 0.5em">
                 <b-dropdown :text="form.horizon.horizon" name="InitiativeHorizon" size="sm" class="horizon m-2">
                 <b-dropdown-item
-                v-for="element in horizonList" v-if="horizonList"
+                v-for="element in horizonList"
                 v-bind:key="element.horizon"
                 @click="handleInitiativeSetField(element, 'horizon')"
                 size = "sm"
@@ -39,7 +39,7 @@
             <b-form-group label = "Priority: " label-for = "InitiativeStatuses" horizontal :label-cols="5" label-size="sm" class="col-6">
               <b-dropdown :text="form.status.name" name="InitiativeStatuses" size="sm" class="statuses m-2">
                 <b-dropdown-item
-                v-for="element in objStatuses" v-if="objStatuses"
+                v-for="element in objStatuses"
                 v-bind:key="element.id"
                 @click="handleInitiativeSetField(element, 'status')"
                 size = "sm"
@@ -56,7 +56,10 @@
             <Connections :toConnectionData='toConnectionData'>
             </Connections>
           </div>
-          <div class="button-box" style="margin-top:20px;">
+          <div class="button-box col-12" style="margin-top:20px;">
+            <b-form-group class="float-left" label = "Archived: " label-for = "checkbox1" label-size="sm" :label-cols="7" horizontal>
+              <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived" > </b-form-checkbox>
+            </b-form-group>
             <div class="float-right">
               <b-btn size="sm" type="submit" variant="primary" @click="handleSaveInitiative()">Save & close</b-btn>
               <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
@@ -86,7 +89,7 @@ export default {
       vote: '',
       btntrue: '',
       btnfalse: '',
-      form: { title: '', description: '', status: { id: 10, name: 'Should have' }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null },
+      form: { title: '', description: '', status: { id: 10, name: 'Should have' }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null, archived: false },
       admin: false
     };
   },
@@ -216,7 +219,11 @@ export default {
           horizon: this.getHorizonName(new Date(initiative.horizon))
         };
         this.toCommentsData.admin = _get(response, 'data.admin');
-
+        if (initiative.archived === 0) {
+          initiative.archived = false;
+        } else {
+          initiative.archived = true;
+        };
         this.form = initiative;
       } catch (error) {
         return this.$errorMessage.show(error);

@@ -5,7 +5,8 @@
       <div class="col-12">
         <b-btn class="float-right btnHeader" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
       </div>
-      <div class="col-6">
+       <div class="col-6">
+        <b-form-checkbox style="float-right" id="checkbox0" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
       </div>
       <b-input-group  class="col-6">
         <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
@@ -96,7 +97,7 @@
             <b-form-group label = "Horizon:" label-for = "InitiativeHorizon" horizontal :label-cols="6" label-size="sm" class="col-12" style="margin-left: 1px;">
                 <b-dropdown :text="newInitiative.horizon.horizon" name="newInitiativeHorizon" size="sm" class="horizon m-2" >
                 <b-dropdown-item
-                v-for="element in horizonList" v-if="horizonList"
+                v-for="element in horizonList"
                 v-bind:key="element.horizon"
                 @click="handleNewInitiativeSetField(element, 'horizon')"
                 size = "sm"
@@ -107,7 +108,7 @@
             <b-form-group label = "Priority:" label-for = "newInitiativeStatuses" horizontal :label-cols="6" label-size="sm" class="col-12" style="margin-left: 1px;">
               <b-dropdown :text="newInitiative.status.name" name="newInitiativeStatuses" size="sm" class="statuses m-2" >
                 <b-dropdown-item
-                v-for="element in objStatuses" v-if="objStatuses"
+                v-for="element in objStatuses"
                 v-bind:key="element.id"
                 @click="handleNewInitiativeSetField(element, 'status')"
                 size = "sm"
@@ -160,7 +161,8 @@ export default {
       btnfalse: '',
       show: false,
       currentInitiative: '',
-      admin: false
+      admin: false,
+      showArchived: false
     };
   },
 
@@ -173,6 +175,10 @@ export default {
   },
 
   methods: {
+    async reload(checked) {
+      this.showArchived = checked;
+      await this.loadOrgInitiatives();
+    },
     setCurrentInitiative(element) {
       this.currentInitiative = element;
     },
@@ -229,8 +235,8 @@ export default {
     },
     async loadOrgInitiatives() {
       try {
-        this.$loading(true);
-        const response = await this.axios.get(`/api/initiatives/${this.$store.state.organization.id}`);
+        // this.$loading(true);
+        const response = await this.axios.get(`/api/initiatives/all/${this.showArchived}/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
@@ -251,7 +257,7 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
+        // this.$loading(false);
       }
     },
     async handleInitiativeDelete(initiative) {

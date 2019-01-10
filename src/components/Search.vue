@@ -7,9 +7,12 @@
       </b-input-group-append>
     </b-input-group> -->
     <div class="row">
-      <b-dropdown :text="currentVarriant" size="sm" class="col-6">
+      <div class="col-5">
+        <b-form-checkbox style="margin-top:2px;" id="checkbox0"  class="mb-2 float-left" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
+      </div>
+      <b-dropdown :text="currentVarriant" size="sm" class="col-1">
       <b-dropdown-item
-        v-for="oneVar in variants" v-if="variants"
+        v-for="oneVar in variants"
         v-bind:key="oneVar"
         @click="handleChangeView(oneVar)"
       >{{ oneVar }}</b-dropdown-item>
@@ -45,8 +48,6 @@
           <!-- <b-button style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentItem(data.item)"><font-awesome-icon icon="trash-alt" /></b-button> -->
         </div>
       </template>
-      <template slot="createdOn" slot-scope="data" class="col-2">
-      </template>
       <template slot="assignee" slot-scope="data" class="col-2">
         {{ handleUsername(data.item.assignee) }}
       </template>
@@ -76,7 +77,8 @@ export default {
       variants: [],
       currentVarriant: 'all',
       itemsFields: ['type', 'title', {key: 'description', label: 'Description or comment'}, 'createdAt', 'author', 'assignee', 'ownerId'],
-      filter: ''
+      filter: '',
+      showArchived: false
     };
   },
   async mounted() {
@@ -88,6 +90,11 @@ export default {
   computed: {
   },
   methods: {
+    async reload(checked) {
+      this.showArchived = checked;
+      this.text = this.$route.query.text;
+      await this.search();
+    },
     handleUsername (element) {
       return username(element);
     },
@@ -127,7 +134,7 @@ export default {
         try {
           const orgId = this.$store.state.organization.id;
 
-          const response = await this.axios.get(`/api/search/${this.text}/${orgId}`);
+          const response = await this.axios.get(`/api/search/${this.text}/${orgId}/${this.showArchived}`);
 
           const success = _get(response, 'data.success');
           if (!success) throw new Error(`Unable to search data.`);
@@ -146,6 +153,7 @@ export default {
           this.variants = variants;
 
           this.results = results;
+
           this.totalRows = results.length;
         } catch (error) {
           return this.$errorMessage.show(error);

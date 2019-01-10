@@ -13,7 +13,7 @@
         <b-form-group label= "Severity" label-for="formSeverity" label-size="sm" class="col-3">
           <b-dropdown :text="form.severity" name="formSeverity" size="sm" class="severity m-2" >
             <b-dropdown-item
-            v-for="element in severityArray" v-if="severityArray"
+            v-for="element in severityArray"
             v-bind:key="element"
             @click="handleBugSetField(element, 'severity')"
             size = "sm"
@@ -24,7 +24,7 @@
         <b-form-group label= "Status" label-for="formStatus" label-size="sm" class="col-3">
           <b-dropdown :text="form.status.name" name="formStatus" size="sm" class="status m-2" >
             <b-dropdown-item
-            v-for="element in objStatuses" v-if="objStatuses"
+            v-for="element in objStatuses"
             v-bind:key="element.id"
             @click="handleBugSetField(element, 'status')"
             size = "sm"
@@ -67,7 +67,10 @@
           <Connections :toConnectionData='toConnectionData'>
           </Connections>
         </div>
-        <div class="button-box" style="margin-top:20px;">
+        <div class="button-box col-12" style="margin-top:20px;">
+            <b-form-group class="float-left" label = "Archived: " label-for = "checkbox1" label-size="sm" :label-cols="7" horizontal>
+              <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived" > </b-form-checkbox>
+            </b-form-group>
             <div class="float-right">
               <b-btn size="sm" type="submit" variant="primary" @click="handleSaveBug()">Save & close</b-btn>
               <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
@@ -122,6 +125,11 @@ export default {
         if (!success) throw new Error(`Unable to load bugs's.`);
 
         let bug = _get(response, 'data.bug');
+        if (bug.archived === 0) {
+          bug.archived = false;
+        } else {
+          bug.archived = true;
+        };
 
         bug.status = _.find(this.objStatuses, { 'id': bug.statusId });
         this.toCommentsData.admin = _get(response, 'data.admin');
@@ -153,6 +161,7 @@ export default {
         if (this.form.assignee) data.assignee = String(this.form.assignee.userId);
         data.description = this.form.description;
         data.title = this.form.title;
+        data.archived = this.form.archived;
         data.severity = this.form.severity;
         if (this.form.reportedBy) data.createdBy = String(this.form.reportedBy.userId);
         if (this.form.status.id !== 0) data.statusId = String(this.form.status.id);

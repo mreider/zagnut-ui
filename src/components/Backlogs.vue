@@ -6,7 +6,7 @@
         <b-btn class="btnHeader" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
       </div>
       <div class="col-6">
-        <b-form-checkbox style="float-right" id="checkbox0" v-model="showArhived" @change="reload"> Show archived </b-form-checkbox>
+        <b-form-checkbox style="float-right" id="checkbox0" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
       </div>
       <b-input-group  class="col-6">
         <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
@@ -103,7 +103,7 @@ export default {
       currentBacklog: '',
       filter: null,
       perPage: 10,
-      showArhived: false,
+      showArchived: false,
       currentPage: 1,
       totalRows: 0
     };
@@ -117,12 +117,12 @@ export default {
 
   methods: {
     async reload(checked) {
-      this.showArhived = checked;
+      this.showArchived = checked;
       await this.loadOrgBacklogs();
     },
     async loadOrgBacklogs() {
       try {
-        const response = await this.axios.get(`/api/backlogs/${this.showArhived}/${this.$store.state.organization.id}`);
+        const response = await this.axios.get(`/api/backlogs/${this.showArchived}/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's backlogs.`);

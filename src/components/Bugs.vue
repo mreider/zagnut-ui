@@ -6,7 +6,9 @@
         <b-btn class="float-right btnHeader" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
       </div>
       <div class="col-6">
+        <b-form-checkbox style="float-right" id="checkbox0" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
       </div>
+
       <b-input-group  class="col-6">
         <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
         <b-input-group-append>
@@ -91,7 +93,7 @@
         <b-form-group label= "Severity" label-for="newBugSeverity" label-size="sm" class="col-3">
           <b-dropdown :text="newBug.severity" name="newBugSeverity" size="sm" class="severity m-2" >
             <b-dropdown-item
-            v-for="element in severityArray" v-if="severityArray"
+            v-for="element in severityArray"
             v-bind:key="element"
             @click="handleNewBugSetField(element, 'severity')"
             size = "sm"
@@ -102,7 +104,7 @@
         <b-form-group label= "Status" label-for="newBugStatus" label-size="sm" class="col-3">
           <b-dropdown :text="newBug.status.name" name="newBugStatus" size="sm" class="status m-2" >
             <b-dropdown-item
-            v-for="element in objStatuses" v-if="objStatuses"
+            v-for="element in objStatuses"
             v-bind:key="element.id"
             @click="handleNewBugSetField(element, 'status')"
             size = "sm"
@@ -185,7 +187,8 @@ export default {
       currentBug: '',
       admin: false,
       severityArray: ['P0', 'P1', 'P2', 'P3'],
-      users: []
+      users: [],
+      showArchived: false
     };
   },
   async mounted() {
@@ -199,6 +202,10 @@ export default {
   },
 
   methods: {
+    async reload(checked) {
+      this.showArchived = checked;
+      await this.loadOrgBugs();
+    },
     setCurrentUser() {
       this.newBug.reportedBy = this.$store.state.user;
       this.newBug.reportedBy.userId = this.newBug.reportedBy.id;
@@ -295,13 +302,12 @@ export default {
     },
     async loadOrgBugs() {
       try {
-        this.$loading(true);
-        const response = await this.axios.get(`/api/bugs/full/${this.$store.state.organization.id}` + '/false');
-
+        const response = await this.axios.get(`/api/bugs/full/${this.showArchived}/${this.$store.state.organization.id}` + '/false');
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
         const bugs = _get(response, 'data.bugs');
+
         bugs.forEach(element => {
           element.reportedBy = username(element.reportedByData);
           element.assignedTo = username(element.assigneeData);
@@ -313,13 +319,12 @@ export default {
           element.createdAt = new Date(element.createdAt).toLocaleString();
         });
         this.totalRows = bugs.length;
-
         this.bugs = bugs;
         this.admin = _get(response, 'data.admin');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
+
       }
     },
     onFiltered (filteredItems) {

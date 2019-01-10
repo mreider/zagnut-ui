@@ -12,7 +12,7 @@
             <b-form-group label = "Status: " label-for = "labelStatus" label-size="sm" :label-cols="3" horizontal>
               <b-dropdown :text="currentStatus" name="itemStatus" size="sm" class="statuses m-2" >
                 <b-dropdown-item
-                v-for="element in objStatuses" v-if="objStatuses"
+                v-for="element in objStatuses"
                 v-bind:key="element.id"
                 @click="handleItemSetField(element, 'status')"
                 size = "sm"
@@ -47,7 +47,8 @@
                 </b-dropdown-item>
               </b-dropdown>
             </b-form-group>
-
+          </div>
+          <div class="col-3">
           </div>
           <div class="col-12">
             <b-form-textarea v-model="form.description"
@@ -63,7 +64,10 @@
             <Connections :toConnectionData='toConnectionData'>
             </Connections>
           </div>
-          <div class="button-box" style="margin-top:20px;">
+          <div class="button-box col-12" style="margin-top:20px;">
+            <b-form-group label = "Archived: " class="float-left" label-for = "checkbox1" label-size="sm" :label-cols="7" horizontal>
+              <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived" > </b-form-checkbox>
+            </b-form-group>
             <div class="float-right">
               <b-btn size="sm" type="submit" variant="primary" @click="handleSaveItem()">Save & close</b-btn>
               <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
@@ -105,7 +109,8 @@ export default {
         actualRelease: '',
         statusId: 0,
         id: '',
-        Author: {firstName: '', lastName: '', email: ''}
+        Author: {firstName: '', lastName: '', email: ''},
+        archived: false
       }
     };
   },
@@ -128,7 +133,13 @@ export default {
 
         let success = _get(response, 'data.success');
         if (!success) this.$errorMessage.show('Unable to load current user profile');
-        this.form = _get(response, 'data.item');
+        let items = _get(response, 'data.item');
+        if (items.archived === 0) {
+          items.archived = false;
+        } else {
+          items.archived = true;
+        };
+        this.form = items;
         if (this.objStatuses) this.form.status = _.find(this.objStatuses, { 'id': this.form.statusId });
         this.currentStatus = this.form.status.name;
         this.points = String(this.form.points);

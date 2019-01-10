@@ -11,6 +11,7 @@
       </div>
 
       <div class="col-6">
+        <b-form-checkbox style="float-right" id="checkbox0" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
       </div>
 
       <div class="col-6">
@@ -105,7 +106,7 @@
           <b-form-group label = "Status: " label-for = "labelStatus">
             <b-dropdown :text="newItem.status.name" name="newItemStatuses" size="sm" class="statuses m-2" >
               <b-dropdown-item
-              v-for="element in objStatuses" v-if="objStatuses"
+              v-for="element in objStatuses"
               v-bind:key="element.id"
               @click="handleItemNewItemSetField(element, 'status')"
               size = "sm"
@@ -172,7 +173,8 @@ export default {
       currentItem: '',
       filter: null,
       perPage: 5,
-      title: 'backlog title'
+      title: 'backlog title',
+      showArchived: false
     };
   },
   async mounted() {
@@ -189,6 +191,10 @@ export default {
   },
 
   methods: {
+    async reload(checked) {
+      this.showArchived = checked;
+      await this.loadOrgStatuses(false);
+    },
     setCurrentUser() {
       this.newItem.assignee = this.$store.state.user;
       this.newItem.assignee.userId = this.newItem.assignee.id;
@@ -271,7 +277,7 @@ export default {
       const backlogid = this.$route.query.backlogid;
       try {
         this.$loading(true);
-        const response = await this.axios.get(`/api/items/backlogs/${orgId}/${backlogid}`);
+        const response = await this.axios.get(`/api/items/${this.showArchived}/backlogs/${orgId}/${backlogid}`);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
@@ -286,9 +292,6 @@ export default {
       } finally {
         this.$loading(false);
       }
-    },
-    async handleChangeGroupBy(element) {
-      this.currentGroupBy = element;
     },
     async handleItemNewItemSetField(element, name) {
       this.newItem[name] = element;
