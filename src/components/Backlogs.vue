@@ -58,7 +58,7 @@
         <b-form-checkbox id="checkbox1" v-model="currentBacklog.archived" v-if="currentBacklog"> Archived </b-form-checkbox>
     </b-modal>
     <b-modal id="delete"
-              :title="'Delete ' + currentBacklog.title + '?'"
+              :title="'Wait. Are you sure you want to delete this permanently?'"
               button-size="sm"
               size="sm"
               centered

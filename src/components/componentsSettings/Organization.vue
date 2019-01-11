@@ -22,7 +22,7 @@
       </template>
     </b-table>
     <b-modal id="delete"
-              :title="'Delete ' + currentOrganization.name + '?'"
+              :title="'Wait. Are you sure you want to delete this permanently?'"
               button-size="sm"
               size="sm"
               centered

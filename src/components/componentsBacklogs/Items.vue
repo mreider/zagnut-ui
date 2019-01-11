@@ -69,7 +69,7 @@
         <b-form-input v-model=newNameOldItem :placeholder="currentItem.title"></b-form-input>
     </b-modal>
     <b-modal id="delete"
-              :title="'Delete ' + currentItem.title + '?'"
+              :title="'Wait. Are you sure you want to delete this permanently?'"
               button-size="sm"
               size="sm"
               centered
@@ -326,9 +326,13 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        const response = await this.axios.delete(`/api/items/${this.$store.state.organization.id}/${item.id}`);
-        const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to create new organization.`);
+        let response = await this.axios.post('/api/connections/' + 'item' + '/' + item.id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
+        let success = _get(response, 'data.success');
+        if (success) {
+          response = await this.axios.delete(`/api/items/${this.$store.state.organization.id}/${item.id}`);
+          success = _get(response, 'data.success');
+        };
+        if (!success) throw new Error(`Unable to delete item.`);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {

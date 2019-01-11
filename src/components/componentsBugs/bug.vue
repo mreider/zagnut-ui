@@ -74,12 +74,24 @@
             <div class="float-right">
               <b-btn size="sm" type="submit" variant="primary" @click="handleSaveBug()">Save & close</b-btn>
               <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
+              <b-btn variant="danger" size="sm" v-b-modal.deletebug>Delete</b-btn>
             </div>
             <Comments :toCommentsData='toCommentsData' ref="comments_ref">
             </Comments>
         </div>
       </div>
     </b-card>
+    <b-modal id="deletebug"
+          :title="'Wait. Are you sure you want to delete this permanently?'"
+          button-size="sm"
+          size="sm"
+          centered
+          body-class="zero-size"
+          ok-variant="danger"
+          @ok="handleBugDelete()"
+          ok-title="delete"
+          >
+    </b-modal>
   </div>
 </template>
 
@@ -113,6 +125,23 @@ export default {
   },
 
   methods: {
+    async handleBugDelete() {
+      const bugId = this.$route.query.bugid;
+      try {
+        let response = await this.axios.post('/api/connections/' + 'bug' + '/' + bugId, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
+        let success = _get(response, 'data.success');
+        if (success) {
+          response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bugId}`);
+          success = _get(response, 'data.success');
+        };
+        if (!success) throw new Error(`Unable to delete bug.`);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$notify({group: 'app', type: 'success', text: `Bug ${this.form.title} was deleted`});
+        this.$router.go(-1);
+      }
+    },
     async loadOrgBug() {
       try {
         this.$loading(true);
@@ -178,6 +207,7 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.$router.go(-1);
+        this.$notify({group: 'app', type: 'success', text: 'Bug updated'});
       }
     },
     handleUsername (element) {

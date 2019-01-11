@@ -71,12 +71,24 @@
             <div class="float-right">
               <b-btn size="sm" type="submit" variant="primary" @click="handleSaveItem()">Save & close</b-btn>
               <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
+              <b-btn variant="danger" size="sm" v-b-modal.deleteitem>Delete</b-btn>
             </div>
             <Comments :toCommentsData='toCommentsData' ref="comments_ref">
             </Comments>
           </div>
         </div>
     </b-card>
+    <b-modal id="deleteitem"
+          :title="'Wait. Are you sure you want to delete this permanently?'"
+          button-size="sm"
+          size="sm"
+          centered
+          body-class="zero-size"
+          ok-variant="danger"
+          @ok="handleItemDelete()"
+          ok-title="delete"
+          >
+    </b-modal>
   </div>
 </template>
 
@@ -124,6 +136,27 @@ export default {
   },
 
   methods: {
+    async handleItemDelete() {
+      const item = this.form;
+      const orgId = this.$route.query.orgId;
+      if (!item || !this.$store.state.user.id) {
+        // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
+      }
+      try {
+        let response = await this.axios.post('/api/connections/' + 'item' + '/' + item.id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
+        let success = _get(response, 'data.success');
+        if (success) {
+          response = await this.axios.delete(`/api/items/${orgId}/${item.id}`);
+          success = _get(response, 'data.success');
+        };
+        if (!success) throw new Error(`Unable to delete item.`);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$notify({group: 'app', type: 'success', text: `Item ${item.title} was deleted`});
+        this.$router.go(-1);
+      }
+    },
     async loadItem() {
       this.$loading(true);
       const orgId = this.$route.query.orgId;
@@ -192,6 +225,7 @@ export default {
       } finally {
         // this.$loading(false);
         this.$router.go(-1);
+        this.$notify({group: 'app', type: 'success', text: 'Item updated'});
       }
     },
     async loadOrgUsers() {

@@ -61,7 +61,7 @@
     </div>
 
     <b-modal id="delete"
-          :title="'Delete ' + currentBug.title + '?'"
+          :title="'Wait. Are you sure you want to delete this permanently?'"
           button-size="sm"
           size="sm"
           centered
@@ -286,8 +286,12 @@ export default {
       if (!bug || !this.$store.state.user.id) {
       }
       try {
-        const response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bug.id}`);
-        const success = _get(response, 'data.success');
+        let response = await this.axios.post('/api/connections/' + 'bug' + '/' + bug.id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
+        let success = _get(response, 'data.success');
+        if (success) {
+          response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bug.id}`);
+          success = _get(response, 'data.success');
+        };
         if (!success) throw new Error(`Unable to delete bug.`);
       } catch (error) {
         return this.$errorMessage.show(error);

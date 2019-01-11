@@ -25,6 +25,7 @@
               >
        <div class="row" style="margin-top:0.5em">
         <div class="col-7">
+          <b-form-checkbox style="float-right" id="checkbox0" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
         </div>
 
         <b-input-group  class="col-5">
@@ -88,7 +89,8 @@ export default {
       filter: '',
       currentPage: 0,
       totalRows: 0,
-      perPage: 10
+      perPage: 10,
+      showArchived: false
     };
   },
   async mounted () {
@@ -98,6 +100,22 @@ export default {
   },
 
   methods: {
+    async reload(checked) {
+      this.showArchived = checked;
+      let element = this.currentConnectionType;
+      if (element === 'backlog') {
+        await this.loadOrgBacklogs(element);
+      } else if (element === 'initiative') {
+        await this.loadOrgInitiatives(element);
+      } else if (element === 'item') {
+        await this.loadOrgItems(element);
+      } else if (element === 'bug') {
+        await this.loadOrgBugs(element);
+      };
+      this.connectionsFieldToAdd.forEach(el => {
+        if (el.key === 'title') el.label = element;
+      });
+    },
     async loadRelaitedList() {
       this.toConnectionData.connects.forEach(element => {
         this.getConnection(element);
@@ -137,7 +155,7 @@ export default {
     async loadOrgItems() {
       const orgId = this.$route.query.orgId;
       try {
-        const response = await this.axios.get(`/api/items/all/backlogs/${orgId}`);
+        const response = await this.axios.get(`/api/items/all/${this.showArchived}/backlogs/${orgId}`);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
@@ -145,7 +163,7 @@ export default {
         let items = _get(response, 'data.items');
         items.forEach(element => {
           element.selected = false;
-          element.href = '/item/?orgId=' + this.$store.state.organization.id + '&itemId=' + element.id;
+          element.href = '/items' + '/item/?orgId=' + this.$store.state.organization.id + '&itemId=' + element.id;
         });
         items = await this.deleteConnected('item', items);
 
@@ -158,7 +176,7 @@ export default {
     async loadOrgBugs() {
       const orgId = this.$route.query.orgId;
       try {
-        const response = await this.axios.get(`/api/bugs/full/${orgId}` + '/false');
+        const response = await this.axios.get(`/api/bugs/full/${this.showArchived}/${orgId}` + '/false');
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
@@ -179,7 +197,7 @@ export default {
     },
     async loadOrgBacklogs() {
       try {
-        const response = await this.axios.get(`/api/backlogs/${this.$store.state.organization.id}`);
+        const response = await this.axios.get(`/api/backlogs/${this.showArchived}/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's baclogs.`);
@@ -197,7 +215,7 @@ export default {
     },
     async loadOrgInitiatives() {
       try {
-        const response = await this.axios.get(`/api/initiatives/${this.$store.state.organization.id}`);
+        const response = await this.axios.get(`/api/initiatives/all/${this.showArchived}/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);

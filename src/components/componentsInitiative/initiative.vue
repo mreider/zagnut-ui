@@ -63,12 +63,24 @@
             <div class="float-right">
               <b-btn size="sm" type="submit" variant="primary" @click="handleSaveInitiative()">Save & close</b-btn>
               <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
+              <b-btn variant="danger" size="sm" v-b-modal.deleteinitiative>Delete</b-btn>
             </div>
             <Comments :toCommentsData='toCommentsData' ref="comments_ref">
             </Comments>
           </div>
       </div>
     </b-card>
+     <b-modal id="deleteinitiative"
+          :title="'Wait. Are you sure you want to delete this permanently?'"
+          button-size="sm"
+          size="sm"
+          centered
+          body-class="zero-size"
+          ok-variant="danger"
+          @ok="handleInitiativeDelete()"
+          ok-title="delete"
+          >
+    </b-modal>
   </div>
 </template>
 
@@ -105,6 +117,26 @@ export default {
   },
 
   methods: {
+    async handleInitiativeDelete() {
+      let initiative = this.form;
+      if (!initiative || !this.$store.state.user.id) {
+        // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
+      }
+      try {
+        let response = await this.axios.post('/api/connections/' + 'initiative' + '/' + initiative.id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
+        let success = _get(response, 'data.success');
+        if (success) {
+          response = await this.axios.delete(`/api/initiatives/${this.$store.state.organization.id}/${initiative.id}`);
+          success = _get(response, 'data.success');
+        };
+        if (!success) throw new Error(`Unable delete initiative.`);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$notify({group: 'app', type: 'success', text: `Item ${initiative.title} was deleted`});
+        this.$router.go(-1);
+      }
+    },
     async loadOrgStatuses() {
       try {
         this.$loading(true);
@@ -263,6 +295,7 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.$router.go(-1);
+        this.$notify({group: 'app', type: 'success', text: 'Initiative updated'});
       }
     },
     async doVote(result) {

@@ -53,7 +53,7 @@
     </div>
 
        <b-modal id="delete"
-              :title="'Delete ' + currentInitiative.title + '?'"
+              :title="'Wait. Are you sure you want to delete this permanently?'"
               button-size="sm"
               size="sm"
               centered
@@ -265,8 +265,12 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        const response = await this.axios.delete(`/api/initiatives/${this.$store.state.organization.id}/${initiative.id}`);
-        const success = _get(response, 'data.success');
+        let response = await this.axios.post('/api/connections/' + 'initiative' + '/' + initiative.id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
+        let success = _get(response, 'data.success');
+        if (success) {
+          response = await this.axios.delete(`/api/initiatives/${this.$store.state.organization.id}/${initiative.id}`);
+          success = _get(response, 'data.success');
+        };
         if (!success) throw new Error(`Unable delete initiative.`);
       } catch (error) {
         return this.$errorMessage.show(error);
