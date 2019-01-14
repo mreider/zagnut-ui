@@ -2,7 +2,7 @@
   <div class="users">
     <b-dropdown :text="selectedOrg.name" size="sm">
       <b-dropdown-item
-        v-for="org in organizations" v-if="organizations"
+        v-for="org in organizations"
         v-bind:key="org.orgId"
         @click="handleOrgChange(org)"
       >{{ org.name }}</b-dropdown-item>
