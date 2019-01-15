@@ -41,9 +41,7 @@
                 :filter="filter"
                 >
         <template slot="title" slot-scope="data" class="col-8">
-          <a :href="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id" @click="setCurrentItem(data.item)">
-            {{  data.item.title }}
-          </a>
+          <router-link :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id" v-on:click="setCurrentItem(data.item)">{{  data.item.title }}</router-link>
         </template>
         <template slot="author" slot-scope="data" class="col-4">
           <a :href="`#`" v-on:click="filter = data.item.author">
@@ -154,7 +152,7 @@
 import _get from 'lodash/get';
 import _ from 'lodash';
 import Item from '../componentsBacklogs/item.vue';
-import { username } from '@/utils';
+import { username, deleteAllCommentsConnections } from '@/utils';
 export default {
   name: 'Items',
   data() {
@@ -326,10 +324,9 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        let response = await this.axios.post('/api/connections/' + 'item' + '/' + item.id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
-        let success = _get(response, 'data.success');
+        let success = await deleteAllCommentsConnections('items', item.id, 'item');
         if (success) {
-          response = await this.axios.delete(`/api/items/${this.$store.state.organization.id}/${item.id}`);
+          let response = await this.axios.delete(`/api/items/${this.$store.state.organization.id}/${item.id}`);
           success = _get(response, 'data.success');
         };
         if (!success) throw new Error(`Unable to delete item.`);

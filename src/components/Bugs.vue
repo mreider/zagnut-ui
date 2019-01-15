@@ -27,7 +27,7 @@
                 @filtered="onFiltered"
                 style="margin-top: 0.5em">
         <template slot="title" slot-scope="data">
-            <router-link :to="'bug/?orgId='+$store.state.organization.id +'&bugid='+ data.item.id">{{  data.item.title }}</router-link>
+            <router-link :to="'bug/?orgId='+$store.state.organization.id +'&orgId='+ data.item.id">{{  data.item.title }}</router-link>
         </template>
         <template slot="severity" slot-scope="data">
           <a :href="`#`" v-on:click="filter = data.item.severity">
@@ -52,7 +52,7 @@
         <template slot="createdAt" slot-scope="data" class="col-4">
           {{ data.item.createdAt }}
           <div style="float: right;">
-            <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'bug/?orgId='+$store.state.organization.id +'&bugid='+ data.item.id"><font-awesome-icon icon="pencil-alt" /> </b-button>
+            <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'bug/?orgId='+$store.state.organization.id +'&bugId='+ data.item.id"><font-awesome-icon icon="pencil-alt" /> </b-button>
             <b-button v-if="$store.state.user.id ===  data.item.createdBy || admin" style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentBug(data.item)"><font-awesome-icon icon="trash-alt" /></b-button>
           </div>
         </template>
@@ -160,7 +160,7 @@
 <script>
 import _get from 'lodash/get';
 import _ from 'lodash';
-import { username } from '@/utils';
+import { username, deleteAllCommentsConnections } from '@/utils';
 export default {
   name: 'Bugs',
   data() {
@@ -269,7 +269,7 @@ export default {
         if (success) {
           const createdBug = _get(response, 'data.bugs');
           if (go === true) {
-            this.$router.push({ name: 'bug', query: {orgid: orgId, bug: createdBug.id} });
+            this.$router.push({ name: 'bug', query: {orgId: orgId, bugId: createdBug.id} });
           };
         };
         if (!success) throw new Error(`Unable to create new bug.`);
@@ -286,10 +286,9 @@ export default {
       if (!bug || !this.$store.state.user.id) {
       }
       try {
-        let response = await this.axios.post('/api/connections/' + 'bug' + '/' + bug.id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
-        let success = _get(response, 'data.success');
+        let success = await deleteAllCommentsConnections('bugs', bug.id, 'bug');
         if (success) {
-          response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bug.id}`);
+          let response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bug.id}`);
           success = _get(response, 'data.success');
         };
         if (!success) throw new Error(`Unable to delete bug.`);

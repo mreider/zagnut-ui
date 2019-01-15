@@ -28,9 +28,7 @@
               @filtered="onFiltered"
               >
       <template slot="title" slot-scope="data" class="col-8">
-        <a :href="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id">
-          {{  data.item.title }}
-        </a>
+        <router-link :to="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id">{{  data.item.title }}</router-link>
       </template>
       <template slot="author" slot-scope="data" class="col-4">
         <a :href="`#`" v-on:click="filter = data.item.author">
@@ -190,6 +188,7 @@ export default {
       } finally {
         this.$notify({group: 'app', type: 'success', text: `Backlog ${backLog.title} was deleted`});
         this.currentBacklog = '';
+        await this.loadOrgBacklogs();
       }
     },
     async handleNewBacklog() {

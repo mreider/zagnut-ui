@@ -113,7 +113,7 @@ export default {
     },
     handleGetHref(item, backlog) {
       if (item.type === 'bugs' && !backlog) {
-        return 'bug/?orgId=' + this.$store.state.organization.id + '&bugid=' + item.id;
+        return 'bug/?orgId=' + this.$store.state.organization.id + '&bugId=' + item.id;
       } else if (item.type === 'initiatives' && !backlog) {
         return 'initiative/?orgId=' + this.$store.state.organization.id + '&initiativeid=' + item.id;
       } else if (item.type === 'items' && !backlog) {
@@ -125,6 +125,7 @@ export default {
       } else if (item.type === 'comments' && !backlog) {
         let copyItem = JSON.parse(JSON.stringify(item));
         copyItem.type = copyItem.ownerTable;
+        copyItem.id = copyItem.ownerId;
         return this.handleGetHref(copyItem, false);
       };
       return '';
@@ -135,12 +136,10 @@ export default {
           const orgId = this.$store.state.organization.id;
 
           const response = await this.axios.get(`/api/search/${this.text}/${orgId}/${this.showArchived}`);
-
           const success = _get(response, 'data.success');
           if (!success) throw new Error(`Unable to search data.`);
 
           let results = _get(response, 'data.data');
-
           let variants = [];
           results.forEach(element => {
             if (element.createdOn) {
@@ -159,7 +158,7 @@ export default {
           return this.$errorMessage.show(error);
         } finally {
           this.results.forEach(element => {
-            delete element['ownerTable'];
+            // delete element['ownerTable'];
           });
         }
       };

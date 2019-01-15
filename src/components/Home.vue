@@ -35,13 +35,15 @@ export default {
   methods: {
     async loadFeed() {
       try {
+        // this.$loading(true);
+        if (!success) this.showImg = false;
         const response = await this.axios.get(`/api/rss`);
 
         const success = _get(response, 'data.success');
-        if (!success) this.showImg = true;
 
         const rss = _get(response, 'data.rss');
         this.rss = rss;
+        if (!success) this.showImg = true;
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {

@@ -96,7 +96,7 @@
 
 import _get from 'lodash/get';
 import _ from 'lodash';
-import { username } from '@/utils';
+import { username, deleteAllCommentsConnections } from '@/utils';
 import Connections from '../common/connections.vue';
 import Comments from '../common/comments.vue';
 
@@ -143,10 +143,9 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        let response = await this.axios.post('/api/connections/' + 'item' + '/' + item.id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
-        let success = _get(response, 'data.success');
+        let success = await deleteAllCommentsConnections('items', item.id, 'item');
         if (success) {
-          response = await this.axios.delete(`/api/items/${orgId}/${item.id}`);
+          let response = await this.axios.delete(`/api/items/${orgId}/${item.id}`);
           success = _get(response, 'data.success');
         };
         if (!success) throw new Error(`Unable to delete item.`);

@@ -184,7 +184,7 @@ export default {
         let bugs = _get(response, 'data.bugs');
         bugs.forEach(element => {
           element.selected = false;
-          element.href = '/bug/?orgId=' + orgId + '&bugid=' + element.id;
+          element.href = '/bug/?orgId=' + orgId + '&bugId=' + element.id;
         });
 
         bugs = await this.deleteConnected('bug', bugs);
@@ -252,7 +252,7 @@ export default {
           } else if (element === 'item') {
             el.href = '/items/item/?orgId=' + this.$store.state.organization.id + '&itemId=' + el.id;
           } else if (element === 'bug') {
-            el.href = '/bug/?orgId=' + this.$store.state.organization.id + '&bugid=' + el.id;
+            el.href = '/bug/?orgId=' + this.$store.state.organization.id + '&bugId=' + el.id;
           };
         });
 

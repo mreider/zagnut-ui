@@ -101,13 +101,13 @@ import _get from 'lodash/get';
 import _ from 'lodash';
 import Connections from '../common/connections.vue';
 import Comments from '../common/comments.vue';
-import { username } from '@/utils';
+import { username, deleteAllCommentsConnections } from '@/utils';
 export default {
   name: 'bug',
   data() {
     return {
-      toConnectionData: {name: 'bug', id: this.$route.query.bugid, connects: ['initiative', 'item']},
-      toCommentsData: {name: 'bugs', id: this.$route.query.bugid, admin: false},
+      toConnectionData: {name: 'bug', id: this.$route.query.bugId, connects: ['initiative', 'item']},
+      toCommentsData: {name: 'bugs', id: this.$route.query.bugId, admin: false},
       objStatuses: [],
       severityArray: ['P0', 'P1', 'P2', 'P3'],
       users: [],
@@ -126,12 +126,11 @@ export default {
 
   methods: {
     async handleBugDelete() {
-      const bugId = this.$route.query.bugid;
+      const bugId = this.$route.query.bugId;
       try {
-        let response = await this.axios.post('/api/connections/' + 'bug' + '/' + bugId, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
-        let success = _get(response, 'data.success');
+        let success = await deleteAllCommentsConnections('bugs', bugId, 'bug');
         if (success) {
-          response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bugId}`);
+          let response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bugId}`);
           success = _get(response, 'data.success');
         };
         if (!success) throw new Error(`Unable to delete bug.`);
@@ -147,7 +146,7 @@ export default {
         this.$loading(true);
 
         const orgId = this.$route.query.orgId;
-        const bugId = this.$route.query.bugid;
+        const bugId = this.$route.query.bugId;
         const response = await this.axios.get(`/api/bugs/` + orgId + '/' + bugId);
 
         const success = _get(response, 'data.success');
@@ -183,7 +182,7 @@ export default {
     async handleSaveBug() {
       try {
         const orgId = this.$route.query.orgId;
-        const bugId = this.$route.query.bugid;
+        const bugId = this.$route.query.bugId;
 
         let data = {};
 

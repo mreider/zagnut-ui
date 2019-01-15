@@ -8,7 +8,7 @@
     </b-btn> -->
     <b-collapse class="mt-2" v-model="showComments" id="collapse4">
       <b-form-group
-          v-for="element in comments" v-if="comments"
+          v-for="element in comments"
           v-bind:key="element.id"
           breakpoint="lg"
           :description="labelComment(element)"
@@ -161,7 +161,6 @@ export default {
     async handleNewComment(newComment) {
       const orgId = this.$route.query.orgId;
       const id = this.toCommentsData.id;
-      // console.log('from item', newComment);
 
       try {
         this.$loading(true);
