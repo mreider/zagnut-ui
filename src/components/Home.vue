@@ -6,8 +6,10 @@
         <h4> {{ element.name }} </h4>
         <b-card v-for="item in element.items" v-bind:key="item.link" class="col-12" style="margin-top: 1em">
           {{ item.title }}
-          <b-media>
-            <span v-html="item.content"></span>
+          <b-media style="word-wrap: break-word">
+            <div style="word-wrap: break-word">
+              <p v-html="item.content" ></p>
+            </div>
           </b-media>
         </b-card>
       </div>
@@ -42,6 +44,12 @@ export default {
         const success = _get(response, 'data.success');
 
         const rss = _get(response, 'data.rss');
+        rss.forEach(element => {
+          element.items.forEach(el => {
+            el.content = el.content.replace('<pre>', '<p>');
+            el.content = el.content.replace('</pre>', '</p>');
+          });
+        });
         this.rss = rss;
         if (!success) this.showImg = true;
       } catch (error) {

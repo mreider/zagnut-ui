@@ -153,14 +153,15 @@ export default {
         if (!success) throw new Error(`Unable to load bugs's.`);
 
         let bug = _get(response, 'data.bug');
+
         if (bug.archived === 0) {
           bug.archived = false;
         } else {
           bug.archived = true;
         };
-
         bug.status = _.find(this.objStatuses, { 'id': bug.statusId });
         this.toCommentsData.admin = _get(response, 'data.admin');
+
         if (bug.statusId) {
           bug.status = _.find(this.objStatuses, { 'id': bug.statusId });
         } else {
@@ -169,6 +170,7 @@ export default {
         bug.assignee.userId = bug.assignee.id;
         bug.reportedBy.userId = bug.reportedBy.id;
         bug.createdAt = new Date(bug.createdAt).toLocaleString();
+
         this.form = bug;
       } catch (error) {
         return this.$errorMessage.show(error);
