@@ -134,7 +134,7 @@
 <script>
 import _get from 'lodash/get';
 import _ from 'lodash';
-import { username, deleteAllCommentsConnections } from '@/utils';
+import { username } from '@/utils';
 export default {
   name: 'Initiatives',
   data() {
@@ -239,7 +239,7 @@ export default {
         const response = await this.axios.get(`/api/initiatives/all/${this.showArchived}/${this.$store.state.organization.id}`);
 
         const success = _get(response, 'data.success');
-        if (!success) throw new Error(`Unable to load user's organizations.`);
+        if (!success) throw new Error(`Unable to load initiatives.`);
 
         const initiatives = _get(response, 'data.initiatives');
         initiatives.forEach(element => {
@@ -265,11 +265,8 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        let success = await deleteAllCommentsConnections('initiatives', initiative.id, 'initiative');
-        if (success) {
-          let response = await this.axios.delete(`/api/initiatives/${this.$store.state.organization.id}/${initiative.id}`);
-          success = _get(response, 'data.success');
-        };
+        let response = await this.axios.delete(`/api/initiatives/${this.$store.state.organization.id}/${initiative.id}`);
+        let success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable delete initiative.`);
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -352,7 +349,7 @@ export default {
       }
     },
     getHorizonName(d) {
-      const month = d.getMonth();
+      const month = d.getMonth() + 1;
       const year = d.getFullYear();
       let quarter = 0;
       if (month < 3) {
@@ -367,9 +364,10 @@ export default {
       return 'Q' + quarter + year;
     },
     formatDate(d) {
-      const month = d.getMonth();
+      const month = d.getMonth() + 1;
       const year = d.getFullYear();
       const day = d.getDate();
+      console.log(year + '-' + month + '-' + day);
       return year + '-' + month + '-' + day;
     }
   },

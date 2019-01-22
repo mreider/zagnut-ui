@@ -46,17 +46,17 @@ export async function forgotPassword(vue, email) {
   window.location.reload();
 }
 
-export async function deleteAllCommentsConnections(ownerTable, id, strCon) {
-  let response = await axios.delete('/api/comments/deleteAll/' + ownerTable + '/' + id);
-  let success = _get(response, 'data.success');
+// export async function deleteAllCommentsConnections(ownerTable, id, strCon) {
+//   let response = await axios.delete('/api/comments/deleteAll/' + ownerTable + '/' + id);
+//   let success = _get(response, 'data.success');
 
-  if (!success) return false;
+//   if (!success) return false;
 
-  response = await axios.post('/api/connections/' + strCon + '/' + id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
-  success = _get(response, 'data.success');
+//   response = await axios.post('/api/connections/' + strCon + '/' + id, { items: [], initiatives: [], backlogs: [], bugs: [], delete: true });
+//   success = _get(response, 'data.success');
 
-  return success;
-}
+//   return success;
+// }
 
 export function username(user) {
   if (!user) return '';

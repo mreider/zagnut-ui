@@ -152,7 +152,7 @@
 import _get from 'lodash/get';
 import _ from 'lodash';
 import Item from '../componentsBacklogs/item.vue';
-import { username, deleteAllCommentsConnections } from '@/utils';
+import { username } from '@/utils';
 export default {
   name: 'Items',
   data() {
@@ -324,11 +324,8 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        let success = await deleteAllCommentsConnections('items', item.id, 'item');
-        if (success) {
-          let response = await this.axios.delete(`/api/items/${this.$store.state.organization.id}/${item.id}`);
-          success = _get(response, 'data.success');
-        };
+        let response = await this.axios.delete(`/api/items/${this.$store.state.organization.id}/${item.id}`);
+        let success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to delete item.`);
       } catch (error) {
         return this.$errorMessage.show(error);

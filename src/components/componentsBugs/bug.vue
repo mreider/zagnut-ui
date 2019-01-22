@@ -101,7 +101,7 @@ import _get from 'lodash/get';
 import _ from 'lodash';
 import Connections from '../common/connections.vue';
 import Comments from '../common/comments.vue';
-import { username, deleteAllCommentsConnections } from '@/utils';
+import { username } from '@/utils';
 export default {
   name: 'bug',
   data() {
@@ -128,11 +128,8 @@ export default {
     async handleBugDelete() {
       const bugId = this.$route.query.bugId;
       try {
-        let success = await deleteAllCommentsConnections('bugs', bugId, 'bug');
-        if (success) {
-          let response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bugId}`);
-          success = _get(response, 'data.success');
-        };
+        let response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bugId}`);
+        let success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to delete bug.`);
       } catch (error) {
         return this.$errorMessage.show(error);

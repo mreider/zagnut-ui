@@ -27,7 +27,7 @@
                 @filtered="onFiltered"
                 style="margin-top: 0.5em">
         <template slot="title" slot-scope="data">
-            <router-link :to="'bug/?orgId='+$store.state.organization.id +'&orgId='+ data.item.id">{{  data.item.title }}</router-link>
+            <router-link :to="'bug/?orgId='+$store.state.organization.id +'&bugId='+ data.item.id">{{  data.item.title }}</router-link>
         </template>
         <template slot="severity" slot-scope="data">
           <a :href="`#`" v-on:click="filter = data.item.severity">
@@ -160,7 +160,7 @@
 <script>
 import _get from 'lodash/get';
 import _ from 'lodash';
-import { username, deleteAllCommentsConnections } from '@/utils';
+import { username } from '@/utils';
 export default {
   name: 'Bugs',
   data() {
@@ -286,11 +286,8 @@ export default {
       if (!bug || !this.$store.state.user.id) {
       }
       try {
-        let success = await deleteAllCommentsConnections('bugs', bug.id, 'bug');
-        if (success) {
-          let response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bug.id}`);
-          success = _get(response, 'data.success');
-        };
+        let response = await this.axios.delete(`/api/bugs/${this.$store.state.organization.id}/${bug.id}`);
+        let success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to delete bug.`);
       } catch (error) {
         return this.$errorMessage.show(error);
