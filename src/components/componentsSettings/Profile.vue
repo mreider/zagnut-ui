@@ -72,7 +72,7 @@
                   <b-col md="4" sm="4">
                     <b-dropdown :text="invite.org.name" class="m-2" split size="sm" left>
                       <b-dropdown-item
-                        v-for="org in organizations" v-if="organizations"
+                        v-for="org in organizations"
                         v-bind:key="org.id"
                         @click="handleInviteOrgChange(org)"
                       >{{ org.name }}</b-dropdown-item>
@@ -181,7 +181,7 @@ export default {
         if (!success) throw new Error(`Unable to generate new api key.`);
 
         this.profile.apiKey = _get(response, 'data.apiKey');
-
+        console.log(this.profile.apiKey);
         return this.$notify({group: 'error', type: 'success', text: 'New API key was created. Do not forget to update it everywhere.'});
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -219,12 +219,18 @@ export default {
       this.$loading(true);
 
       try {
-        const response = await this.axios.get('/api/user');
+        let response = await this.axios.get('/api/user');
 
         let success = _get(response, 'data.success');
         if (!success) this.$errorMessage.show('Unable to load current user profile');
+        let data = _get(response, 'data.user');
+        data.apiKey = '';
+        this.profile = data;
+        response = await this.axios.get('/api/user/apikey');
+        success = _get(response, 'data.success');
 
-        this.profile = _get(response, 'data.user');
+        if (success) this.profile.apiKey = _get(response, 'data.apikey');
+        console.log(this.profile, _get(response, 'data'));
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {

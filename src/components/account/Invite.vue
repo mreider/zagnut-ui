@@ -1,93 +1,98 @@
 <template>
   <div class="invite">
-    <h2 class="center">You are invited to join {{ organization }}</h2>
+    <div v-if="!err">
+      <h2 class="center">You are invited to join {{ organization }}</h2>
 
-    <b-form @submit="handleRegister" class="register" v-if="form === 'register'">
-      <div class="not-registered" v-if="!postRegister">
-        <h5>Please create an account to accept invitation</h5>
+      <b-form @submit="handleRegister" class="register" v-if="form === 'register'">
+        <div class="not-registered" v-if="!postRegister">
+          <h5>Please create an account to accept invitation</h5>
 
-        <b-row>
-          <b-col md="6" sm="12">
-            <b-form-group>
-              <b-form-input type="text" v-model="register.firstName" placeholder="First Name"></b-form-input>
-            </b-form-group>
-          </b-col>
+          <b-row>
+            <b-col md="6" sm="12">
+              <b-form-group>
+                <b-form-input type="text" v-model="register.firstName" placeholder="First Name"></b-form-input>
+              </b-form-group>
+            </b-col>
 
-          <b-col md="6" sm="12">
-            <b-form-group>
-              <b-form-input type="text" v-model="register.lastName" placeholder="Last Name"></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
+            <b-col md="6" sm="12">
+              <b-form-group>
+                <b-form-input type="text" v-model="register.lastName" placeholder="Last Name"></b-form-input>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row>
-          <b-col md="6" sm="12">
-            <b-form-group>
-              <b-form-input type="email" required v-model="register.email" placeholder="Email" readonly ></b-form-input>
-            </b-form-group>
-          </b-col>
+          <b-row>
+            <b-col md="6" sm="12">
+              <b-form-group>
+                <b-form-input type="email" required v-model="register.email" placeholder="Email" readonly ></b-form-input>
+              </b-form-group>
+            </b-col>
 
-          <b-col md="6" sm="12">
-            <b-form-group>
-              <b-form-input type="text" required v-model="organization" placeholder="Organization" readonly ></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
+            <b-col md="6" sm="12">
+              <b-form-group>
+                <b-form-input type="text" required v-model="organization" placeholder="Organization" readonly ></b-form-input>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row>
-          <b-col md="6" sm="12">
-            <b-form-group>
-              <b-form-input type="password" v-model="register.password" placeholder="Password"></b-form-input>
-            </b-form-group>
-          </b-col>
+          <b-row>
+            <b-col md="6" sm="12">
+              <b-form-group>
+                <b-form-input type="password" v-model="register.password" placeholder="Password"></b-form-input>
+              </b-form-group>
+            </b-col>
 
-          <b-col md="6" sm="12">
-            <b-form-group>
-              <b-form-input type="password" v-model="register.confirmation" placeholder="Confrmation"></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
+            <b-col md="6" sm="12">
+              <b-form-group>
+                <b-form-input type="password" v-model="register.confirmation" placeholder="Confrmation"></b-form-input>
+              </b-form-group>
+            </b-col>
+          </b-row>
 
-        <b-row class="tos">
-            <b-form-checkbox value="Y" v-model="register.tosAccepted">I accept <a href="#">Terms of Service</a> </b-form-checkbox>
-        </b-row>
+          <b-row class="tos">
+              <b-form-checkbox value="Y" v-model="register.tosAccepted">I accept <a href="#">Terms of Service</a> </b-form-checkbox>
+          </b-row>
 
-        <div class="button-box center">
-          <b-button type="submit" variant="primary" :disabled="saving">Save</b-button>
-          <a href="#" class="small" @click="toggleForm('login')">Already registered?</a>
+          <div class="button-box center">
+            <b-button type="submit" variant="primary" :disabled="saving">Save</b-button>
+            <a href="#" class="small" @click="toggleForm('login')">Already registered?</a>
+          </div>
         </div>
-      </div>
 
-      <div v-else>
-        <p>Your invitation accepted and account created.
-          Please check your inbox for verification email and <router-link tag="a" :to="{ name: 'account', params: { action: 'login' } }"><a>process to login</a></router-link></p>
-      </div>
-    </b-form>
-
-    <b-form @submit="handleLogin" class="login" v-if="form === 'login'">
-      <div class="not-logged-on" v-if="!postLogin">
-        <h5>Please login to accept invitation</h5>
-
-        <b-form-group>
-          <b-form-input type="email" v-model="login.email" readonly required placeholder="Email address">
-          </b-form-input>
-        </b-form-group>
-
-        <b-form-group>
-          <b-form-input type="password" v-model="login.password" required placeholder="Password">
-          </b-form-input>
-        </b-form-group>
-
-        <div class="button-box center">
-          <b-button type="submit" variant="primary" :disabled="saving">Login</b-button>
-          <a href="#" class="small" @click="toggleForm('register')">Not registered?</a>
+        <div v-else>
+          <p>Your invitation accepted and account created.
+            Please check your inbox for verification email and <router-link tag="a" :to="{ name: 'account', params: { action: 'login' } }"><a>process to login</a></router-link></p>
         </div>
-      </div>
+      </b-form>
 
-      <div v-else>
-        <p>Your invitation accepted.Process to <router-link tag="a" :to="{ name: 'home' }"><a>dashboard</a></router-link></p>
-      </div>
-    </b-form>
+      <b-form @submit="handleLogin" class="login" v-if="form === 'login'">
+        <div class="not-logged-on" v-if="!postLogin">
+          <h5>Please login to accept invitation</h5>
+
+          <b-form-group>
+            <b-form-input type="email" v-model="login.email" readonly required placeholder="Email address">
+            </b-form-input>
+          </b-form-group>
+
+          <b-form-group>
+            <b-form-input type="password" v-model="login.password" required placeholder="Password">
+            </b-form-input>
+          </b-form-group>
+
+          <div class="button-box center">
+            <b-button type="submit" variant="primary" :disabled="saving">Login</b-button>
+            <a href="#" class="small" @click="toggleForm('register')">Not registered?</a>
+          </div>
+        </div>
+
+        <div v-else>
+          <p>Your invitation accepted.Process to <router-link tag="a" :to="{ name: 'home' }"><a>dashboard</a></router-link></p>
+        </div>
+      </b-form>
+    </div>
+    <div class="invite" v-if="err">
+      <h2 class="center">Bad invite link, request a new one!</h2>
+    </div>
   </div>
 </template>
 
@@ -98,11 +103,11 @@ import { doLogin } from '@/utils';
 export default {
   name: 'Invite',
 
-  beforeCreate() {
+  async beforeCreate() {
   },
 
-  mounted() {
-    this.checkToken();
+  async mounted() {
+    await this.checkToken();
   },
 
   data() {
@@ -116,7 +121,7 @@ export default {
         tosAccepted: false,
         token: null
       },
-
+      err: false,
       login: {
         email: undefined,
         password: undefined,
@@ -137,17 +142,13 @@ export default {
   methods: {
     async checkToken() {
       const token = this.$route.query.token;
-
       if (!token) return;
 
       if (token) {
         this.invited = true;
 
-        this.$loading(true);
-
         try {
           const response = await this.axios.get('/api/org/invite', { params: { token } });
-
           const success = _get(response, 'data.success');
           if (!success) throw new Error('Token invalid or expired');
 
@@ -159,9 +160,9 @@ export default {
           this.login.token = token;
           this.register.token = token;
         } catch (error) {
+          this.err = true;
           return this.$errorMessage.show(error);
         } finally {
-          this.$loading(false);
         }
       }
     },
