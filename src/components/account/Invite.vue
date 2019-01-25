@@ -50,7 +50,7 @@
           </b-row>
 
           <b-row class="tos">
-              <b-form-checkbox value="Y" v-model="register.tosAccepted">I accept <a href="#">Terms of Service</a> </b-form-checkbox>
+              <b-form-checkbox value="Y" v-model="register.tosAccepted">I accept <a href="#" class="small" @click="openTerms">Terms of Service</a> </b-form-checkbox>
           </b-row>
 
           <div class="button-box center">
@@ -140,6 +140,9 @@ export default {
   },
 
   methods: {
+    openTerms() {
+      window.open('/static/PM415TERMSANDCONDITIONS.html', '_blank');
+    },
     async checkToken() {
       const token = this.$route.query.token;
       if (!token) return;
