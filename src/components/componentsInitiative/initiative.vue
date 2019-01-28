@@ -1,8 +1,8 @@
 <template>
-  <div class="initiative col-12">
-     <b-card bg-variant="light" class="card col-lg-12">
+  <div class="initiative col-lg-12 col-md-8 col-sm-6 col-xs-4">
+     <b-card no-body bg-variant="light" class="card col-lg-12">
        <div class="container-fluid  row">
-          <div class="col-8">
+          <div class="col-lg-8 col-md-8 cols-sm-6 col-xs-4">
             <b-form-group label-for = "title">
               <b-form-input v-model="form.title" placeholder="Enter initiative" id="title">></b-form-input>
             </b-form-group>
@@ -15,8 +15,8 @@
               </b-form-textarea>
             </b-form-group>
           </div>
-       <div class="col-4 row" >
-            <b-form-group label = "Vote:" horizontal label-size="md" :label-cols="3" class="col-12">
+       <div class="col-lg-4 col-md-8 col-sm-6 col-xs-4 row" >
+            <b-form-group label = "Vote:" horizontal label-size="md" :label-cols="3" class="col-lg-12">
               <template>
                 <div style="display: inline-block; margin-left: 0px; padding-top: 0.5em">
                   <b-button v-model="vote" style="vertical-align: right;" size="lg" :variant.sync="btntrue" v-on:click="handleInitiativeSetField(true, 'vote')"><font-awesome-icon icon="thumbs-up"/> </b-button>

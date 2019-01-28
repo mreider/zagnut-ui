@@ -1,16 +1,16 @@
 <template>
-  <div class="bug col-12">
-     <b-card bg-variant="light" class="card col-lg-12">
+  <div class="bug col-lg-12 col-md-8 col-sm-6 col-xs-4">
+     <b-card no-body bg-variant="light" class="card col-lg-12">
         <div class="container-fluid  row">
-        <div class="col-7">
+        <div class="col-lg-7 col-md-8">
           <b-form-group label-for = "title">
             <b-form-input v-model="form.title" placeholder="Enter bug" id="title">></b-form-input>
             <label class="left">Created by  {{handleUsername(form.reportedBy)}} on {{form.createdAt}}</label>
           </b-form-group>
         </div>
-        <div class="col-5">
+        <div class="col-lg-5 col-md-0">
         </div>
-        <b-form-group label= "Severity" label-for="formSeverity" label-size="sm" class="col-3">
+        <b-form-group label= "Severity" label-for="formSeverity" label-size="sm" class="col-lg-3 col-md-8">
           <b-dropdown :text="form.severity" name="formSeverity" size="sm" class="severity m-2" >
             <b-dropdown-item
             v-for="element in severityArray"
@@ -21,7 +21,7 @@
             </b-dropdown-item>
           </b-dropdown>
         </b-form-group>
-        <b-form-group label= "Status" label-for="formStatus" label-size="sm" class="col-3">
+        <b-form-group label= "Status" label-for="formStatus" label-size="sm" class="col-lg-3 col-md-8">
           <b-dropdown :text="form.status.name" name="formStatus" size="sm" class="status m-2" >
             <b-dropdown-item
             v-for="element in objStatuses"
@@ -32,7 +32,7 @@
             </b-dropdown-item>
           </b-dropdown>
         </b-form-group>
-        <b-form-group  label = "Reported by: " label-for = "formgReportedBy" label-size="sm" class="col-3" >
+        <b-form-group  label = "Reported by: " label-for = "formgReportedBy" label-size="sm" class="col-lg-3 col-md-8" >
           <b-dropdown :text="handleUsername(form.reportedBy)" name="formReportedBy" size="sm" class="users m-2" >
             <b-dropdown-item
             v-for="element in users"
@@ -43,7 +43,7 @@
             </b-dropdown-item>
           </b-dropdown>
         </b-form-group>
-        <b-form-group  label = "Assigned to: " label-for = "formAssignedTo" label-size="sm" class="col-3">
+        <b-form-group  label = "Assigned to: " label-for = "formAssignedTo" label-size="sm" class="col-lg-3 col-md-8">
           <b-dropdown :text="handleUsername(form.assignee)" name="formgAssignedTo" size="sm" class="users m-2" >
             <b-dropdown-item
             v-for="element in users"
@@ -55,7 +55,7 @@
           </b-dropdown>
         </b-form-group>
 
-        <b-form-group  label-for = "description" class="col-12">
+        <b-form-group  label-for = "description" class="col-lg-12">
           <b-form-textarea id="description"
               v-model="form.description"
               placeholder="Enter description"

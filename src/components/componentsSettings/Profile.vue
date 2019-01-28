@@ -181,7 +181,6 @@ export default {
         if (!success) throw new Error(`Unable to generate new api key.`);
 
         this.profile.apiKey = _get(response, 'data.apiKey');
-        console.log(this.profile.apiKey);
         return this.$notify({group: 'error', type: 'success', text: 'New API key was created. Do not forget to update it everywhere.'});
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -230,7 +229,6 @@ export default {
         success = _get(response, 'data.success');
 
         if (success) this.profile.apiKey = _get(response, 'data.apikey');
-        console.log(this.profile, _get(response, 'data'));
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {

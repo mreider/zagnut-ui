@@ -1,14 +1,14 @@
 <template>
-  <div class="item col-lg-12 col-md-8 col-sm-6 col-xs-4">
-     <b-card bg-variant="light" class="card col-lg-12">
-        <div class="container-fluid row">
-          <div class="col-8">
-            <b-form-input placeholder="Enter title" v-model="form.title" id="title" class="text-left description"></b-form-input>
-            <label class="left">Created by  {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
-          </div>
-          <div class="col-4">
-          </div>
-          <div class="col-3" >
+  <div class="item col-lg-12 col-md-12 col-sm-6 col-xs-4">
+     <b-card no-body bg-variant="light" class="card col-lg-12">
+        <div class="col-lg-8 col-md-8">
+          <b-form-input placeholder="Enter title" v-model="form.title" id="title" class="text-left description" style="margin-top: 1em;"></b-form-input>
+          <label class="left">Created by  {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
+        </div>
+        <div class="col-lg-4 col-md-0">
+        </div>
+        <div class="row">
+          <div class="col-lg-3 col-md-8 col-sm-6" >
             <b-form-group label = "Status: " label-for = "labelStatus" label-size="sm" :label-cols="3" horizontal>
               <b-dropdown :text="currentStatus" name="itemStatus" size="sm" class="statuses m-2" >
                 <b-dropdown-item
@@ -21,7 +21,7 @@
               </b-dropdown>
             </b-form-group>
           </div>
-          <div class="col-3" >
+          <div class="col-lg-3 col-md-8 col-sm-6" >
             <b-form-group label = "Assignee: " label-for = "ItemAssignee" label-size="sm" :label-cols="4" horizontal>
               <b-dropdown :text="handleUsername(form.assignee)" name="ItemAssignee" size="sm" class="users m-2" >
                 <b-dropdown-item
@@ -35,7 +35,7 @@
               </b-dropdown>
             </b-form-group>
           </div>
-          <div class="col-3" >
+          <div class="col-lg-3 col-md-8 col-sm-6" >
             <b-form-group label = "Points: " label-for = "ItemPoints" label-size="sm" :label-cols="3" horizontal>
               <b-dropdown :text="String(form.points)" name="ItemPoints" size="sm" class="points m-2" >
                 <b-dropdown-item
@@ -50,32 +50,30 @@
           </div>
           <div class="col-3">
           </div>
-          <div class="col-12">
-            <b-form-textarea v-model="form.description"
-                              id="description"
-                              :rows="6"
-                              :max-rows="8"
-                              class="description text-left"
-                              placeholder="Enter description"
-                              >
-            </b-form-textarea>
+        </div>
+        <div class="col-12">
+          <b-form-textarea v-model="form.description"
+                            id="description"
+                            :rows="6"
+                            :max-rows="8"
+                            class="description text-left"
+                            placeholder="Enter description"
+                            >
+          </b-form-textarea>
+        </div>
+        <Connections :toConnectionData='toConnectionData' class="col-lg-12">
+        </Connections>
+        <div class="button-box col-12" style="margin-top:20px;">
+          <b-form-group label = "Archived: " class="float-left" label-for = "checkbox1" label-size="sm" :label-cols="7" horizontal>
+            <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived" > </b-form-checkbox>
+          </b-form-group>
+          <div class="float-right">
+            <b-btn size="sm" type="submit" variant="primary" @click="handleSaveItem()">Save & close</b-btn>
+            <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
+            <b-btn variant="danger" size="sm" v-b-modal.deleteitem>Delete</b-btn>
           </div>
-          <div class="col-12">
-            <Connections :toConnectionData='toConnectionData'>
-            </Connections>
-          </div>
-          <div class="button-box col-12" style="margin-top:20px;">
-            <b-form-group label = "Archived: " class="float-left" label-for = "checkbox1" label-size="sm" :label-cols="7" horizontal>
-              <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived" > </b-form-checkbox>
-            </b-form-group>
-            <div class="float-right">
-              <b-btn size="sm" type="submit" variant="primary" @click="handleSaveItem()">Save & close</b-btn>
-              <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
-              <b-btn variant="danger" size="sm" v-b-modal.deleteitem>Delete</b-btn>
-            </div>
-            <Comments :toCommentsData='toCommentsData' ref="comments_ref">
-            </Comments>
-          </div>
+          <Comments :toCommentsData='toCommentsData' ref="comments_ref">
+          </Comments>
         </div>
     </b-card>
     <b-modal id="deleteitem"

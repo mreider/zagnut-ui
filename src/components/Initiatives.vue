@@ -367,7 +367,6 @@ export default {
       const month = d.getMonth() + 1;
       const year = d.getFullYear();
       const day = d.getDate();
-      console.log(year + '-' + month + '-' + day);
       return year + '-' + month + '-' + day;
     }
   },

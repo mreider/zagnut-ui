@@ -1,19 +1,16 @@
 <template>
-  <b-card class="connections" bg-variant="light">
-    <div class=" col-lg-12 col-md-8 col-sm-6 col-xs-4">
-      <div class="row">
-        <b-card v-for="element in relations" v-bind:key="element.key" class="col-12" style="margin-top: 1em">
-          <div class="float-right">
-            <b-btn size="sm" style="width: 10em" @click="setCurrentConnectionType(element.key)">Link {{element.key}}</b-btn>
-          <br>
-            <b-btn style="margin-top: 0.5em; width: 10em;" variant="danger" size="sm" v-b-modal.delete>Remove seleted</b-btn>
-          </div>
-          <div v-for="item in element.data" v-bind:key="item.id" class="" style="margin-top: 1em">
-            <b-form-checkbox v-model="item.selected">   <router-link :to="item.href">{{item.title}}</router-link>  </b-form-checkbox>
-          </div>
-        </b-card>
-      </div>
-    </div>
+  <b-card  no-body class="connections col-lg-12 col-md-8 col-sm-6 col-xs-4" bg-variant="light">
+     <b-card  v-for="element in relations" v-bind:key="element.key" class="col-lg-12 col-sm-12 col-md-12 col-xs-12" style="margin-top: 1em; margin-bottom: 1em">
+        <div class="float-right">
+          <b-btn size="sm" style="width: 10em" @click="setCurrentConnectionType(element.key)">Link {{element.key}}</b-btn>
+        <br>
+          <b-btn style="margin-top: 0.5em; width: 10em;" variant="danger" size="sm" v-b-modal.delete>Remove seleted</b-btn>
+        </div>
+        <br>
+        <div v-for="item in element.data" v-bind:key="item.id" class="" style="margin-top: 1em">
+          <b-form-checkbox v-model="item.selected">   <router-link :to="item.href">{{item.title}}</router-link>  </b-form-checkbox>
+        </div>
+      </b-card>
     <b-modal id="modalnew"
               button-size="sm"
               :title="'Link ' + currentConnectionType + 's'"
@@ -23,18 +20,16 @@
               ok-title="Link selected"
               ref="modalnew"
               >
-       <div class="row" style="margin-top:0.5em">
-        <div class="col-7">
+        <div class="col-lg-7 col-md-4">
           <b-form-checkbox style="float-right" id="checkbox0" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
         </div>
 
-        <b-input-group  class="col-5">
+        <b-input-group  class="col-lg-5 col-md-4">
           <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
           <b-input-group-append>
             <b-btn size="sm" class="btnHeader "  :disabled="!filter" @click="filter = ''">Clear</b-btn>
           </b-input-group-append>
         </b-input-group >
-        </div>
 
       <b-table  bordered
                 fixed
