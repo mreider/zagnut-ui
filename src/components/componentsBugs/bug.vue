@@ -1,59 +1,70 @@
 <template>
-  <div class="bug col-lg-12 col-md-8 col-sm-6 col-xs-4">
-     <b-card no-body bg-variant="light" class="card col-lg-12">
-        <div class="container-fluid  row">
-        <div class="col-lg-7 col-md-8">
-          <b-form-group label-for = "title">
-            <b-form-input v-model="form.title" placeholder="Enter bug" id="title">></b-form-input>
-            <label class="left">Created by  {{handleUsername(form.reportedBy)}} on {{form.createdAt}}</label>
-          </b-form-group>
-        </div>
-        <div class="col-lg-5 col-md-0">
-        </div>
-        <b-form-group label= "Severity" label-for="formSeverity" label-size="sm" class="col-lg-3 col-md-8">
-          <b-dropdown :text="form.severity" name="formSeverity" size="sm" class="severity m-2" >
-            <b-dropdown-item
-            v-for="element in severityArray"
-            v-bind:key="element"
-            @click="handleBugSetField(element, 'severity')"
-            size = "sm"
-            >{{ element }}
-            </b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
-        <b-form-group label= "Status" label-for="formStatus" label-size="sm" class="col-lg-3 col-md-8">
-          <b-dropdown :text="form.status.name" name="formStatus" size="sm" class="status m-2" >
-            <b-dropdown-item
-            v-for="element in objStatuses"
-            v-bind:key="element.id"
-            @click="handleBugSetField(element, 'status')"
-            size = "sm"
-            >{{ element.name }}
-            </b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
-        <b-form-group  label = "Reported by: " label-for = "formgReportedBy" label-size="sm" class="col-lg-3 col-md-8" >
-          <b-dropdown :text="handleUsername(form.reportedBy)" name="formReportedBy" size="sm" class="users m-2" >
-            <b-dropdown-item
-            v-for="element in users"
-            v-bind:key="element.id"
-            @click="handleBugSetField(element, 'reportedBy')"
-            size = "sm"
-            >{{ handleUsername(element) }}
-            </b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
-        <b-form-group  label = "Assigned to: " label-for = "formAssignedTo" label-size="sm" class="col-lg-3 col-md-8">
-          <b-dropdown :text="handleUsername(form.assignee)" name="formgAssignedTo" size="sm" class="users m-2" >
-            <b-dropdown-item
-            v-for="element in users"
-            v-bind:key="element.id"
-            @click="handleBugSetField(element, 'assignee')"
-            size = "sm"
-            >{{ handleUsername(element) }}
-            </b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
+  <div class="bug">
+     <b-card no-body bg-variant="light" class="card">
+        <b-container>
+        <b-row>
+          <b-col col lg="7" sm="12" md="7" xl="7">
+            <b-form-group label-for = "title">
+              <b-form-input v-model="form.title" placeholder="Enter bug" id="title">></b-form-input>
+              <label class="left">Created by  {{handleUsername(form.reportedBy)}} on {{form.createdAt}}</label>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col col lg="3" sm="6" md="3" xl="3">
+            <b-form-group label= "Severity" label-for="formSeverity" label-size="sm" >
+              <b-dropdown :text="form.severity" name="formSeverity" size="sm" class="severity m-2" >
+                <b-dropdown-item
+                v-for="element in severityArray"
+                v-bind:key="element"
+                @click="handleBugSetField(element, 'severity')"
+                size = "sm"
+                >{{ element }}
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-form-group>
+          </b-col>
+          <b-col col lg="3" sm="6" md="3" xl="3">
+            <b-form-group label= "Status" label-for="formStatus" label-size="sm">
+              <b-dropdown :text="form.status.name" name="formStatus" size="sm" class="status m-2" >
+                <b-dropdown-item
+                v-for="element in objStatuses"
+                v-bind:key="element.id"
+                @click="handleBugSetField(element, 'status')"
+                size = "sm"
+                >{{ element.name }}
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-form-group>
+          </b-col>
+          <b-col col lg="3" sm="5" md="3" xl="3">
+            <b-form-group  label = "Reported by: " label-for = "formgReportedBy" label-size="sm" >
+              <b-dropdown :text="handleUsername(form.reportedBy)" name="formReportedBy" size="sm" class="users m-2" >
+                <b-dropdown-item
+                v-for="element in users"
+                v-bind:key="element.id"
+                @click="handleBugSetField(element, 'reportedBy')"
+                size = "sm"
+                >{{ handleUsername(element) }}
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-form-group>
+          </b-col>
+          <b-col col lg="3" sm="5" md="3" xl="3">
+            <b-form-group  label = "Assigned to: " label-for = "formAssignedTo" label-size="sm">
+              <b-dropdown :text="handleUsername(form.assignee)" name="formgAssignedTo" size="sm" class="users m-2" >
+                <b-dropdown-item
+                v-for="element in users"
+                v-bind:key="element.id"
+                @click="handleBugSetField(element, 'assignee')"
+                size = "sm"
+                >{{ handleUsername(element) }}
+                </b-dropdown-item>
+              </b-dropdown>
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </b-container>
 
         <b-form-group  label-for = "description" class="col-lg-12">
           <b-form-textarea id="description"
@@ -79,7 +90,6 @@
             <Comments :toCommentsData='toCommentsData' ref="comments_ref">
             </Comments>
         </div>
-      </div>
     </b-card>
     <b-modal id="deletebug"
           :title="'Wait. Are you sure you want to delete this permanently?'"
@@ -96,7 +106,6 @@
 </template>
 
 <script>
-
 import _get from 'lodash/get';
 import _ from 'lodash';
 import Connections from '../common/connections.vue';
@@ -120,10 +129,8 @@ export default {
     await this.loadOrgUsers();
     await this.loadOrgBug();
   },
-
   computed: {
   },
-
   methods: {
     async handleBugDelete() {
       const bugId = this.$route.query.bugId;
@@ -141,16 +148,12 @@ export default {
     async loadOrgBug() {
       try {
         this.$loading(true);
-
         const orgId = this.$route.query.orgId;
         const bugId = this.$route.query.bugId;
         const response = await this.axios.get(`/api/bugs/` + orgId + '/' + bugId);
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load bugs's.`);
-
         let bug = _get(response, 'data.bug');
-
         if (bug.archived === 0) {
           bug.archived = false;
         } else {
@@ -158,7 +161,6 @@ export default {
         };
         bug.status = _.find(this.objStatuses, { 'id': bug.statusId });
         this.toCommentsData.admin = _get(response, 'data.admin');
-
         if (bug.statusId) {
           bug.status = _.find(this.objStatuses, { 'id': bug.statusId });
         } else {
@@ -167,7 +169,6 @@ export default {
         bug.assignee.userId = bug.assignee.id;
         bug.reportedBy.userId = bug.reportedBy.id;
         bug.createdAt = new Date(bug.createdAt).toLocaleString();
-
         this.form = bug;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -182,9 +183,7 @@ export default {
       try {
         const orgId = this.$route.query.orgId;
         const bugId = this.$route.query.bugId;
-
         let data = {};
-
         if (this.form.assignee) data.assignee = String(this.form.assignee.userId);
         data.description = this.form.description;
         data.title = this.form.title;
@@ -192,10 +191,8 @@ export default {
         data.severity = this.form.severity;
         if (this.form.reportedBy) data.createdBy = String(this.form.reportedBy.userId);
         if (this.form.status.id !== 0) data.statusId = String(this.form.status.id);
-
         delete data.status;
         const response = await this.axios.put(`/api/bugs/edit/${orgId}/${bugId}`, data);
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update bug.`);
         // this.$notify({group: 'app', type: 'success', text: 'Item updated'});
@@ -215,12 +212,9 @@ export default {
       try {
         this.$loading(true);
         const orgId = this.$store.state.organization.id;
-
         const response = await this.axios.get(`/api/statuses/bugs/${orgId}`);
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-
         this.objStatuses = _get(response, 'data.statuses');
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -233,12 +227,9 @@ export default {
         const orgId = this.$store.state.organization.id;
         this.$loading(true);
         const response = await this.axios.get(`/api/org/${orgId}/users`);
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-
         const users = _get(response, 'data.users');
-
         this.users = users;
       } catch (error) {
         return this.$errorMessage.show(error);

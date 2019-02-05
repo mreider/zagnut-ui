@@ -1,29 +1,24 @@
 <template>
-  <b-card bg-variant="light" class="card col-12" style="margin-top:2em;" >
-    <!-- <b-input-group prepend="Text to search" class="col-12">
-      <b-form-input v-model="text"></b-form-input>
-      <b-input-group-append>
-        <b-btn variant="outline-success" size="sm" @click="search"><font-awesome-icon icon="search" aria-hidden="true"/>  Search</b-btn>
-      </b-input-group-append>
-    </b-input-group> -->
+  <b-card bg-variant="light" class="card" style="margin-top:2em;" >
     <div class="row">
       <div class="col-5">
         <b-form-checkbox style="margin-top:2px;" id="checkbox0"  class="mb-2 float-left" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
+         <b-dropdown :text="currentVarriant" size="sm" class="col-1">
+          <b-dropdown-item
+            v-for="oneVar in variants"
+            v-bind:key="oneVar"
+            @click="handleChangeView(oneVar)"
+          >{{ oneVar }}
+          </b-dropdown-item>
+        </b-dropdown>
       </div>
-      <b-dropdown :text="currentVarriant" size="sm" class="col-1">
-      <b-dropdown-item
-        v-for="oneVar in variants"
-        v-bind:key="oneVar"
-        @click="handleChangeView(oneVar)"
-      >{{ oneVar }}</b-dropdown-item>
-      </b-dropdown>
 
       <b-input-group  class="col-6">
         <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
         <b-input-group-append>
           <b-btn size="sm" class="btnHeader "  :disabled="!filter" @click="filter = ''">Clear</b-btn>
         </b-input-group-append>
-    </b-input-group >
+      </b-input-group >
     </div>
     <b-table  bordered
               fixed
@@ -31,6 +26,7 @@
               :fields="itemsFields"
               :items="results"
               :filter="filter"
+              stacked="sm"
               :current-page="currentPage"
               :per-page="perPage"
               @filtered="onFiltered"

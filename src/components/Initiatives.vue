@@ -1,5 +1,5 @@
 <template>
-  <b-card bg-variant="light" class="card col-12">
+  <b-card no-body bg-variant="light" class="card col-12">
     <div class="initiatives">
      <div class="row">
       <div class="col-12">
@@ -22,6 +22,7 @@
                 :filter="filter"
                 :current-page="currentPage"
                 :per-page="perPage"
+                stacked="sm"
                 class="col-12"
                 sort-by="horizon"
                 @filtered="onFiltered"
@@ -49,7 +50,7 @@
           </a>
         </template>
       </b-table>
-      <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+      <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" style="padding-bottom:1em"/>
     </div>
 
        <b-modal id="delete"

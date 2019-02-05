@@ -1,6 +1,6 @@
 <template>
-   <b-card bg-variant="light" class="card col-12">
-    <div class="bugs">
+   <b-card no-body bg-variant="light" class="card col-12">
+    <b-container class="bugs">
      <div class="row">
       <div class="col-12">
         <b-btn class="float-right btnHeader" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
@@ -23,6 +23,7 @@
                 :filter="filter"
                 :current-page="currentPage"
                 :per-page="perPage"
+                stacked="sm"
                 class="col-12"
                 @filtered="onFiltered"
                 style="margin-top: 0.5em">
@@ -57,7 +58,7 @@
           </div>
         </template>
       </b-table>
-      <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+      <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" style="padding-bottom:1em"/>
     </div>
 
     <b-modal id="delete"
@@ -153,7 +154,7 @@
       </div>
     </b-modal>
 
-    </div>
+    </b-container>
   </b-card>
 </template>
 

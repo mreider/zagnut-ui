@@ -36,8 +36,8 @@
           :ref="newComment"
           ></b-form-textarea>
         </vue-tribute>
-        <div style="float: right;">
-          <b-button style="bottom" variant="primary" size="sm" @click="handleNewComment(newComment)"><font-awesome-icon icon="save" /> Add comment</b-button>
+        <div style="float: right; padding-bottom:1em">
+          <b-button style="bottom"  variant="primary" size="sm" @click="handleNewComment(newComment)"><font-awesome-icon icon="save" /> Add comment</b-button>
         </div>
     </b-collapse>
   </div>

@@ -1,7 +1,6 @@
 <template>
-  <div class="initiative col-lg-12 col-md-8 col-sm-6 col-xs-4">
      <b-card no-body bg-variant="light" class="card col-lg-12">
-       <div class="container-fluid  row">
+       <div class="container row">
           <div class="col-lg-8 col-md-8 cols-sm-6 col-xs-4">
             <b-form-group label-for = "title">
               <b-form-input v-model="form.title" placeholder="Enter initiative" id="title">></b-form-input>
@@ -15,7 +14,7 @@
               </b-form-textarea>
             </b-form-group>
           </div>
-       <div class="col-lg-4 col-md-8 col-sm-6 col-xs-4 row" >
+          <div class="col-lg-4 col-md-8 col-sm-6 col-xs-4 row" >
             <b-form-group label = "Vote:" horizontal label-size="md" :label-cols="3" class="col-lg-12">
               <template>
                 <div style="display: inline-block; margin-left: 0px; padding-top: 0.5em">
@@ -52,25 +51,22 @@
           </div>
           <div class="col-4">
           </div>
-          <div class="col-12">
-            <Connections :toConnectionData='toConnectionData'>
-            </Connections>
-          </div>
-          <div class="button-box col-12" style="margin-top:20px;">
-            <b-form-group class="float-left" label = "Archived: " label-for = "checkbox1" label-size="sm" :label-cols="7" horizontal>
-              <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived" > </b-form-checkbox>
-            </b-form-group>
-            <div class="float-right">
-              <b-btn size="sm" type="submit" variant="primary" @click="handleSaveInitiative()">Save & close</b-btn>
-              <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
-              <b-btn variant="danger" size="sm" v-b-modal.deleteinitiative>Delete</b-btn>
-            </div>
-            <Comments :toCommentsData='toCommentsData' ref="comments_ref">
-            </Comments>
-          </div>
       </div>
-    </b-card>
-     <b-modal id="deleteinitiative"
+        <Connections :toConnectionData='toConnectionData'>
+        </Connections>
+        <div class="button-box" style="margin-top:20px;">
+          <b-form-group class="float-left" label = "Archived: " label-for = "checkbox1" label-size="sm" :label-cols="7" horizontal>
+            <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived" > </b-form-checkbox>
+          </b-form-group>
+          <div class="float-right">
+            <b-btn size="sm" type="submit" variant="primary" @click="handleSaveInitiative()">Save & close</b-btn>
+            <b-btn size="sm" @click="$router.go(-1)"> Back </b-btn>
+            <b-btn variant="danger" size="sm" v-b-modal.deleteinitiative>Delete</b-btn>
+          </div>
+          <Comments :toCommentsData='toCommentsData' ref="comments_ref">
+          </Comments>
+        </div>
+      <b-modal id="deleteinitiative"
           :title="'Wait. Are you sure you want to delete this permanently?'"
           button-size="sm"
           size="sm"
@@ -80,12 +76,11 @@
           @ok="handleInitiativeDelete()"
           ok-title="delete"
           >
-    </b-modal>
-  </div>
+      </b-modal>
+    </b-card>
 </template>
 
 <script>
-
 import _get from 'lodash/get';
 import _ from 'lodash';
 import Connections from '../common/connections.vue';
@@ -112,10 +107,8 @@ export default {
     await this.loadVotes();
     // this.btnfalse = '';
   },
-
   computed: {
   },
-
   methods: {
     async handleInitiativeDelete() {
       let initiative = this.form;
@@ -137,12 +130,9 @@ export default {
       try {
         this.$loading(true);
         const orgId = this.$store.state.organization.id;
-
         const response = await this.axios.get(`/api/statuses/initiatives/${orgId}`);
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-
         this.objStatuses = _get(response, 'data.statuses');
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -172,35 +162,30 @@ export default {
         horizon: this.getHorizonName(newDate)
       };
       this.horizonList.push(obj);
-
       newDate = new Date(new Date().setMonth(new Date().getMonth() + 3));
       obj = {
         date: newDate,
         horizon: this.getHorizonName(newDate)
       };
       this.horizonList.push(obj);
-
       newDate = new Date(new Date().setMonth(new Date().getMonth() + 6));
       obj = {
         date: newDate,
         horizon: this.getHorizonName(newDate)
       };
       this.horizonList.push(obj);
-
       newDate = new Date(new Date().setMonth(new Date().getMonth() + 9));
       obj = {
         date: newDate,
         horizon: this.getHorizonName(newDate)
       };
       this.horizonList.push(obj);
-
       newDate = new Date(new Date().setMonth(new Date().getMonth() + 12));
       obj = {
         date: newDate,
         horizon: this.getHorizonName(newDate)
       };
       this.horizonList.push(obj);
-
       newDate = new Date(new Date().setMonth(new Date().getMonth() + 15));
       obj = {
         date: newDate,
@@ -232,14 +217,11 @@ export default {
     async loadOrgInitiative() {
       try {
         this.$loading(true);
-
         const orgId = this.$route.query.orgId;
         const initiativeId = this.$route.query.initiativeid;
         const response = await this.axios.get(`/api/initiatives/` + orgId + '/' + initiativeId);
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-
         let initiative = _get(response, 'data.initiative');
         initiative.status = _.find(this.objStatuses, { 'id': initiative.statusId });
         initiative.horizon = {
@@ -263,7 +245,6 @@ export default {
       try {
         const orgId = this.$route.query.orgId;
         const initiativeId = this.$route.query.initiativeid;
-
         let data = JSON.parse(JSON.stringify(this.form));
         delete data['createdAt'];
         delete data['updatedAt'];
@@ -272,18 +253,13 @@ export default {
         delete data['author'];
         delete data['id'];
         delete data.vote;
-
         data.horizon = this.formatDate(new Date(data.horizon.date));
         data.statusId = String(data.status.id);
-
         delete data.status;
-
         data.organizationId = String(data.organizationId);
         const response = await this.axios.put(`/api/initiatives/edit/${orgId}/${initiativeId}`, data);
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update initiative.`);
-
         // this.$notify({group: 'app', type: 'success', text: 'Item updated'});
         const newComment = this.$refs['comments_ref'].newComment;
         if (newComment) this.$refs['comments_ref'].handleNewComment(this.$refs['comments_ref'].newComment);
@@ -299,12 +275,9 @@ export default {
         // this.$loading(true);
         const initiativeId = this.$route.query.initiativeid;
         const response = await this.axios.post(`/api/votes/initiatives/` + initiativeId + '/' + String(result));
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to vote.`);
-
         let vote = _get(response, 'data.votes');
-
         this.vote = vote;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -315,13 +288,10 @@ export default {
     async loadVotes() {
       try {
         // this.$loading(true);
-
         const initiativeId = this.$route.query.initiativeid;
         const response = await this.axios.get(`/api/votes/initiatives/` + initiativeId);
-
         const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable load votes.`);
-
         let vote = _get(response, 'data.votes');
         this.vote = vote;
         let myVote = _get(response, 'data.myVote');
