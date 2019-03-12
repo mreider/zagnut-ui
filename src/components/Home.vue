@@ -1,6 +1,6 @@
 <template>
   <b-card class="home" bg-variant="light">
-    <v-btn color="error">Error</v-btn>
+    <v-btn color="success">success</v-btn>
 
     <div class="col-lg-12 col-md-8 col-sm-6 col-xs-4">
       <div class="img center" style="margin-top: 3em" v-if="showImg">
