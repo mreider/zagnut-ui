@@ -21,10 +21,29 @@ import './scss/tribute.css';
 import './scss/global.scss';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPencilAlt, faTrashAlt, faSave, faThumbsUp, faThumbsDown, faSearch } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPencilAlt,
+  faTrashAlt,
+  faSave,
+  faThumbsUp,
+  faThumbsDown,
+  faSearch
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import Vuetify from 'vuetify';
+import 'vuetify/dist/vuetify.min.css'; // Ensure you are using css-loader
+// @import '~vuetify/src/stylus/main' // Ensure you are using stylus-loader
 
-library.add(faPencilAlt, faTrashAlt, faSave, faThumbsUp, faThumbsDown, faSearch);
+Vue.use(Vuetify);
+
+library.add(
+  faPencilAlt,
+  faTrashAlt,
+  faSave,
+  faThumbsUp,
+  faThumbsDown,
+  faSearch
+);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
