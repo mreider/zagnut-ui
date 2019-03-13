@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-layout row wrap>
-      <v-toolbar card prominent align-center>
+      <v-toolbar card prominent align-center height="auto">
         <v-checkbox label="Show archived" class="checkbox"></v-checkbox>
         <div>
           <v-btn small color="primary" outline>Initiative</v-btn>
@@ -11,11 +11,13 @@
           <v-btn small color="primary" outline>Author</v-btn>
         </div>
         <v-spacer></v-spacer>
-        <div>
-          <v-btn small outline color="success">New</v-btn>
-          <v-btn small outline>Clear</v-btn>
-        </div>
+        <v-btn small outline color="success">New</v-btn>
+      </v-toolbar>
+      <v-toolbar card prominent align-center height="auto">
         <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-text-field label="Filter" single-line class="pt-0"></v-text-field>
+        <v-btn small outline class="pt-0 mt-0 clear-filter-botton">Clear</v-btn>
       </v-toolbar>
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
         <v-card>
@@ -75,7 +77,7 @@
       </div>
     </v-layout>
 
-    <!-- <div class="initiatives">
+    <div class="initiatives">
       <div class="row">
         <div class="col-12">
           <b-btn class="float-right btnHeader" variant="primary" size="sm" v-b-modal.modalnew>New</b-btn>
@@ -292,7 +294,7 @@
           </div>
         </div>
       </b-modal>
-    </div>-->
+    </div>
   </v-container>
 </template>
 
@@ -618,5 +620,13 @@ export default {
       margin-bottom: 0;
     }
   }
+}
+.toolbar-buttons-holder {
+  display: flex;
+  flex-direction: column;
+}
+
+.clear-filter-botton {
+  margin-bottom: 13px;
 }
 </style>
