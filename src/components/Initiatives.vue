@@ -75,7 +75,7 @@
       </div>
     </v-layout>
 
-    <div class="initiatives">
+    <!-- <div class="initiatives">
       <div class="row">
         <div class="col-12">
           <b-btn class="float-right btnHeader" variant="primary" size="sm" v-b-modal.modalnew>New</b-btn>
@@ -292,7 +292,7 @@
           </div>
         </div>
       </b-modal>
-    </div>
+    </div>-->
   </v-container>
 </template>
 
