@@ -69,6 +69,11 @@
         </v-card>
       </v-flex>
     </v-layout>
+    <v-layout row wrap justify-center>
+      <div class="text-xs-center pt-3">
+        <v-pagination v-model="page" :length="1"></v-pagination>
+      </div>
+    </v-layout>
 
     <div class="initiatives">
       <div class="row">
@@ -315,6 +320,7 @@ export default {
       ],
       filter: null,
       objStatuses: [],
+      page: 1,
       currentPage: 0,
       totalRows: 0,
       perPage: 10,
