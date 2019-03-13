@@ -1,5 +1,42 @@
 <template>
-  <b-card no-body bg-variant="light" class="card col-12">
+  <v-container fluid>
+    <v-layout row wrap>
+      <v-flex xs4 v-for="item in initiatives" :key="item.id">
+        <v-card>
+          <v-card-title primary-title>
+            <h4 class="mb-0">
+              Initiative:
+              <a href="#">{{item.title}}</a>
+            </h4>
+          </v-card-title>
+          <div class="card-body">
+            <p>Description: {{item.description}}</p>
+            <p>Popularity: {{item.popularity}}</p>
+            <p>
+              importance:
+              <a href="#">Should have</a>
+            </p>
+            <p>Horizon:
+              <a href="#">{{item.horizon.horizon}}</a>
+            </p>
+            <p>
+              Author:
+              <a href="#">{{item.firstName + ' ' + item.lastName }}</a>
+            </p>
+          </div>
+
+          <v-card-actions>
+            <v-btn slot="activator" class="delete-button" fab dark small color="primary">
+              <i class="material-icons">edit</i>
+            </v-btn>
+            <v-btn slot="activator" class="delete-button" fab dark small color="primary">
+              <i class="material-icons">delete</i>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+
     <div class="initiatives">
       <div class="row">
         <div class="col-12">
@@ -218,7 +255,7 @@
         </div>
       </b-modal>
     </div>
-  </b-card>
+  </v-container>
 </template>
 
 <script>
