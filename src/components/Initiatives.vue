@@ -3,6 +3,18 @@
     <v-layout row wrap>
       <v-toolbar card prominent align-center>
         <v-checkbox label="Show archived" class="checkbox"></v-checkbox>
+        <div>
+          <v-btn small color="primary" outline>Initiative</v-btn>
+          <v-btn small color="primary" outline>Popularity</v-btn>
+          <v-btn small color="primary" outline>Importance</v-btn>
+          <v-btn small color="primary" outline>Horizon</v-btn>
+          <v-btn small color="primary" outline>Author</v-btn>
+        </div>
+        <v-spacer></v-spacer>
+        <div>
+          <v-btn small outline color="success">New</v-btn>
+          <v-btn small outline>Clear</v-btn>
+        </div>
         <v-spacer></v-spacer>
       </v-toolbar>
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
