@@ -1,7 +1,8 @@
 <template>
   <v-container fluid>
     <v-layout row wrap>
-      <v-toolbar card prominent pl-0 pr-0>
+      <v-toolbar card prominent align-center>
+        <v-checkbox label="Show archived" class="checkbox"></v-checkbox>
         <v-spacer></v-spacer>
       </v-toolbar>
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
@@ -590,6 +591,14 @@ export default {
   }
   i {
     font-size: 15px;
+  }
+}
+.v-toolbar--card {
+  .checkbox {
+    margin-top: 15px;
+    label {
+      margin-bottom: 0;
+    }
   }
 }
 </style>
