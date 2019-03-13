@@ -1,7 +1,10 @@
 <template>
   <v-container fluid>
     <v-layout row wrap>
-      <v-flex xs3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
+      <v-toolbar card prominent pl-0 pr-0>
+        <v-spacer></v-spacer>
+      </v-toolbar>
+      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
         <v-card>
           <v-card-title primary-title>
             <h4 class="mb-0">
