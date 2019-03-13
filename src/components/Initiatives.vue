@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-layout row wrap>
-      <v-flex xs4 v-for="item in initiatives" :key="item.id">
+      <v-flex xs3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
         <v-card>
           <v-card-title primary-title>
             <h4 class="mb-0">
@@ -9,27 +9,44 @@
               <a href="#">{{item.title}}</a>
             </h4>
           </v-card-title>
-          <div class="card-body">
-            <p>Description: {{item.description}}</p>
-            <p>Popularity: {{item.popularity}}</p>
-            <p>
+          <div class="card-body pt-0 pb-0">
+            <p class="mb-2">Description: {{item.description}}</p>
+            <p class="mb-2">Popularity: {{item.popularity}}</p>
+            <p class="mb-2">
               importance:
               <a href="#">Should have</a>
             </p>
-            <p>Horizon:
+            <p class="mb-2">
+              Horizon:
               <a href="#">{{item.horizon.horizon}}</a>
             </p>
-            <p>
+            <p class="mb-2">
               Author:
               <a href="#">{{item.firstName + ' ' + item.lastName }}</a>
             </p>
           </div>
 
-          <v-card-actions>
-            <v-btn slot="activator" class="delete-button" fab dark small color="primary">
+          <v-card-actions class="pl-3 pb-2">
+            <v-btn
+              slot="activator"
+              class="delete-button extra-small-button"
+              outline
+              fab
+              dark
+              small
+              color="primary"
+            >
               <i class="material-icons">edit</i>
             </v-btn>
-            <v-btn slot="activator" class="delete-button" fab dark small color="primary">
+            <v-btn
+              slot="activator"
+              class="delete-button extra-small-button"
+              outline
+              fab
+              dark
+              small
+              color="primary"
+            >
               <i class="material-icons">delete</i>
             </v-btn>
           </v-card-actions>
@@ -559,6 +576,17 @@ export default {
     height: 2em;
     float: right;
     margin-top: 5px;
+  }
+}
+
+.extra-small-button {
+  width: 30px !important;
+  height: 30px !important;
+  &:focus {
+    outline: none;
+  }
+  i {
+    font-size: 15px;
   }
 }
 </style>
