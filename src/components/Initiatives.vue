@@ -4,11 +4,41 @@
       <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
         <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
         <div>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('initiative')">Initiative</v-btn>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('popularity')">Popularity</v-btn>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('Importance')">Importance</v-btn>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('horizon')">horizon</v-btn>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('author')">Author</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('initiative')"
+            :class="{'v-btn--active': this.activatedButton === 'initiative' }"
+          >Initiative</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('popularity')"
+            :class="{'v-btn--active': this.activatedButton === 'popularity' }"
+          >Popularity</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('Importance')"
+            :class="{'v-btn--active': this.activatedButton === 'Importance' }"
+          >Importance</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('horizon')"
+            :class="{'v-btn--active': this.activatedButton === 'horizon' }"
+          >horizon</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('author')"
+            :class="{'v-btn--active': this.activatedButton === 'author' }"
+          >Author</v-btn>
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
         <v-btn small outline color="success" v-b-modal.modalnew>New</v-btn>
@@ -330,6 +360,7 @@ export default {
   data() {
     return {
       initiativesIsSorted: false,
+      activatedButton: "",
       initialItiatives: [],
       initiatives: [],
       initiativesFields: [
@@ -607,8 +638,8 @@ export default {
       const day = d.getDate();
       return year + "-" + month + "-" + day;
     },
-    sortInitiaiveCards(payload) {
-      let param = payload.toLowerCase();
+    sortInitiaiveCards(initiativeName) {
+      let param = initiativeName.toLowerCase();
       function sortFunction(a, b) {
         if (param === "initiative") {
           param = "title";
@@ -637,9 +668,6 @@ export default {
               : b[param];
         }
 
-        console.log(aParam);
-        console.log(bParam);
-
         if (aParam < bParam) {
           return -1;
         }
@@ -648,15 +676,20 @@ export default {
         }
         return 0;
       }
-      if (this.initiativesIsSorted === false) {
-        this.initialItiatives = this.initiatives.slice();
+      if (this.activatedButton !== initiativeName) {
+        if (this.activatedButton === "") {
+          this.initialItiatives = this.initiatives.slice();
+        }
 
         this.initiatives.sort(sortFunction);
 
         this.initiativesIsSorted = true;
+
+        this.activatedButton = initiativeName;
       } else {
         let init = this.initialItiatives;
         this.initiatives = init;
+        this.activatedButton = "";
         this.initiativesIsSorted = false;
       }
     }
