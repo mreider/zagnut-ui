@@ -46,7 +46,13 @@
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
-        <v-text-field label="Filter" v-model="filter" single-line class="pt-0"></v-text-field>
+        <v-text-field
+          label="Filter"
+          v-model="filter"
+          single-line
+          class="pt-0"
+          @keyup="filterInitiatives"
+        ></v-text-field>
         <v-btn small outline class="pt-0 mt-0 clear-filter-botton" @click="filter = ''">Clear</v-btn>
       </v-toolbar>
       <!--toolbar for mobile sizes-->
@@ -722,6 +728,15 @@ export default {
         this.activatedButton = "";
         this.initiativesIsSorted = false;
       }
+    },
+    filterInitiatives() {
+      console.log(this.initiatives);
+      let initiatives = this.initiatives;
+      let filterInputValue = this.filter;
+      const filteredIniatives = initiatives.filter(function(item) {
+        return item.title.toLowerCase().indexOf(filterInputValue) !== -1; // returns true or false
+      });
+      console.log(filteredIniatives);
     }
   },
   components: {}
