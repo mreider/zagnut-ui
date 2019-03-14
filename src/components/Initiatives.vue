@@ -10,15 +10,33 @@
           <v-btn small color="primary" outline>Horizon</v-btn>
           <v-btn small color="primary" outline>Author</v-btn>
         </div>
-        <!-- <v-spacer class="hidden-md-and-down"></v-spacer> -->
+        <v-spacer class="hidden-md-and-down"></v-spacer>
         <v-btn small outline color="success">New</v-btn>
       </v-toolbar>
-      <v-toolbar card prominent align-center height="auto" class="cards-toolbar">
+      <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
         <v-text-field label="Filter" single-line class="pt-0"></v-text-field>
         <v-btn small outline class="pt-0 mt-0 clear-filter-botton">Clear</v-btn>
       </v-toolbar>
+      <!--toolbar for mobile sizes-->
+      <v-layout row wrap justify-center>
+        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
+          <v-btn small outline color="success">New</v-btn>
+          <v-checkbox label="Show archived" class="checkbox pl-2 pr-2"></v-checkbox>
+          <v-btn small color="primary" outline>Initiative</v-btn>
+          <v-btn small color="primary" outline>Popularity</v-btn>
+          <v-btn small color="primary" outline>Importance</v-btn>
+          <v-btn small color="primary" outline>Horizon</v-btn>
+          <v-btn small color="primary" outline>Author</v-btn>
+        </v-flex>
+
+        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
+          <v-text-field label="Filter" single-line class="pt-0 pl-2 pr-2"></v-text-field>
+          <v-btn small outline class="pt-0 mt-0 clear-filter-botton">Clear</v-btn>
+        </v-flex>
+      </v-layout>
+
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
         <v-card>
           <v-card-title primary-title>
