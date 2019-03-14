@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-layout row wrap>
-      <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
+      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
         <div>
           <v-btn
@@ -22,8 +22,8 @@
             small
             color="primary"
             outline
-            @click="sortInitiaiveCards('Importance')"
-            :class="{'v-btn--active': this.activatedButton === 'Importance' }"
+            @click="sortInitiaiveCards('importance')"
+            :class="{'v-btn--active': this.activatedButton === 'importance' }"
           >Importance</v-btn>
           <v-btn
             small
@@ -43,7 +43,7 @@
         <v-spacer class="hidden-md-and-down"></v-spacer>
         <v-btn small outline color="success" v-b-modal.modalnew>New</v-btn>
       </v-toolbar>
-      <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
+      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
         <v-text-field label="Filter" single-line class="pt-0"></v-text-field>
@@ -59,11 +59,41 @@
             v-model="showArchived"
             @change="reload"
           ></v-checkbox>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('initiative')">Initiative</v-btn>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('popularity')">Popularity</v-btn>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('Importance')">Importance</v-btn>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('horizon')">horizon</v-btn>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('author')">Author</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('initiative')"
+            :class="{'v-btn--active': this.activatedButton === 'initiative' }"
+          >Initiative</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('popularity')"
+            :class="{'v-btn--active': this.activatedButton === 'popularity' }"
+          >Popularity</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('importance')"
+            :class="{'v-btn--active': this.activatedButton === 'importance' }"
+          >Importance</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('horizon')"
+            :class="{'v-btn--active': this.activatedButton === 'horizon' }"
+          >horizon</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortInitiaiveCards('author')"
+            :class="{'v-btn--active': this.activatedButton === 'author' }"
+          >Author</v-btn>
         </v-flex>
 
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
@@ -202,13 +232,13 @@
             >{{ data.item.horizon.horizon }}</a>
           </template>
         </b-table>
-        <b-pagination
+        <!-- <b-pagination
           :total-rows="totalRows"
           :per-page="perPage"
           v-model="currentPage"
           class="my-0"
           style="padding-bottom:1em"
-        />
+        />-->
       </div>
 
       <b-modal
@@ -734,6 +764,7 @@ export default {
 }
 
 .cards-toolbar {
+  height: auto !important;
   .v-btn {
     @media screen and (max-width: 1264px) {
       margin: 6px 4px;
