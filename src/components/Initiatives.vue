@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-layout row wrap>
-      <v-toolbar card prominent align-center height="auto">
+      <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
         <v-checkbox label="Show archived" class="checkbox"></v-checkbox>
         <div>
           <v-btn small color="primary" outline>Initiative</v-btn>
@@ -10,10 +10,10 @@
           <v-btn small color="primary" outline>Horizon</v-btn>
           <v-btn small color="primary" outline>Author</v-btn>
         </div>
-        <v-spacer></v-spacer>
+        <!-- <v-spacer class="hidden-md-and-down"></v-spacer> -->
         <v-btn small outline color="success">New</v-btn>
       </v-toolbar>
-      <v-toolbar card prominent align-center height="auto">
+      <v-toolbar card prominent align-center height="auto" class="cards-toolbar">
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
         <v-text-field label="Filter" single-line class="pt-0"></v-text-field>
@@ -621,12 +621,18 @@ export default {
     }
   }
 }
-.toolbar-buttons-holder {
-  display: flex;
-  flex-direction: column;
-}
 
-.clear-filter-botton {
-  margin-bottom: 13px;
+.cards-toolbar {
+  .v-btn {
+    @media screen and (max-width: 1264px) {
+      margin: 6px 4px;
+    }
+  }
+  .clear-filter-botton {
+    margin-bottom: 13px;
+    @media screen and (max-width: 1264px) {
+      margin-bottom: 13px;
+    }
+  }
 }
 </style>
