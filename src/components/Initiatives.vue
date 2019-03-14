@@ -4,11 +4,11 @@
       <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
         <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
         <div>
-          <v-btn small color="primary" outline @click="sortInitiaiveCards('Initiative')">Initiative</v-btn>
-          <v-btn small color="primary" outline>Popularity</v-btn>
-          <v-btn small color="primary" outline>Importance</v-btn>
-          <v-btn small color="primary" outline>Horizon</v-btn>
-          <v-btn small color="primary" outline>Author</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('initiative')">Initiative</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('popularity')">Popularity</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('Importance')">Importance</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('horizon')">horizon</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('author')">Author</v-btn>
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
         <v-btn small outline color="success" v-b-modal.modalnew>New</v-btn>
@@ -29,11 +29,11 @@
             v-model="showArchived"
             @change="reload"
           ></v-checkbox>
-          <v-btn small color="primary" outline @click="sortByString('Initiative')">Initiative</v-btn>
-          <v-btn small color="primary" outline>Popularity</v-btn>
-          <v-btn small color="primary" outline>Importance</v-btn>
-          <v-btn small color="primary" outline>Horizon</v-btn>
-          <v-btn small color="primary" outline>Author</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('initiative')">Initiative</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('popularity')">Popularity</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('Importance')">Importance</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('horizon')">horizon</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('author')">Author</v-btn>
         </v-flex>
 
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
@@ -55,7 +55,7 @@
             <p class="mb-2">Popularity: {{item.popularity}}</p>
             <p class="mb-2">
               importance:
-              <a href="#">Should have</a>
+              <a href="#">{{item.importance}}</a>
             </p>
             <p class="mb-2">
               Horizon:
@@ -614,8 +614,32 @@ export default {
           param = "title";
         }
 
-        const aParam = a[param].replace(/\s/g, "X").toLowerCase();
-        const bParam = b[param].replace(/\s/g, "X").toLowerCase();
+        let aParam;
+        let bParam;
+        if (param === "horizon") {
+          aParam = a[param][param].replace(/\s/g, "X").toLowerCase();
+          bParam = b[param][param].replace(/\s/g, "X").toLowerCase();
+          if (aParam > bParam) {
+            return -1;
+          }
+          if (aParam === bParam) {
+            return 1;
+          }
+          return 0;
+        } else {
+          aParam =
+            typeof a[param] === "string"
+              ? a[param].replace(/\s/g, "X").toLowerCase()
+              : a[param];
+          bParam =
+            typeof b[param] === "string"
+              ? b[param].replace(/\s/g, "X").toLowerCase()
+              : b[param];
+        }
+
+        console.log(aParam);
+        console.log(bParam);
+
         if (aParam < bParam) {
           return -1;
         }
