@@ -2,16 +2,16 @@
   <v-container fluid>
     <v-layout row wrap>
       <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
-        <v-checkbox label="Show archived" class="checkbox"></v-checkbox>
+        <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
         <div>
-          <v-btn small color="primary" outline>Initiative</v-btn>
+          <v-btn small color="primary" outline @click="sortByString('Initiative')">Initiative</v-btn>
           <v-btn small color="primary" outline>Popularity</v-btn>
           <v-btn small color="primary" outline>Importance</v-btn>
           <v-btn small color="primary" outline>Horizon</v-btn>
           <v-btn small color="primary" outline>Author</v-btn>
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
-        <v-btn small outline color="success">New</v-btn>
+        <v-btn small outline color="success" v-b-modal.modalnew>New</v-btn>
       </v-toolbar>
       <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
@@ -22,9 +22,14 @@
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-btn small outline color="success">New</v-btn>
-          <v-checkbox label="Show archived" class="checkbox pl-2 pr-2"></v-checkbox>
-          <v-btn small color="primary" outline>Initiative</v-btn>
+          <v-btn small outline color="success" v-b-modal.modalnew>New</v-btn>
+          <v-checkbox
+            label="Show archived"
+            class="checkbox pl-2 pr-2"
+            v-model="showArchived"
+            @change="reload"
+          ></v-checkbox>
+          <v-btn small color="primary" outline @click="sortByString('Initiative')">Initiative</v-btn>
           <v-btn small color="primary" outline>Popularity</v-btn>
           <v-btn small color="primary" outline>Importance</v-btn>
           <v-btn small color="primary" outline>Horizon</v-btn>
@@ -36,7 +41,7 @@
           <v-btn small outline class="pt-0 mt-0 clear-filter-botton">Clear</v-btn>
         </v-flex>
       </v-layout>
-
+      <!--cards section-->
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
         <v-card>
           <v-card-title primary-title>
@@ -324,6 +329,8 @@ export default {
   name: "Initiatives",
   data() {
     return {
+      initiativesIsSorted: false,
+      initialItiatives: [],
       initiatives: [],
       initiativesFields: [
         {
@@ -599,6 +606,30 @@ export default {
       const year = d.getFullYear();
       const day = d.getDate();
       return year + "-" + month + "-" + day;
+    },
+    sortByString(param) {
+      function sortFunction(a, b) {
+        const aParam = a.title.replace(/\s/g, "X").toLowerCase();
+        const bParam = b.title.replace(/\s/g, "X").toLowerCase();
+        if (aParam < bParam) {
+          return -1;
+        }
+        if (aParam === bParam) {
+          return 1;
+        }
+        return 0;
+      }
+      if (this.initiativesIsSorted === false) {
+        this.initialItiatives = this.initiatives.slice();
+
+        this.initiatives.sort(sortFunction);
+
+        this.initiativesIsSorted = true;
+      } else {
+        let init = this.initialItiatives;
+        this.initiatives = init;
+        this.initiativesIsSorted = false;
+      }
     }
   },
   components: {}
