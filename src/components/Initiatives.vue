@@ -736,6 +736,25 @@ export default {
       const filteredIniatives = initiatives.filter(function(item) {
         return item.title.toLowerCase().indexOf(filterInputValue) !== -1; // returns true or false
       });
+
+      // let anotherArr = initiatives.filter(obj =>
+      //   Object.keys(obj).some(key => obj[key].includes(filterInputValue))
+      // );
+
+      let matches = [];
+
+      for (let i = 0, len = initiatives.length; i < len; i++) {
+        for (let key in initiatives[i]) {
+          if (
+            initiatives[i].hasOwnProperty(key) &&
+            initiatives[i][key].toString().indexOf(filterInputValue) > -1
+          ) {
+            matches.push(initiatives[i]);
+          }
+        }
+      }
+
+      console.log(matches);
       console.log(filteredIniatives);
     }
   },
