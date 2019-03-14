@@ -733,28 +733,29 @@ export default {
       console.log(this.initiatives);
       let initiatives = this.initiatives;
       let filterInputValue = this.filter;
-      const filteredIniatives = initiatives.filter(function(item) {
-        return item.title.toLowerCase().indexOf(filterInputValue) !== -1; // returns true or false
-      });
-
-      // let anotherArr = initiatives.filter(obj =>
-      //   Object.keys(obj).some(key => obj[key].includes(filterInputValue))
-      // );
-
-      let matches = [];
-
+      let filteredIniatives = [];
       for (let i = 0, len = initiatives.length; i < len; i++) {
-        for (let key in initiatives[i]) {
-          if (
-            initiatives[i].hasOwnProperty(key) &&
-            initiatives[i][key].toString().indexOf(filterInputValue) > -1
-          ) {
-            matches.push(initiatives[i]);
-          }
-        }
+        filteredIniatives = initiatives.filter(function(obj) {
+          return Object.keys(obj).some(function(key) {
+            console.log(obj[key]);
+            if (typeof obj[key] === "string") {
+              console.log(obj[key].includes(filterInputValue));
+              return obj[key]
+                .toLowerCase()
+                .includes(filterInputValue.toLowerCase());
+            }
+            if (typeof obj[key] === "number") {
+              console.log("number");
+              return obj[key].toString().includes(filterInputValue);
+            }
+            if (typeof obj[key] === "object") {
+              return obj[key]["horizon"]
+                .toLowerCase()
+                .includes(filterInputValue.toLowerCase());
+            }
+          });
+        });
       }
-
-      console.log(matches);
       console.log(filteredIniatives);
     }
   },
