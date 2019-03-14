@@ -46,8 +46,8 @@
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
-        <v-text-field label="Filter" single-line class="pt-0"></v-text-field>
-        <v-btn small outline class="pt-0 mt-0 clear-filter-botton">Clear</v-btn>
+        <v-text-field label="Filter" v-model="filter" single-line class="pt-0"></v-text-field>
+        <v-btn small outline class="pt-0 mt-0 clear-filter-botton" @click="filter = ''">Clear</v-btn>
       </v-toolbar>
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
@@ -97,7 +97,7 @@
         </v-flex>
 
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-text-field label="Filter" single-line class="pt-0 pl-2 pr-2"></v-text-field>
+          <v-text-field label="Filter" single-line class="pt-0 pl-2 pr-2" v-model="filter"></v-text-field>
           <v-btn small outline class="pt-0 mt-0 clear-filter-botton">Clear</v-btn>
         </v-flex>
       </v-layout>
