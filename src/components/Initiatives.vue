@@ -4,7 +4,7 @@
       <v-toolbar card prominent align-center height="auto" class="cards-toolbar hidden-sm-and-down">
         <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
         <div>
-          <v-btn small color="primary" outline @click="sortByString('Initiative')">Initiative</v-btn>
+          <v-btn small color="primary" outline @click="sortInitiaiveCards('Initiative')">Initiative</v-btn>
           <v-btn small color="primary" outline>Popularity</v-btn>
           <v-btn small color="primary" outline>Importance</v-btn>
           <v-btn small color="primary" outline>Horizon</v-btn>
@@ -607,10 +607,15 @@ export default {
       const day = d.getDate();
       return year + "-" + month + "-" + day;
     },
-    sortByString(param) {
+    sortInitiaiveCards(payload) {
+      let param = payload.toLowerCase();
       function sortFunction(a, b) {
-        const aParam = a.title.replace(/\s/g, "X").toLowerCase();
-        const bParam = b.title.replace(/\s/g, "X").toLowerCase();
+        if (param === "initiative") {
+          param = "title";
+        }
+
+        const aParam = a[param].replace(/\s/g, "X").toLowerCase();
+        const bParam = b[param].replace(/\s/g, "X").toLowerCase();
         if (aParam < bParam) {
           return -1;
         }
