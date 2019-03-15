@@ -140,7 +140,7 @@
               Author:
               <a
                 href="#"
-                @click="filterInitiatives(item.firstName + ' ' + item.lastName )"
+                @click="filterInitiatives(item.lastName)"
               >{{item.firstName + ' ' + item.lastName }}</a>
             </p>
           </div>
@@ -148,16 +148,18 @@
           <v-card-actions class="pl-3 pb-2">
             <v-btn
               slot="activator"
-              class="delete-button extra-small-button"
+              class="edit-button extra-small-button"
               outline
               fab
               dark
               small
               color="primary"
+              :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ item.id"
             >
               <i class="material-icons">edit</i>
             </v-btn>
             <v-btn
+              v-if="$store.state.user.id ===  item.createdBy || admin"
               slot="activator"
               class="delete-button extra-small-button"
               outline
@@ -165,6 +167,8 @@
               dark
               small
               color="primary"
+              v-b-modal.delete
+              @click="setCurrentInitiative(item)"
             >
               <i class="material-icons">delete</i>
             </v-btn>
