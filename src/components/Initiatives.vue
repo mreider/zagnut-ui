@@ -116,9 +116,10 @@
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in intiativeCards" :key="item.id">
         <v-card>
           <v-card-title primary-title>
-            <h4 class="mb-0">
-              Initiative:
-              <a href="#">{{item.title}}</a>
+            <h4 class="mb-0">Initiative:
+              <router-link
+                :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ item.id"
+              >{{ item.title }}</router-link>
             </h4>
           </v-card-title>
           <div class="card-body pt-0 pb-0">
@@ -777,8 +778,6 @@ export default {
         });
       }
       this.initialFilterredInitiatives = this.filteredIniatives.slice();
-      console.log(this.initialFilterredInitiatives);
-      console.log(this.filteredIniatives);
     },
     clearInitiativesFilter() {
       this.filteredIniatives = this.initiatives;
