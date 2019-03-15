@@ -404,6 +404,7 @@ export default {
       activatedButton: "",
       initialItiatives: [],
       initiatives: [],
+      initialFilterredInitiatives: null,
       filteredIniatives: null,
       initiativesFields: [
         {
@@ -444,7 +445,6 @@ export default {
 
   computed: {
     intiativeCards: function() {
-      console.log(this.filteredIniatives);
       return this.filteredIniatives !== null
         ? this.filteredIniatives
         : this.initiatives;
@@ -729,11 +729,21 @@ export default {
         if (this.activatedButton === "") {
           this.initialItiatives = this.initiatives.slice();
         }
-        this.initiatives.sort(sortFunction);
+        if (this.filteredIniatives !== null) {
+          this.filteredIniatives.sort(sortFunction);
+        } else {
+          this.initiatives.sort(sortFunction);
+        }
         this.activatedButton = initiativeName;
       } else {
-        let init = this.initialItiatives;
-        this.initiatives = init;
+        if (this.filteredIniatives !== null) {
+          console.log("hello");
+          console.log(this.initialFilterredInitiatives);
+          this.filteredIniatives = this.initialFilterredInitiatives.slice();
+        } else {
+          this.initiatives = this.initialItiatives;
+        }
+
         this.activatedButton = "";
       }
     },
@@ -766,10 +776,13 @@ export default {
           });
         });
       }
+      this.initialFilterredInitiatives = this.filteredIniatives.slice();
+      console.log(this.initialFilterredInitiatives);
       console.log(this.filteredIniatives);
     },
     clearInitiativesFilter() {
       this.filteredIniatives = this.initiatives;
+      this.initialFilterredInitiatives = this.filteredIniatives.slice();
     }
   },
   components: {}
