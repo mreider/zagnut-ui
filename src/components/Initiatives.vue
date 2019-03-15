@@ -178,7 +178,12 @@
     </v-layout>
     <v-layout row wrap justify-center>
       <div class="text-xs-center pt-3">
-        <v-pagination v-model="page" :length="1"></v-pagination>
+        <v-pagination
+          v-model="page"
+          :length="totalPages"
+          :total-visible="15"
+          @input="paginationFunction"
+        ></v-pagination>
       </div>
     </v-layout>
     <!--old bootstrap section-->
@@ -435,7 +440,8 @@ export default {
       page: 1,
       currentPage: 0,
       totalRows: 0,
-      perPage: 10,
+      totalPages: 4,
+      perPage: 8,
       newInitiative: {
         title: "",
         description: "",
@@ -549,6 +555,7 @@ export default {
           };
         });
         this.totalRows = initiatives.length;
+        this.totalPages = Math.ceil(initiatives.length / this.perPage);
 
         this.initiatives = initiatives;
         this.admin = _get(response, "data.admin");
@@ -797,6 +804,15 @@ export default {
     clearInitiativesFilter() {
       this.filteredInitiatives = this.initiatives;
       this.initialFilteredInitiatives = this.filteredInitiatives.slice();
+    },
+    paginationFunction(event) {
+      let sliceFrom = (event - 1) * this.perPage;
+      let paginatedArray = this.initiatives.slice(
+        sliceFrom,
+        sliceFrom + this.perPage
+      );
+      console.log(this.initiatives);
+      console.log(sliceFrom, paginatedArray);
     }
   },
   components: {}
