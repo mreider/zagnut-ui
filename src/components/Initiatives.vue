@@ -113,7 +113,7 @@
         </v-flex>
       </v-layout>
       <!--cards section-->
-      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in initiatives" :key="item.id">
+      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in intiativeCards" :key="item.id">
         <v-card>
           <v-card-title primary-title>
             <h4 class="mb-0">
@@ -404,7 +404,7 @@ export default {
       activatedButton: "",
       initialItiatives: [],
       initiatives: [],
-      filteredIniatives: [],
+      filteredIniatives: null,
       initiativesFields: [
         {
           key: "title",
@@ -442,13 +442,19 @@ export default {
     };
   },
 
-  computed: {},
+  computed: {
+    intiativeCards: function() {
+      console.log(this.filteredIniatives);
+      return this.filteredIniatives !== null
+        ? this.filteredIniatives
+        : this.initiatives;
+    }
+  },
   async mounted() {
     await this.loadOrgStatuses();
     await this.loadOrgInitiatives();
     this.horizonLoadList();
   },
-
   methods: {
     async reload(checked) {
       this.showArchived = checked;
