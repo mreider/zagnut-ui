@@ -405,8 +405,8 @@ export default {
       activatedButton: "",
       initialItiatives: [],
       initiatives: [],
-      initialFilterredInitiatives: null,
-      filteredIniatives: null,
+      initialFilteredInitiatives: null,
+      filteredInitiatives: null,
       initiativesFields: [
         {
           key: "title",
@@ -446,8 +446,8 @@ export default {
 
   computed: {
     intiativeCards: function() {
-      return this.filteredIniatives !== null
-        ? this.filteredIniatives
+      return this.filteredInitiatives !== null
+        ? this.filteredInitiatives
         : this.initiatives;
     }
   },
@@ -730,17 +730,15 @@ export default {
         if (this.activatedButton === "") {
           this.initialItiatives = this.initiatives.slice();
         }
-        if (this.filteredIniatives !== null) {
-          this.filteredIniatives.sort(sortFunction);
+        if (this.filteredInitiatives !== null) {
+          this.filteredInitiatives.sort(sortFunction);
         } else {
           this.initiatives.sort(sortFunction);
         }
         this.activatedButton = initiativeName;
       } else {
-        if (this.filteredIniatives !== null) {
-          console.log("hello");
-          console.log(this.initialFilterredInitiatives);
-          this.filteredIniatives = this.initialFilterredInitiatives.slice();
+        if (this.filteredInitiatives !== null) {
+          this.filteredInitiatives = this.initialFilteredInitiatives.slice();
         } else {
           this.initiatives = this.initialItiatives;
         }
@@ -761,7 +759,7 @@ export default {
         "author"
       ];
       for (let i = 0, len = initiatives.length; i < len; i++) {
-        this.filteredIniatives = initiatives.filter(function(obj) {
+        this.filteredInitiatives = initiatives.filter(function(obj) {
           return filterKeys.some(function(key) {
             if (typeof obj[key] === "string" || typeof obj[key] === "number") {
               return obj[key]
@@ -777,11 +775,11 @@ export default {
           });
         });
       }
-      this.initialFilterredInitiatives = this.filteredIniatives.slice();
+      this.initialFilteredInitiatives = this.filteredInitiatives.slice();
     },
     clearInitiativesFilter() {
-      this.filteredIniatives = this.initiatives;
-      this.initialFilterredInitiatives = this.filteredIniatives.slice();
+      this.filteredInitiatives = this.initiatives;
+      this.initialFilteredInitiatives = this.filteredInitiatives.slice();
     }
   },
   components: {}
