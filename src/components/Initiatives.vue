@@ -127,15 +127,21 @@
             <p class="mb-2">Popularity: {{item.popularity}}</p>
             <p class="mb-2">
               importance:
-              <a href="#">{{item.importance}}</a>
+              <a href="#" @click="filterInitiatives(item.importance)">{{item.importance}}</a>
             </p>
             <p class="mb-2">
               Horizon:
-              <a href="#">{{item.horizon.horizon}}</a>
+              <a
+                href="#"
+                @click="filterInitiatives(item.horizon.horizon)"
+              >{{item.horizon.horizon}}</a>
             </p>
             <p class="mb-2">
               Author:
-              <a href="#">{{item.firstName + ' ' + item.lastName }}</a>
+              <a
+                href="#"
+                @click="filterInitiatives(item.firstName + ' ' + item.lastName )"
+              >{{item.firstName + ' ' + item.lastName }}</a>
             </p>
           </div>
 
@@ -171,7 +177,7 @@
         <v-pagination v-model="page" :length="1"></v-pagination>
       </div>
     </v-layout>
-
+    <!--old bootstrap section-->
     <div class="initiatives">
       <div class="row">
         <div class="col-12">
@@ -746,9 +752,16 @@ export default {
         this.activatedButton = "";
       }
     },
-    filterInitiatives() {
+    filterInitiatives(clickParam) {
       let initiatives = this.initiatives;
-      let filterInputValue = this.filter;
+
+      let filterInputValue;
+
+      if (typeof clickParam === "string") {
+        filterInputValue = clickParam;
+      } else {
+        filterInputValue = this.filter;
+      }
 
       let filterKeys = [
         "title",
@@ -790,6 +803,7 @@ export default {
 .card {
   margin-top: 50px;
 }
+
 .initiatives {
   .header {
     margin-top: 10px;
