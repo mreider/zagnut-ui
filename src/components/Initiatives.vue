@@ -688,6 +688,7 @@ export default {
     },
     sortInitiaiveCards(initiativeName) {
       let param = initiativeName.toLowerCase();
+
       function sortFunction(a, b) {
         if (param === "initiative") {
           param = "title";
@@ -714,31 +715,26 @@ export default {
             typeof b[param] === "string"
               ? b[param].replace(/\s/g, "X").toLowerCase()
               : b[param];
+          if (aParam < bParam) {
+            return -1;
+          }
+          if (aParam === bParam) {
+            return 1;
+          }
+          return 0;
         }
-
-        if (aParam < bParam) {
-          return -1;
-        }
-        if (aParam === bParam) {
-          return 1;
-        }
-        return 0;
       }
+
       if (this.activatedButton !== initiativeName) {
         if (this.activatedButton === "") {
           this.initialItiatives = this.initiatives.slice();
         }
-
         this.initiatives.sort(sortFunction);
-
-        this.initiativesIsSorted = true;
-
         this.activatedButton = initiativeName;
       } else {
         let init = this.initialItiatives;
         this.initiatives = init;
         this.activatedButton = "";
-        this.initiativesIsSorted = false;
       }
     },
     filterInitiatives() {
