@@ -53,7 +53,12 @@
           class="pt-0"
           @keyup="filterInitiatives"
         ></v-text-field>
-        <v-btn small outline class="pt-0 mt-0 clear-filter-botton" @click="filter = ''">Clear</v-btn>
+        <v-btn
+          small
+          outline
+          class="pt-0 mt-0 clear-filter-botton"
+          @click="filter = '', clearInitiativesFilter()"
+        >Clear</v-btn>
       </v-toolbar>
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
@@ -399,6 +404,7 @@ export default {
       activatedButton: "",
       initialItiatives: [],
       initiatives: [],
+      filteredIniatives: [],
       initiativesFields: [
         {
           key: "title",
@@ -730,23 +736,25 @@ export default {
       }
     },
     filterInitiatives() {
-      console.log(this.initiatives);
       let initiatives = this.initiatives;
       let filterInputValue = this.filter;
-      let filteredIniatives = [];
+
+      let filterKeys = [
+        "title",
+        "Initiative",
+        "popularity",
+        "importance",
+        "horizon",
+        "author"
+      ];
       for (let i = 0, len = initiatives.length; i < len; i++) {
-        filteredIniatives = initiatives.filter(function(obj) {
-          return Object.keys(obj).some(function(key) {
-            console.log(obj[key]);
-            if (typeof obj[key] === "string") {
-              console.log(obj[key].includes(filterInputValue));
+        this.filteredIniatives = initiatives.filter(function(obj) {
+          return filterKeys.some(function(key) {
+            if (typeof obj[key] === "string" || typeof obj[key] === "number") {
               return obj[key]
+                .toString()
                 .toLowerCase()
                 .includes(filterInputValue.toLowerCase());
-            }
-            if (typeof obj[key] === "number") {
-              console.log("number");
-              return obj[key].toString().includes(filterInputValue);
             }
             if (typeof obj[key] === "object") {
               return obj[key]["horizon"]
@@ -756,7 +764,10 @@ export default {
           });
         });
       }
-      console.log(filteredIniatives);
+      console.log(this.filteredIniatives);
+    },
+    clearInitiativesFilter() {
+      this.filteredIniatives = this.initiatives;
     }
   },
   components: {}
