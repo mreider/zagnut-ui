@@ -557,7 +557,8 @@ export default {
         this.totalRows = initiatives.length;
         this.totalPages = Math.ceil(initiatives.length / this.perPage);
 
-        this.initiatives = initiatives;
+        this.initialItiatives = initiatives;
+        this.initiatives = this.initialItiatives.slice(0, this.perPage);
         this.admin = _get(response, "data.admin");
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -807,10 +808,11 @@ export default {
     },
     paginationFunction(event) {
       let sliceFrom = (event - 1) * this.perPage;
-      let paginatedArray = this.initiatives.slice(
+      let paginatedArray = this.initialItiatives.slice(
         sliceFrom,
         sliceFrom + this.perPage
       );
+      this.initiatives = paginatedArray;
       console.log(this.initiatives);
       console.log(sliceFrom, paginatedArray);
     }
