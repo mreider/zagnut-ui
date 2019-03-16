@@ -752,7 +752,6 @@ export default {
 
       if (this.activatedButton !== initiativeName) {
         // if (this.activatedButton === "") {
-        //   // hell starting here
         //   this.initialItiatives = this.initiatives.slice();
         // }
         // Check if initiatives was filtered by filter input, if true, sorting filtered initiatives
