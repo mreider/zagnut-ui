@@ -561,10 +561,7 @@ export default {
         this.initialItiatives = initiatives;
         this.initialIitiativesForSorting = initiatives.slice();
         this.initiatives = this.initialItiatives.slice(0, this.perPage);
-        // this.intiatives = this.initiatives.slice(0, this.perPage);
 
-        console.log(this.initiatives);
-        console.log(this.initialItiatives);
         this.admin = _get(response, "data.admin");
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -758,24 +755,19 @@ export default {
         if (this.filteredInitiatives !== null) {
           this.filteredInitiatives.sort(sortFunction);
         } else {
-          console.log("hello");
           // this.initiatives.sort(sortFunction);
-          console.log(this.initialItiatives);
-
           this.initialIitiativesForSorting.sort(sortFunction);
           this.initiatives = this.initialIitiativesForSorting.slice(
             0,
             this.perPage
           );
           this.page = 1;
-          console.log(this.initialItiatives);
         }
         this.activatedButton = initiativeName;
       } else {
         if (this.filteredInitiatives !== null) {
           this.filteredInitiatives = this.initialFilteredInitiatives.slice();
         } else {
-          console.log(this.initialItiatives);
           this.page = 1;
           this.initiatives = this.initialItiatives.slice(0, this.perPage);
         }
@@ -832,9 +824,6 @@ export default {
         sliceFrom + this.perPage
       );
       this.initiatives = paginatedArray;
-      console.log("pagination function fired");
-      console.log(this.initiatives);
-      console.log(this.initialItiatives);
     }
   },
   components: {}
