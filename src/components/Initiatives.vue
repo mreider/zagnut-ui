@@ -418,9 +418,9 @@ export default {
     return {
       initiativesIsSorted: false,
       activatedButton: "",
-      initialItiatives: [],
+      initialInitiatives: [],
       initiatives: [],
-      initialIitiativesForSorting: [],
+      initialInitiativesForSorting: [],
       initialFilteredInitiatives: null,
       filteredInitiatives: null,
       initiativesFields: [
@@ -464,7 +464,7 @@ export default {
   computed: {
     intiativeCards: function() {
       return this.filteredInitiatives !== null
-        ? this.filteredInitiatives
+        ? this.filteredInitiatives.slice(0, this.perPage)
         : this.initiatives;
     }
   },
@@ -558,9 +558,9 @@ export default {
         this.totalRows = initiatives.length;
         this.totalPages = Math.ceil(initiatives.length / this.perPage);
 
-        this.initialItiatives = initiatives;
-        this.initialIitiativesForSorting = initiatives.slice();
-        this.initiatives = this.initialItiatives.slice(0, this.perPage);
+        this.initialInitiatives = initiatives;
+        this.initialInitiativesForSorting = initiatives.slice();
+        this.initiatives = this.initialInitiatives.slice(0, this.perPage);
 
         this.admin = _get(response, "data.admin");
       } catch (error) {
@@ -748,16 +748,13 @@ export default {
       }
 
       if (this.activatedButton !== initiativeName) {
-        // if (this.activatedButton === "") {
-        //   this.initialItiatives = this.initiatives.slice();
-        // }
         // Check if initiatives was filtered by filter input, if true, sorting filtered initiatives
         if (this.filteredInitiatives !== null) {
           this.filteredInitiatives.sort(sortFunction);
         } else {
           // this.initiatives.sort(sortFunction);
-          this.initialIitiativesForSorting.sort(sortFunction);
-          this.initiatives = this.initialIitiativesForSorting.slice(
+          this.initialInitiativesForSorting.sort(sortFunction);
+          this.initiatives = this.initialInitiativesForSorting.slice(
             0,
             this.perPage
           );
@@ -769,14 +766,15 @@ export default {
           this.filteredInitiatives = this.initialFilteredInitiatives.slice();
         } else {
           this.page = 1;
-          this.initiatives = this.initialItiatives.slice(0, this.perPage);
+          this.initiatives = this.initialInitiatives.slice(0, this.perPage);
         }
 
         this.activatedButton = "";
       }
     },
     filterInitiatives(clickParam) {
-      let initiatives = this.initiatives;
+      this.page = 1;
+      let initiatives = this.initialInitiatives;
 
       let filterInputValue;
 
@@ -811,18 +809,39 @@ export default {
           });
         });
       }
+      this.totalPages = Math.ceil(
+        this.filteredInitiatives.length / this.perPage
+      );
       this.initialFilteredInitiatives = this.filteredInitiatives.slice();
     },
     clearInitiativesFilter() {
-      this.filteredInitiatives = this.initiatives;
-      this.initialFilteredInitiatives = this.filteredInitiatives.slice();
+      this.filteredInitiatives = null;
+      this.totalPages = Math.ceil(
+        this.initialInitiatives.length / this.perPage
+      );
     },
     paginationFunction(event) {
       let sliceFrom = (event - 1) * this.perPage;
-      let paginatedArray = this.initialItiatives.slice(
-        sliceFrom,
-        sliceFrom + this.perPage
-      );
+      let paginatedArray;
+      if (this.activatedButton === "") {
+        if (this.filteredInitiatives !== null) {
+          paginatedArray = this.initialFilteredInitiatives.slice(
+            sliceFrom,
+            sliceFrom + this.perPage
+          );
+          this.filteredInitiatives = paginatedArray.slice();
+        } else {
+          paginatedArray = this.initialInitiatives.slice(
+            sliceFrom,
+            sliceFrom + this.perPage
+          );
+        }
+      } else {
+        paginatedArray = this.initialInitiativesForSorting.slice(
+          sliceFrom,
+          sliceFrom + this.perPage
+        );
+      }
       this.initiatives = paginatedArray;
     }
   },
