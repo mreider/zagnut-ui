@@ -750,7 +750,11 @@ export default {
       if (this.activatedButton !== initiativeName) {
         // Check if initiatives was filtered by filter input, if true, sorting filtered initiatives
         if (this.filteredInitiatives !== null) {
-          this.filteredInitiatives.sort(sortFunction);
+          let sortedFilteredInitiatives = this.initialFilteredInitiatives.slice();
+          this.filteredInitiatives = sortedFilteredInitiatives
+            .sort(sortFunction)
+            .slice(0, this.perPage);
+          this.page = 1;
         } else {
           // this.initiatives.sort(sortFunction);
           this.initialInitiativesForSorting.sort(sortFunction);
@@ -773,6 +777,7 @@ export default {
       }
     },
     filterInitiatives(clickParam) {
+      this.activatedButton = "";
       this.page = 1;
       let initiatives = this.initialInitiatives;
 
@@ -837,10 +842,18 @@ export default {
           );
         }
       } else {
-        paginatedArray = this.initialInitiativesForSorting.slice(
-          sliceFrom,
-          sliceFrom + this.perPage
-        );
+        if (this.filteredInitiatives !== null) {
+          paginatedArray = this.initialFilteredInitiatives.slice(
+            sliceFrom,
+            sliceFrom + this.perPage
+          );
+          this.filteredInitiatives = paginatedArray.slice();
+        } else {
+          paginatedArray = this.initialInitiativesForSorting.slice(
+            sliceFrom,
+            sliceFrom + this.perPage
+          );
+        }
       }
       this.initiatives = paginatedArray;
     }
