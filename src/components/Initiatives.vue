@@ -420,6 +420,7 @@ export default {
       activatedButton: "",
       initialItiatives: [],
       initiatives: [],
+      initialIitiativesForSorting: [],
       initialFilteredInitiatives: null,
       filteredInitiatives: null,
       initiativesFields: [
@@ -558,7 +559,12 @@ export default {
         this.totalPages = Math.ceil(initiatives.length / this.perPage);
 
         this.initialItiatives = initiatives;
+        this.initialIitiativesForSorting = initiatives.slice();
         this.initiatives = this.initialItiatives.slice(0, this.perPage);
+        // this.intiatives = this.initiatives.slice(0, this.perPage);
+
+        console.log(this.initiatives);
+        console.log(this.initialItiatives);
         this.admin = _get(response, "data.admin");
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -745,20 +751,34 @@ export default {
       }
 
       if (this.activatedButton !== initiativeName) {
-        if (this.activatedButton === "") {
-          this.initialItiatives = this.initiatives.slice();
-        }
+        // if (this.activatedButton === "") {
+        //   // hell starting here
+        //   this.initialItiatives = this.initiatives.slice();
+        // }
+        // Check if initiatives was filtered by filter input, if true, sorting filtered initiatives
         if (this.filteredInitiatives !== null) {
           this.filteredInitiatives.sort(sortFunction);
         } else {
-          this.initiatives.sort(sortFunction);
+          console.log("hello");
+          // this.initiatives.sort(sortFunction);
+          console.log(this.initialItiatives);
+
+          this.initialIitiativesForSorting.sort(sortFunction);
+          this.initiatives = this.initialIitiativesForSorting.slice(
+            0,
+            this.perPage
+          );
+          this.page = 1;
+          console.log(this.initialItiatives);
         }
         this.activatedButton = initiativeName;
       } else {
         if (this.filteredInitiatives !== null) {
           this.filteredInitiatives = this.initialFilteredInitiatives.slice();
         } else {
-          this.initiatives = this.initialItiatives;
+          console.log(this.initialItiatives);
+          this.page = 1;
+          this.initiatives = this.initialItiatives.slice(0, this.perPage);
         }
 
         this.activatedButton = "";
@@ -813,8 +833,9 @@ export default {
         sliceFrom + this.perPage
       );
       this.initiatives = paginatedArray;
+      console.log("pagination function fired");
       console.log(this.initiatives);
-      console.log(sliceFrom, paginatedArray);
+      console.log(this.initialItiatives);
     }
   },
   components: {}
