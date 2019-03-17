@@ -41,10 +41,9 @@
           >Author</v-btn>
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
-        <v-btn small outline color="success" v-b-modal.modalnew>New</v-btn>
 
         <!--new initiative dialog-->
-        <v-dialog v-model="dialog" max-width="850px">
+        <v-dialog v-model="dialogNewInitiative" max-width="850px">
           <template v-slot:activator="{ on }">
             <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
           </template>
@@ -127,7 +126,7 @@
                     medium
                     @click="handleNewInitiative(true)"
                   >Save and open</v-btn>
-                  <v-btn color="blue darken-1" flat medium @click="dialog=false">Cancel</v-btn>
+                  <v-btn color="blue darken-1" flat medium @click="dialogNewInitiative=false">Cancel</v-btn>
                 </v-flex>
               </v-layout>
             </v-card-actions>
@@ -155,73 +154,8 @@
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
           <!--new initiative dialog-->
-          <!-- <v-dialog v-model="dialog" max-width="850px">
-            <template v-slot:activator="{ on }">
-              <v-btn small outline color="success" v-on="on">New</v-btn>
-            </template>
-            <v-card>
-              <v-card-title>
-                <span class="headline">New initiative</span>
-              </v-card-title>
+          <v-btn small outline color="success" @click="dialogNewInitiative = true">New</v-btn>
 
-              <v-card-text>
-                <v-container grid-list-md>
-                  <v-layout row wrap>
-                    <v-flex xs12 sm7>
-                      <v-text-field v-model="newInitiative.title" placeholder="Enter initiative"></v-text-field>
-                      <v-textarea
-                        v-model="newInitiative.description"
-                        placeholder="Enter hightlights"
-                      ></v-textarea>
-                    </v-flex>
-                    <v-flex xs12 sm5>
-                      <v-layout row wrap align-center>
-                        <v-flex xs4 mt-1>
-                          <v-subheader>Vote</v-subheader>
-                        </v-flex>
-                        <v-flex xs8 mt-1>
-                          <v-btn flat icon color="blue-grey darken-3">
-                            <v-icon>thumb_up</v-icon>
-                          </v-btn>
-                          <v-btn flat icon color="blue-grey darken-3">
-                            <v-icon>thumb_down</v-icon>
-                          </v-btn>
-                        </v-flex>
-                        <v-flex xs4>
-                          <v-subheader>Horizon</v-subheader>
-                        </v-flex>
-                        <v-flex xs8>
-                          <v-select></v-select>
-                        </v-flex>
-                        <v-flex xs4>
-                          <v-subheader>Priority</v-subheader>
-                        </v-flex>
-                        <v-flex xs8>
-                          <v-select></v-select>
-                        </v-flex>
-                      </v-layout>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-layout row wrap>
-                  <v-flex xs-12>
-                    <v-btn
-                      color="blue darken-1"
-                      class="save-and-close-button"
-                      flat
-                      medium
-                      @click="close"
-                    >Save and close</v-btn>
-                    <v-btn color="blue darken-1" flat medium @click="close">Save and open</v-btn>
-                    <v-btn color="blue darken-1" flat medium @click="close">Cancel</v-btn>
-                  </v-flex>
-                </v-layout>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>-->
           <v-checkbox
             label="Show archived"
             class="checkbox pl-2 pr-2"
@@ -329,15 +263,13 @@
             </v-btn>
             <v-btn
               v-if="$store.state.user.id ===  item.createdBy || admin"
-              slot="activator"
               class="delete-button extra-small-button"
               outline
               fab
               dark
               small
               color="primary"
-              v-b-modal.delete
-              @click="setCurrentInitiative(item)"
+              @click="setCurrentInitiative(item), dialogDeleteInitiative = true"
             >
               <i class="material-icons">delete</i>
             </v-btn>
@@ -369,132 +301,32 @@
         @ok="handleInitiativeDelete(currentInitiative)"
         ok-title="delete"
       ></b-modal>
-      <b-modal
-        id="modalnew"
-        button-size="sm"
-        title="New initiative"
-        @ok="handleNewInitiative()"
-        size="lg"
-        centered
-        v-model="show"
-        ref="modalnew"
-        :hide-footer="true"
-      >
-        <div class="container-fluid row">
-          <div class="col-7">
-            <b-form-group label-for="title">
-              <b-form-input
-                v-model="newInitiative.title"
-                placeholder="Enter initiative"
-                id="title"
-              >></b-form-input>
-            </b-form-group>
-            <b-form-group label-for="description">
-              <b-form-textarea
-                id="description"
-                v-model="newInitiative.description"
-                placeholder="Enter highlights"
-                :rows="3"
-                :max-rows="6"
-              ></b-form-textarea>
-            </b-form-group>
-          </div>
-          <div class="col-5 row">
-            <b-form-group label="Vote: " horizontal label-size="md" :label-cols="3" class="col-12">
-              <template>
-                <b-button
-                  v-model="vote"
-                  style="vertical-align: right;"
-                  size="lg"
-                  :variant.sync="btntrue"
-                  v-on:click="handleNewInitiativeSetField(true, 'vote')"
-                >
-                  <font-awesome-icon icon="thumbs-up"/>
-                </b-button>
-                <b-button
-                  v-model="vote"
-                  style="vertical-align: right;"
-                  size="lg"
-                  :variant.sync="btnfalse"
-                  v-on:click="handleNewInitiativeSetField(false, 'vote')"
-                >
-                  <font-awesome-icon icon="thumbs-down"/>
-                </b-button>
-              </template>
-            </b-form-group>
-            <b-form-group
-              label="Horizon:"
-              label-for="InitiativeHorizon"
-              horizontal
-              :label-cols="6"
-              label-size="sm"
-              class="col-12"
-              style="margin-left: 1px;"
-            >
-              <b-dropdown
-                :text="newInitiative.horizon.horizon"
-                name="newInitiativeHorizon"
-                size="sm"
-                class="horizon m-2"
-              >
-                <b-dropdown-item
-                  v-for="element in horizonList"
-                  v-bind:key="element.horizon"
-                  @click="handleNewInitiativeSetField(element, 'horizon')"
-                  size="sm"
-                >{{ element.horizon }}</b-dropdown-item>
-              </b-dropdown>
-            </b-form-group>
-            <b-form-group
-              label="Priority:"
-              label-for="newInitiativeStatuses"
-              horizontal
-              :label-cols="6"
-              label-size="sm"
-              class="col-12"
-              style="margin-left: 1px;"
-            >
-              <b-dropdown
-                :text="newInitiative.status.name"
-                name="newInitiativeStatuses"
-                size="sm"
-                class="statuses m-2"
-              >
-                <b-dropdown-item
-                  v-for="element in objStatuses"
-                  v-bind:key="element.id"
-                  @click="handleNewInitiativeSetField(element, 'status')"
-                  size="sm"
-                >{{ element.name }}</b-dropdown-item>
-              </b-dropdown>
-            </b-form-group>
-          </div>
-          <div class="col-12">
-            <div style="float: left">
-              <b-button
-                slot="modal-ok"
-                style="vertical-align: right;"
-                variant="primary"
-                size="sm"
-                @click="handleNewInitiative(false)"
-              >Save and close</b-button>
-              <b-button
-                style="vertical-align: right;"
-                variant="primary"
-                size="sm"
-                @click="handleNewInitiative(true)"
-              >Save and open</b-button>
-              <b-button
-                style="vertical-align: right;"
-                variant="primary"
-                size="sm"
-                @click="show = false"
-              >Cancel</b-button>
-            </div>
-          </div>
-        </div>
-      </b-modal>
     </div>
+
+    <v-dialog v-model="dialogDeleteInitiative" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="dialogDeleteInitiative = false"
+            small
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            flat="flat"
+            outline
+            @click="handleInitiativeDelete(currentInitiative)"
+            small
+          >Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -548,7 +380,8 @@ export default {
       currentInitiative: "",
       admin: false,
       showArchived: false,
-      dialog: false
+      dialogNewInitiative: false,
+      dialogDeleteInitiative: false
     };
   },
 
@@ -571,13 +404,15 @@ export default {
   },
   methods: {
     close() {
-      this.dialog = false;
+      this.dialogNewInitiative = false;
     },
     async reload(checked) {
       this.showArchived = checked;
       await this.loadOrgInitiatives();
     },
     setCurrentInitiative(element) {
+      console.log("element");
+      console.log(element);
       this.currentInitiative = element;
     },
     onFiltered(filteredItems) {
@@ -691,6 +526,7 @@ export default {
           text: `Item ${initiative.title} was deleted`
         });
         this.currentInitiative = "";
+        this.dialogDeleteInitiative = false;
       }
     },
     async loadOrgStatuses() {
@@ -756,7 +592,7 @@ export default {
         this.btntrue = "";
         this.btnfalse = "";
         this.show = false;
-        this.dialog = false;
+        this.dialogNewInitiative = false;
         this.loadOrgInitiatives();
       }
     },
