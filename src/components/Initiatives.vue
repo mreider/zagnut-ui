@@ -42,6 +42,72 @@
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
         <v-btn small outline color="success" v-b-modal.modalnew>New</v-btn>
+
+        <!--new initiative dialog-->
+        <v-dialog v-model="dialog" max-width="850px">
+          <template v-slot:activator="{ on }">
+            <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="headline">New initiative</span>
+            </v-card-title>
+
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout row wrap>
+                  <v-flex xs12 sm7>
+                    <v-text-field v-model="newInitiative.title" placeholder="Enter initiative"></v-text-field>
+                    <v-textarea v-model="newInitiative.description" placeholder="Enter hightlights"></v-textarea>
+                  </v-flex>
+                  <v-flex xs12 sm5>
+                    <v-layout row wrap align-center>
+                      <v-flex xs4 mt-1>
+                        <v-subheader>Vote</v-subheader>
+                      </v-flex>
+                      <v-flex xs8 mt-1>
+                        <v-btn flat icon color="blue-grey darken-3">
+                          <v-icon>thumb_up</v-icon>
+                        </v-btn>
+                        <v-btn flat icon color="blue-grey darken-3">
+                          <v-icon>thumb_down</v-icon>
+                        </v-btn>
+                      </v-flex>
+                      <v-flex xs4>
+                        <v-subheader>Horizon</v-subheader>
+                      </v-flex>
+                      <v-flex xs8>
+                        <v-select></v-select>
+                      </v-flex>
+                      <v-flex xs4>
+                        <v-subheader>Priority</v-subheader>
+                      </v-flex>
+                      <v-flex xs8>
+                        <v-select></v-select>
+                      </v-flex>
+                    </v-layout>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-layout row wrap>
+                <v-flex xs-12>
+                  <v-btn
+                    color="blue darken-1"
+                    class="save-and-close-button"
+                    flat
+                    medium
+                    @click="close"
+                  >Save and close</v-btn>
+                  <v-btn color="blue darken-1" flat medium @click="close">Save and open</v-btn>
+                  <v-btn color="blue darken-1" flat medium @click="close">Cancel</v-btn>
+                </v-flex>
+              </v-layout>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-toolbar>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
@@ -63,7 +129,73 @@
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-btn small outline color="success" v-b-modal.modalnew>New</v-btn>
+          <v-dialog v-model="dialog" max-width="850px">
+            <template v-slot:activator="{ on }">
+              <v-btn small outline color="success" v-on="on">New</v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                <span class="headline">New initiative</span>
+              </v-card-title>
+
+              <v-card-text>
+                <v-container grid-list-md>
+                  <v-layout row wrap>
+                    <v-flex xs12 sm7>
+                      <v-text-field v-model="newInitiative.title" placeholder="Enter initiative"></v-text-field>
+                      <v-textarea
+                        v-model="newInitiative.description"
+                        placeholder="Enter hightlights"
+                      ></v-textarea>
+                    </v-flex>
+                    <v-flex xs12 sm5>
+                      <v-layout row wrap align-center>
+                        <v-flex xs4 mt-1>
+                          <v-subheader>Vote</v-subheader>
+                        </v-flex>
+                        <v-flex xs8 mt-1>
+                          <v-btn flat icon color="blue-grey darken-3">
+                            <v-icon>thumb_up</v-icon>
+                          </v-btn>
+                          <v-btn flat icon color="blue-grey darken-3">
+                            <v-icon>thumb_down</v-icon>
+                          </v-btn>
+                        </v-flex>
+                        <v-flex xs4>
+                          <v-subheader>Horizon</v-subheader>
+                        </v-flex>
+                        <v-flex xs8>
+                          <v-select></v-select>
+                        </v-flex>
+                        <v-flex xs4>
+                          <v-subheader>Priority</v-subheader>
+                        </v-flex>
+                        <v-flex xs8>
+                          <v-select></v-select>
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-layout row wrap>
+                  <v-flex xs-12>
+                    <v-btn
+                      color="blue darken-1"
+                      class="save-and-close-button"
+                      flat
+                      medium
+                      @click="close"
+                    >Save and close</v-btn>
+                    <v-btn color="blue darken-1" flat medium @click="close">Save and open</v-btn>
+                    <v-btn color="blue darken-1" flat medium @click="close">Cancel</v-btn>
+                  </v-flex>
+                </v-layout>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <v-checkbox
             label="Show archived"
             class="checkbox pl-2 pr-2"
@@ -186,6 +318,7 @@
         ></v-pagination>
       </div>
     </v-layout>
+
     <!--old bootstrap section-->
     <div class="initiatives">
       <b-modal
@@ -377,7 +510,8 @@ export default {
       show: false,
       currentInitiative: "",
       admin: false,
-      showArchived: false
+      showArchived: false,
+      dialog: false
     };
   },
 
@@ -388,12 +522,21 @@ export default {
         : this.initiatives;
     }
   },
+  watch: {
+    // dialog(val) {
+    //   val || this.close();
+    // }
+  },
   async mounted() {
     await this.loadOrgStatuses();
     await this.loadOrgInitiatives();
     this.horizonLoadList();
   },
   methods: {
+    close() {
+      console.log("hello");
+      this.dialog = false;
+    },
     async reload(checked) {
       this.showArchived = checked;
       await this.loadOrgInitiatives();
@@ -830,6 +973,12 @@ export default {
     @media screen and (max-width: 1264px) {
       margin-bottom: 13px;
     }
+  }
+}
+.save-and-close-button {
+  margin-left: 14px !important;
+  @media screen and (max-width: 420px) {
+    margin-left: 9px !important;
   }
 }
 </style>
