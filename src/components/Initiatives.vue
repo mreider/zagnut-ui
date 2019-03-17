@@ -471,7 +471,7 @@ export default {
     async loadOrgInitiatives() {
       try {
         // this.$loading(true);
-        this.loading = true;
+        // this.loading = true;
         const response = await this.axios.get(
           `/api/initiatives/all/${this.showArchived}/${
             this.$store.state.organization.id
@@ -501,6 +501,7 @@ export default {
 
         this.admin = _get(response, "data.admin");
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
         this.loading = false;
@@ -533,6 +534,7 @@ export default {
       }
     },
     async loadOrgStatuses() {
+      this.loading = true;
       try {
         // this.$loading(true);
         const orgId = this.$store.state.organization.id;
@@ -546,8 +548,10 @@ export default {
 
         this.objStatuses = _get(response, "data.statuses");
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
+        // this.loading = false;
         // this.$loading(false);
       }
     },
