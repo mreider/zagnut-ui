@@ -411,8 +411,6 @@ export default {
       await this.loadOrgInitiatives();
     },
     setCurrentInitiative(element) {
-      console.log("element");
-      console.log(element);
       this.currentInitiative = element;
     },
     onFiltered(filteredItems) {
@@ -465,7 +463,6 @@ export default {
         horizon: this.getHorizonName(newDate)
       };
       this.horizonList.push(obj);
-      console.log(this.horizonList);
     },
     async loadOrgInitiatives() {
       try {
@@ -542,7 +539,6 @@ export default {
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
         this.objStatuses = _get(response, "data.statuses");
-        console.log(this.objStatuses);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -597,7 +593,6 @@ export default {
       }
     },
     handleNewInitiativeSetField(element, name) {
-      console.log(element);
       this.newInitiative[name] = element;
       if (name === "vote") {
         this.vote = element;
@@ -774,6 +769,7 @@ export default {
             sliceFrom + this.perPage
           );
           this.filteredInitiatives = paginatedArray.slice();
+          console.log(paginatedArray);
         } else {
           paginatedArray = this.initialInitiatives.slice(
             sliceFrom,
