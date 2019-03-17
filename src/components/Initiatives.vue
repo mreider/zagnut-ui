@@ -66,10 +66,22 @@
                         <v-subheader>Vote</v-subheader>
                       </v-flex>
                       <v-flex xs8 mt-1>
-                        <v-btn flat icon color="blue-grey darken-3">
+                        <v-btn
+                          flat
+                          icon
+                          color="blue-grey darken-3"
+                          :class="{'v-btn--active': this.btntrue === 'voteUp' }"
+                          @click="handleNewInitiativeSetField(true, 'vote')"
+                        >
                           <v-icon>thumb_up</v-icon>
                         </v-btn>
-                        <v-btn flat icon color="blue-grey darken-3">
+                        <v-btn
+                          flat
+                          icon
+                          color="blue-grey darken-3"
+                          :class="{'v-btn--active': this.btnfalse === 'voteDown' }"
+                          @click="handleNewInitiativeSetField(false, 'vote')"
+                        >
                           <v-icon>thumb_down</v-icon>
                         </v-btn>
                       </v-flex>
@@ -77,13 +89,21 @@
                         <v-subheader>Horizon</v-subheader>
                       </v-flex>
                       <v-flex xs8>
-                        <v-select></v-select>
+                        <v-select
+                          :items="horizonList"
+                          item-text="horizon"
+                          @change="handleNewInitiativeSetField"
+                        ></v-select>
                       </v-flex>
                       <v-flex xs4>
                         <v-subheader>Priority</v-subheader>
                       </v-flex>
                       <v-flex xs8>
-                        <v-select></v-select>
+                        <v-select
+                          :items="objStatuses"
+                          item-text="name"
+                          @change="handleNewInitiativeSetField"
+                        ></v-select>
                       </v-flex>
                     </v-layout>
                   </v-flex>
@@ -99,10 +119,15 @@
                     class="save-and-close-button"
                     flat
                     medium
-                    @click="close"
+                    @click="handleNewInitiative(false)"
                   >Save and close</v-btn>
-                  <v-btn color="blue darken-1" flat medium @click="close">Save and open</v-btn>
-                  <v-btn color="blue darken-1" flat medium @click="close">Cancel</v-btn>
+                  <v-btn
+                    color="blue darken-1"
+                    flat
+                    medium
+                    @click="handleNewInitiative(true)"
+                  >Save and open</v-btn>
+                  <v-btn color="blue darken-1" flat medium @click="dialog=false">Cancel</v-btn>
                 </v-flex>
               </v-layout>
             </v-card-actions>
@@ -129,7 +154,8 @@
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-dialog v-model="dialog" max-width="850px">
+          <!--new initiative dialog-->
+          <!-- <v-dialog v-model="dialog" max-width="850px">
             <template v-slot:activator="{ on }">
               <v-btn small outline color="success" v-on="on">New</v-btn>
             </template>
@@ -195,7 +221,7 @@
                 </v-layout>
               </v-card-actions>
             </v-card>
-          </v-dialog>
+          </v-dialog>-->
           <v-checkbox
             label="Show archived"
             class="checkbox pl-2 pr-2"
@@ -240,8 +266,19 @@
         </v-flex>
 
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-text-field label="Filter" single-line class="pt-0 pl-2 pr-2" v-model="filter"></v-text-field>
-          <v-btn small outline class="pt-0 mt-0 clear-filter-botton">Clear</v-btn>
+          <v-text-field
+            label="Filter"
+            @keyup="filterInitiatives"
+            single-line
+            class="pt-0 pl-2 pr-2"
+            v-model="filter"
+          ></v-text-field>
+          <v-btn
+            small
+            outline
+            class="pt-0 mt-0 clear-filter-botton"
+            @click="filter = '', clearInitiativesFilter()"
+          >Clear</v-btn>
         </v-flex>
       </v-layout>
       <!--cards section-->
@@ -534,7 +571,6 @@ export default {
   },
   methods: {
     close() {
-      console.log("hello");
       this.dialog = false;
     },
     async reload(checked) {
@@ -594,6 +630,7 @@ export default {
         horizon: this.getHorizonName(newDate)
       };
       this.horizonList.push(obj);
+      console.log(this.horizonList);
     },
     async loadOrgInitiatives() {
       try {
@@ -669,6 +706,7 @@ export default {
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
         this.objStatuses = _get(response, "data.statuses");
+        console.log(this.objStatuses);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -718,19 +756,21 @@ export default {
         this.btntrue = "";
         this.btnfalse = "";
         this.show = false;
+        this.dialog = false;
         this.loadOrgInitiatives();
       }
     },
     handleNewInitiativeSetField(element, name) {
+      console.log(element);
       this.newInitiative[name] = element;
       if (name === "vote") {
         this.vote = element;
         if (element === true) {
-          this.btntrue = "success";
+          this.btntrue = "voteUp";
           this.btnfalse = "";
         } else {
           this.btntrue = "";
-          this.btnfalse = "danger";
+          this.btnfalse = "voteDown";
         }
         //  this.$nextTick();
       }
