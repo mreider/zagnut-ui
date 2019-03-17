@@ -13,7 +13,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 // import VueSocketIO from 'vue-socket.io';
 import Notifications from 'vue-notification';
-
+import LoadingIndication from './components/shared/LoadingIndication.vue';
 // import './scss/minty-theme.css';
 import './scss/material-theme.css';
 import './scss/tribute.css';
@@ -55,6 +55,8 @@ Vue.use(BootstrapVue);
 Vue.use(VueAxios, axios);
 Vue.use(ErrorMessage);
 Vue.use(Loader);
+
+Vue.component('loading-indication', LoadingIndication);
 
 Vue.config.productionTip = false;
 

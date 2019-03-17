@@ -1,5 +1,8 @@
 <template>
   <v-container fluid>
+    <div v-if="loading === true">
+      <loading-indication></loading-indication>
+    </div>
     <v-layout row wrap>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
@@ -381,7 +384,8 @@ export default {
       admin: false,
       showArchived: false,
       dialogNewInitiative: false,
-      dialogDeleteInitiative: false
+      dialogDeleteInitiative: false,
+      loading: false
     };
   },
 
@@ -467,6 +471,7 @@ export default {
     async loadOrgInitiatives() {
       try {
         // this.$loading(true);
+        this.loading = true;
         const response = await this.axios.get(
           `/api/initiatives/all/${this.showArchived}/${
             this.$store.state.organization.id
@@ -498,6 +503,7 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
+        this.loading = false;
         // this.$loading(false);
       }
     },
@@ -528,7 +534,7 @@ export default {
     },
     async loadOrgStatuses() {
       try {
-        this.$loading(true);
+        // this.$loading(true);
         const orgId = this.$store.state.organization.id;
 
         const response = await this.axios.get(
@@ -542,10 +548,11 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
+        // this.$loading(false);
       }
     },
     async handleNewInitiative(go) {
+      this.loading = true;
       try {
         let data = {};
         data.statusId = String(this.newInitiative.status.id);
@@ -572,8 +579,10 @@ export default {
         }
         if (!success) throw new Error(`Unable to create new initiative.`);
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
+        this.loading = false;
         this.newInitiative = {
           title: "",
           description: "",
