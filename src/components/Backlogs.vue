@@ -1,109 +1,272 @@
 <template>
-<b-card bg-variant="light" class="card ">
-  <div class="backlogs">
-    <div class="row">
-      <div class="col-12">
-        <b-btn class="btnHeader" variant="primary" size="sm" v-b-modal.modalnew> New</b-btn>
-      </div>
-      <div class="col-6">
-        <b-form-checkbox style="float-right" id="checkbox0" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
-      </div>
-      <b-input-group  class="col-6">
-        <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
-        <b-input-group-append>
-          <b-btn size="sm" class="btnHeader "  :disabled="!filter" @click="filter = ''">Clear</b-btn>
-        </b-input-group-append>
-      </b-input-group >
+  <v-container fluid>
+    <div v-if="loading === true">
+      <loading-indication></loading-indication>
     </div>
-
-    <b-table  bordered
-              fixed
-              responsive
-              :items="backlogs"
-              :fields="backlogsFields"
-              :filter="filter"
-              :current-page="currentPage"
-              :per-page="perPage"
-              style="margin-top: 0.5em"
-              @filtered="onFiltered"
-              >
-      <template slot="title" slot-scope="data" class="col-8">
-        <router-link :to="'items/?orgId='+$store.state.organization.id +'&backlogid='+ data.item.id">{{  data.item.title }}</router-link>
-      </template>
-      <template slot="author" slot-scope="data" class="col-4">
-        <a :href="`#`" v-on:click="filter = data.item.author">
-          {{ data.item.author }}
-        </a>
-        <div style="float: right;">
-          <b-button style="vertical-align: right;" variant="primary" size="sm" v-b-modal.edit @click="setCurrentBacklog(data.item)"><font-awesome-icon icon="pencil-alt" /> </b-button>
-          <b-button style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentBacklog(data.item)"><font-awesome-icon icon="trash-alt" /></b-button>
+    <v-layout row wrap>
+      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
+        <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
+        <div>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortBacklogsCards('title')"
+            :class="{'v-btn--active': this.activatedButton === 'title' }"
+          >Backlog</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortBacklogsCards('autor')"
+            :class="{'v-btn--active': this.activatedButton === 'autor' }"
+          >Autor</v-btn>
         </div>
-      </template>
-    </b-table>
-     <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+        <v-spacer class="hidden-md-and-down"></v-spacer>
 
-    <b-modal id="edit"
-              title="Edit"
-              button-size="sm"
-              size="sm"
-              centered
-              ok-variant="submit"
-              @ok="handleBacklogEditTitle(currentBacklog, newNameOldBacklog)"
-              ok-title="submit"
-              >
-        <b-form-input v-model=newNameOldBacklog :placeholder="currentBacklog.title"></b-form-input>
-        <br>
-        <b-form-checkbox id="checkbox1" v-model="currentBacklog.archived" v-if="currentBacklog"> Archived </b-form-checkbox>
-    </b-modal>
-    <b-modal id="delete"
-              :title="'Wait. Are you sure you want to delete this permanently?'"
-              button-size="sm"
-              size="sm"
-              centered
-              body-class="zero-size"
-              ok-variant="danger"
-              @ok="handleBacklogDelete(currentBacklog)"
-              ok-title="delete"
-              >
-    </b-modal>
+        <!--new initiative dialog-->
+        <v-dialog v-model="dialogNewBackLog" max-width="850px">
+          <template v-slot:activator="{ on }">
+            <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="headline">New backlog</span>
+            </v-card-title>
 
-    <b-modal id="modalnew"
-              button-size="sm"
-              title="New backlog"
-              @ok="handleNewBacklog()"
-              size="lg"
-              centered
-              >
-      <b-form-group label = "Title: " label-for = "title" horizontal>
-        <b-form-input v-model="newBacklog.title" placeholder="Title backlog" id="title">></b-form-input>
-      </b-form-group>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout row wrap>
+                  <v-flex xs4>
+                    <v-subheader>Title</v-subheader>
+                  </v-flex>
+                  <v-flex xs8>
+                    <v-text-field v-model="newBacklog.title" placeholder="Title backlog"></v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
 
-    </b-modal>
+            <v-card-actions>
+              <v-layout row wrap>
+                <v-flex xs-12>
+                  <v-btn
+                    color="blue darken-1"
+                    class="save-and-close-button"
+                    flat
+                    medium
+                    @click="handleNewBacklog(false)"
+                  >Save</v-btn>
+                  <v-btn color="blue darken-1" flat medium @click="dialogNewBackLog=false">Cancel</v-btn>
+                </v-flex>
+              </v-layout>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-toolbar>
+      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-text-field
+          label="Filter"
+          v-model="filter"
+          single-line
+          class="pt-0"
+          @keyup="filterBacklogs"
+        ></v-text-field>
+        <v-btn
+          small
+          outline
+          class="pt-0 mt-0 clear-filter-botton"
+          @click="filter = '', clearBacklogsFilter()"
+        >Clear</v-btn>
+      </v-toolbar>
+      <!--toolbar for mobile sizes-->
+      <v-layout row wrap justify-center>
+        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
+          <!--new initiative dialog-->
+          <v-btn small outline color="success" @click="dialogNewBackLog = true">New</v-btn>
 
-  </div>
-  </b-card>
+          <v-checkbox
+            label="Show archived"
+            class="checkbox pl-2 pr-2"
+            v-model="showArchived"
+            @change="reload"
+          ></v-checkbox>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortBacklogs('initiative')"
+            :class="{'v-btn--active': this.activatedButton === 'initiative' }"
+          >Backlog</v-btn>
+          <v-btn
+            small
+            color="primary"
+            outline
+            @click="sortBacklogs('popularity')"
+            :class="{'v-btn--active': this.activatedButton === 'popularity' }"
+          >Autor</v-btn>
+        </v-flex>
+
+        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
+          <v-text-field
+            label="Filter"
+            @keyup="filterBacklogs"
+            single-line
+            class="pt-0 pl-2 pr-2"
+            v-model="filter"
+          ></v-text-field>
+          <v-btn
+            small
+            outline
+            class="pt-0 mt-0 clear-filter-botton"
+            @click="filter = '', clearBacklogsFilter()"
+          >Clear</v-btn>
+        </v-flex>
+      </v-layout>
+      <!--cards section-->
+      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in backlogsCards" :key="item.id">
+        <v-card>
+          <v-card-title primary-title>
+            <h4 class="mb-0">Initiative:
+              <router-link
+                :to="'initiative/?orgId='+$store.state.organization.id +'&backlogid='+ item.id"
+              >{{ item.title }}</router-link>
+            </h4>
+          </v-card-title>
+          <div class="card-body pt-0 pb-0">
+            <p class="mb-2">
+              Author:
+              <a href="#" @click="filterBacklogs(item.author)">{{item.author }}</a>
+            </p>
+          </div>
+
+          <v-card-actions class="pl-3 pb-2">
+            <v-btn
+              class="edit-button extra-small-button"
+              outline
+              fab
+              dark
+              small
+              color="primary"
+              @click="setCurrentBacklog(data.item), dialogNewBackLog = true"
+            >
+              <i class="material-icons">edit</i>
+            </v-btn>
+            <v-btn
+              v-if="$store.state.user.id ===  item.createdBy || admin"
+              class="delete-button extra-small-button"
+              outline
+              fab
+              dark
+              small
+              color="primary"
+              @click="setCurrentBacklog(data.item), dialogDeleteBackLog = true"
+            >
+              <i class="material-icons">delete</i>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap justify-center>
+      <div class="text-xs-center pt-3">
+        <v-pagination
+          v-model="page"
+          :length="totalPages"
+          :total-visible="15"
+          @input="paginationFunction"
+        ></v-pagination>
+      </div>
+    </v-layout>
+
+    <v-dialog v-model="dialogDeleteBackLog" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="dialogDeleteBackLog = false"
+            small
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            flat="flat"
+            outline
+            @click="handleBacklogDelete(currentInitiative)"
+            small
+          >Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialogEditBacklog" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="dialogDeleteBackLog = false"
+            small
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            flat="flat"
+            outline
+            @click="handleBacklogEditTitle(currentBacklog, newNameOldBacklog)"
+            small
+          >Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script>
-import _get from 'lodash/get';
-import { username } from '@/utils';
+import _get from "lodash/get";
+import { username } from "@/utils";
 export default {
-  name: 'Backlogs',
+  name: "Backlogs",
   data() {
     return {
       selected: [],
       options: [],
       users: [],
-      newBacklog: {title: ''},
+      newBacklog: { title: "" },
       backlogs: [],
-      backlogsFields: [{ key: 'title', sortable: true, label: 'Backlog' }, { key: 'author', sortable: true }],
-      newNameOldBacklog: '',
-      currentBacklog: '',
+      activatedButton: "",
+      initialBacklogs: [],
+      initialBacklogsForSorting: [],
+      initialFilteredBacklogs: null,
+      filteredBacklogs: null,
+      backlogsFields: [
+        { key: "title", sortable: true, label: "Backlog" },
+        { key: "author", sortable: true }
+      ],
+      newNameOldBacklog: "",
+      currentBacklog: "",
       filter: null,
-      perPage: 10,
+      page: 1,
+      totalPages: 4,
+      perPage: 8,
       showArchived: false,
       currentPage: 1,
-      totalRows: 0
+      totalRows: 0,
+      loading: false,
+      dialogDeleteBackLog: false,
+      dialogNewBackLog: false,
+      dialogEditBacklog: false
     };
   },
   async mounted() {
@@ -111,31 +274,48 @@ export default {
   },
 
   computed: {
+    backlogsCards: function() {
+      return this.filteredBacklogs !== null
+        ? this.filteredBacklogs.slice(0, this.perPage)
+        : this.backlogs;
+    }
   },
 
   methods: {
+    close() {
+      this.dialogNewBackLog = false;
+    },
     async reload(checked) {
       this.showArchived = checked;
       await this.loadOrgBacklogs();
     },
     async loadOrgBacklogs() {
       try {
-        const response = await this.axios.get(`/api/backlogs/${this.showArchived}/${this.$store.state.organization.id}`);
+        const response = await this.axios.get(
+          `/api/backlogs/${this.showArchived}/${
+            this.$store.state.organization.id
+          }`
+        );
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to load user's backlogs.`);
 
-        const backlogs = _get(response, 'data.backlogs');
+        const backlogs = _get(response, "data.backlogs");
         backlogs.forEach(element => {
           element.author = username(element);
           if (element.archived === 1) {
             element.archived = true;
           } else {
             element.archived = false;
-          };
+          }
         });
-        this.backlogs = backlogs;
+
         this.totalRows = backlogs.length;
+        this.totalPages = Math.ceil(backlogs.length / this.perPage);
+
+        this.initialBacklogs = backlogs;
+        this.initialBacklogsForSorting = backlogs.slice();
+        this.backlogs = this.initialBacklogs.slice(0, this.perPage);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -160,19 +340,28 @@ export default {
       try {
         this.$loading(true);
 
-        const response = await this.axios.put(`/api/backlogs/edit/${this.$store.state.organization.id}/${element.id}`, data);
+        const response = await this.axios.put(
+          `/api/backlogs/edit/${this.$store.state.organization.id}/${
+            element.id
+          }`,
+          data
+        );
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to update backlog.`);
 
-        this.$notify({group: 'app', type: 'success', text: 'Backlog updated'});
+        this.$notify({
+          group: "app",
+          type: "success",
+          text: "Backlog updated"
+        });
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
         await this.loadOrgBacklogs();
         this.$loading(false);
-        this.newNameOldBacklog = '';
-        this.currentBacklog = '';
+        this.newNameOldBacklog = "";
+        this.currentBacklog = "";
       }
     },
     async handleBacklogDelete(backLog) {
@@ -180,14 +369,20 @@ export default {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
       try {
-        const response = await this.axios.delete(`/api/backlogs/${this.$store.state.organization.id}/${backLog.id}`);
-        const success = _get(response, 'data.success');
+        const response = await this.axios.delete(
+          `/api/backlogs/${this.$store.state.organization.id}/${backLog.id}`
+        );
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to create new organization.`);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.$notify({group: 'app', type: 'success', text: `Backlog ${backLog.title} was deleted`});
-        this.currentBacklog = '';
+        this.$notify({
+          group: "app",
+          type: "success",
+          text: `Backlog ${backLog.title} was deleted`
+        });
+        this.currentBacklog = "";
         await this.loadOrgBacklogs();
       }
     },
@@ -195,51 +390,185 @@ export default {
       try {
         let data = {};
         data.title = this.newBacklog.title;
-        const response = await this.axios.post(`/api/backlogs/new/${this.$store.state.organization.id}`, data);
-        const success = _get(response, 'data.success');
+        const response = await this.axios.post(
+          `/api/backlogs/new/${this.$store.state.organization.id}`,
+          data
+        );
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to create new backlog.`);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        this.newBacklog = { title: '' };
+        this.newBacklog = { title: "" };
         await this.loadOrgBacklogs();
       }
     },
-    handleUsername (element) {
+    handleUsername(element) {
       return username(element);
     },
-    onFiltered (filteredItems) {
+    onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.backlogs.forEach(element => {
         element.totalRows = filteredItems.length;
         element.currentPage = 1;
       });
+    },
+    sortBacklogsCards(backlogName) {
+      let param = backlogName.toLowerCase();
+      function sortFunction(a, b) {
+        let aParam;
+        let bParam;
+        if (param === "horizon") {
+          aParam = a[param][param].replace(/\s/g, "X").toLowerCase();
+          bParam = b[param][param].replace(/\s/g, "X").toLowerCase();
+          if (aParam > bParam) {
+            return -1;
+          }
+          if (aParam === bParam) {
+            return 1;
+          }
+          return 0;
+        } else {
+          aParam =
+            typeof a[param] === "string"
+              ? a[param].replace(/\s/g, "X").toLowerCase()
+              : a[param];
+          bParam =
+            typeof b[param] === "string"
+              ? b[param].replace(/\s/g, "X").toLowerCase()
+              : b[param];
+          if (aParam < bParam) {
+            return -1;
+          }
+          if (aParam === bParam) {
+            return 1;
+          }
+          return 0;
+        }
+      }
+
+      if (this.activatedButton !== backlogName) {
+        // Check if initiatives was filtered by filter input, if true, sorting filtered initiatives
+        if (this.filteredBacklogs !== null) {
+          let sortedFilteredBacklogs = this.initialFilteredBacklogs.slice();
+          this.filteredBacklogs = sortedFilteredBacklogs
+            .sort(sortFunction)
+            .slice(0, this.perPage);
+          this.page = 1;
+        } else {
+          // this.initiatives.sort(sortFunction);
+          this.initialBacklogsForSorting.sort(sortFunction);
+          this.backlogs = this.initialBacklogsForSorting.slice(0, this.perPage);
+          this.page = 1;
+        }
+        this.activatedButton = backlogName;
+        console.log(this.activatedButton);
+      } else {
+        if (this.filteredBacklogs !== null) {
+          this.filteredBacklogs = this.initialFilteredBacklogs.slice();
+        } else {
+          this.page = 1;
+          console.log("this.initialBacklogs");
+          console.log(this.initialBacklogs);
+          this.backlogs = this.initialBacklogs.slice(0, this.perPage);
+        }
+
+        this.activatedButton = "";
+      }
+    },
+    filterBacklogs(clickParam) {
+      this.activatedButton = "";
+      this.page = 1;
+      let backlogs = this.initialBacklogs;
+
+      let filterInputValue;
+
+      if (typeof clickParam === "string") {
+        filterInputValue = clickParam;
+      } else {
+        filterInputValue = this.filter;
+      }
+
+      let filterKeys = ["title", "author"];
+      for (let i = 0, len = backlogs.length; i < len; i++) {
+        this.filteredBacklogs = backlogs.filter(function(obj) {
+          return filterKeys.some(function(key) {
+            if (typeof obj[key] === "string" || typeof obj[key] === "number") {
+              return obj[key]
+                .toString()
+                .toLowerCase()
+                .includes(filterInputValue.toLowerCase());
+            }
+            if (typeof obj[key] === "object") {
+              return obj[key]["horizon"]
+                .toLowerCase()
+                .includes(filterInputValue.toLowerCase());
+            }
+          });
+        });
+      }
+      this.totalPages = Math.ceil(this.filteredBacklogs.length / this.perPage);
+      this.initialFilteredBacklogs = this.filteredBacklogs.slice();
+    },
+    clearInitiativesFilter() {
+      this.filteredBacklogs = null;
+      this.totalPages = Math.ceil(this.initialBacklogs.length / this.perPage);
+    },
+    paginationFunction(event) {
+      let sliceFrom = (event - 1) * this.perPage;
+      let paginatedArray;
+      if (this.activatedButton === "") {
+        if (this.filteredBacklogs !== null) {
+          paginatedArray = this.initialFilteredBacklogs.slice(
+            sliceFrom,
+            sliceFrom + this.perPage
+          );
+          this.filteredBacklogs = paginatedArray.slice();
+          console.log(paginatedArray);
+        } else {
+          paginatedArray = this.initialBacklogs.slice(
+            sliceFrom,
+            sliceFrom + this.perPage
+          );
+        }
+      } else {
+        if (this.filteredBacklogs !== null) {
+          paginatedArray = this.initialFilteredBacklogs.slice(
+            sliceFrom,
+            sliceFrom + this.perPage
+          );
+          this.filteredBacklogs = paginatedArray.slice();
+        } else {
+          paginatedArray = this.initialBacklogsForSorting.slice(
+            sliceFrom,
+            sliceFrom + this.perPage
+          );
+        }
+      }
+      this.backlogs = paginatedArray;
     }
   },
-  watch: {
-  },
-  components: {
-  }
+  watch: {},
+  components: {}
 };
 </script>
 
 <style lang="scss">
- .card {
-    margin-top:50px;
+.card {
+  margin-top: 50px;
+}
+.backlogs {
+  .btnHeader {
+    width: 4.5em;
+    height: 2em;
+    float: right;
+    margin-top: 5px;
   }
-  .backlogs {
-    .btnHeader {
-      width: 4.5em;
-      height: 2em;
-      float: right;
-      margin-top:5px;
-    }
-    .header {
-      margin-top:10px;
-    }
-    .hidden_header {
-      display: none;
-    }
-
-  };
+  .header {
+    margin-top: 10px;
+  }
+  .hidden_header {
+    display: none;
+  }
+}
 </style>
