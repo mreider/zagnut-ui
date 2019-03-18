@@ -150,7 +150,7 @@
               dark
               small
               color="primary"
-              @click="setCurrentBacklog(item), dialogEditBackLog = true"
+              @click="setCurrentBacklog(item), dialogBacklogEdit = true"
             >
               <i class="material-icons">edit</i>
             </v-btn>
@@ -199,27 +199,31 @@
             color="error"
             flat="flat"
             outline
-            @click="handleBacklogDelete(currentInitiative)"
+            @click="handleBacklogDelete(currentBacklog)"
             small
           >Yes</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogEditBacklog" max-width="650">
+    <v-dialog v-model="dialogBacklogEdit" max-width="600">
       <v-card>
-        <v-flex xs12>
-          <!-- <v-text-field v-model="newNameOldBacklog" :placeholder="currentBacklog.title"></v-text-field> -->
-        </v-flex>
+        <v-layout row container wrap>
+          <v-flex xs12>
+            <v-text-field v-model="newNameOldBacklog" :placeholder="currentBacklog.title"></v-text-field>
+          </v-flex>
+          <v-flex xs12>
+            <v-checkbox
+              label="Show archived"
+              class="checkbox"
+              v-model="currentBacklog.archived"
+              v-if="currentBacklog"
+            ></v-checkbox>
+          </v-flex>
+        </v-layout>
 
         <v-card-actions>
-          <v-btn
-            color="primary"
-            flat="flat"
-            outline
-            @click="dialogDeleteBackLog = false"
-            small
-          >Cancel</v-btn>
+          <v-btn color="primary" flat="flat" outline @click="dialogBacklogEdit = false" small>Cancel</v-btn>
           <v-spacer></v-spacer>
           <v-btn
             color="error"
@@ -227,7 +231,7 @@
             outline
             @click="handleBacklogEditTitle(currentBacklog, newNameOldBacklog)"
             small
-          >Yes</v-btn>
+          >Edit</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -265,6 +269,7 @@ export default {
       currentPage: 1,
       totalRows: 0,
       loading: false,
+      dialogBacklogEdit: false,
       dialogDeleteBackLog: false,
       dialogNewBackLog: false,
       dialogEditBacklog: false
@@ -331,6 +336,7 @@ export default {
     },
     setCurrentBacklog(element) {
       this.currentBacklog = element;
+      console.log(this.dialogEditBacklog);
     },
     async handleBacklogEditTitle(element, newNameOldBacklog) {
       let data = {};
