@@ -580,6 +580,7 @@ export default {
               }
             });
           }
+          this.dialogNewInitiative = false;
         }
         if (!success) throw new Error(`Unable to create new initiative.`);
       } catch (error) {
@@ -601,7 +602,6 @@ export default {
         this.btntrue = "";
         this.btnfalse = "";
         this.show = false;
-        this.dialogNewInitiative = false;
         this.loadOrgInitiatives();
       }
     },
