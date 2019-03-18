@@ -25,7 +25,7 @@
         <v-spacer class="hidden-md-and-down"></v-spacer>
 
         <!--new initiative dialog-->
-        <v-dialog v-model="dialogNewBackLog" max-width="850px">
+        <v-dialog v-model="dialogNewBackLog" max-width="650px">
           <template v-slot:activator="{ on }">
             <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
           </template>
@@ -97,15 +97,15 @@
             small
             color="primary"
             outline
-            @click="sortBacklogs('initiative')"
+            @click="sortBacklogsCards('title')"
             :class="{'v-btn--active': this.activatedButton === 'initiative' }"
           >Backlog</v-btn>
           <v-btn
             small
             color="primary"
             outline
-            @click="sortBacklogs('popularity')"
-            :class="{'v-btn--active': this.activatedButton === 'popularity' }"
+            @click="sortBacklogsCards('autor')"
+            :class="{'v-btn--active': this.activatedButton === 'autor'}"
           >Autor</v-btn>
         </v-flex>
 
@@ -150,7 +150,7 @@
               dark
               small
               color="primary"
-              @click="setCurrentBacklog(data.item), dialogNewBackLog = true"
+              @click="setCurrentBacklog(item), dialogEditBackLog = true"
             >
               <i class="material-icons">edit</i>
             </v-btn>
@@ -162,7 +162,7 @@
               dark
               small
               color="primary"
-              @click="setCurrentBacklog(data.item), dialogDeleteBackLog = true"
+              @click="setCurrentBacklog(item), dialogDeleteBackLog = true"
             >
               <i class="material-icons">delete</i>
             </v-btn>
@@ -206,11 +206,12 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogEditBacklog" max-width="250">
+    <v-dialog v-model="dialogEditBacklog" max-width="650">
       <v-card>
-        <v-card-text
-          class="text-xs-center subheading"
-        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-flex xs12>
+          <!-- <v-text-field v-model="newNameOldBacklog" :placeholder="currentBacklog.title"></v-text-field> -->
+        </v-flex>
+
         <v-card-actions>
           <v-btn
             color="primary"
@@ -462,17 +463,13 @@ export default {
           this.page = 1;
         }
         this.activatedButton = backlogName;
-        console.log(this.activatedButton);
       } else {
         if (this.filteredBacklogs !== null) {
           this.filteredBacklogs = this.initialFilteredBacklogs.slice();
         } else {
           this.page = 1;
-          console.log("this.initialBacklogs");
-          console.log(this.initialBacklogs);
           this.backlogs = this.initialBacklogs.slice(0, this.perPage);
         }
-
         this.activatedButton = "";
       }
     },
@@ -510,7 +507,7 @@ export default {
       this.totalPages = Math.ceil(this.filteredBacklogs.length / this.perPage);
       this.initialFilteredBacklogs = this.filteredBacklogs.slice();
     },
-    clearInitiativesFilter() {
+    clearBacklogsFilter() {
       this.filteredBacklogs = null;
       this.totalPages = Math.ceil(this.initialBacklogs.length / this.perPage);
     },
@@ -525,6 +522,7 @@ export default {
           );
           this.filteredBacklogs = paginatedArray.slice();
           console.log(paginatedArray);
+          console.log(this.filteredBacklogs);
         } else {
           paginatedArray = this.initialBacklogs.slice(
             sliceFrom,
@@ -569,6 +567,46 @@ export default {
   }
   .hidden_header {
     display: none;
+  }
+}
+
+.extra-small-button {
+  width: 30px !important;
+  height: 30px !important;
+  &:focus {
+    outline: none;
+  }
+  i {
+    font-size: 15px;
+  }
+}
+.v-toolbar--card {
+  .checkbox {
+    margin-top: 15px;
+    label {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.cards-toolbar {
+  height: auto !important;
+  .v-btn {
+    @media screen and (max-width: 1264px) {
+      margin: 6px 4px;
+    }
+  }
+  .clear-filter-botton {
+    margin-bottom: 13px;
+    @media screen and (max-width: 1264px) {
+      margin-bottom: 13px;
+    }
+  }
+}
+.save-and-close-button {
+  margin-left: 14px !important;
+  @media screen and (max-width: 420px) {
+    margin-left: 9px !important;
   }
 }
 </style>
