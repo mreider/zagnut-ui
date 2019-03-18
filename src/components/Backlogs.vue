@@ -296,6 +296,7 @@ export default {
       await this.loadOrgBacklogs();
     },
     async loadOrgBacklogs() {
+      this.loading = true;
       try {
         const response = await this.axios.get(
           `/api/backlogs/${this.showArchived}/${
@@ -323,8 +324,10 @@ export default {
         this.initialBacklogsForSorting = backlogs.slice();
         this.backlogs = this.initialBacklogs.slice(0, this.perPage);
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
+        this.loading = false;
         // this.$loading(false);
       }
     },
@@ -339,6 +342,7 @@ export default {
       console.log(this.dialogEditBacklog);
     },
     async handleBacklogEditTitle(element, newNameOldBacklog) {
+      this.loading = true;
       let data = {};
       if (newNameOldBacklog) {
         data.title = newNameOldBacklog;
@@ -362,9 +366,14 @@ export default {
           type: "success",
           text: "Backlog updated"
         });
+        this.dialogEditBacklog;
+        this.loading = false;
+        this.dialogBacklogEdit = false;
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
+        this.loading = true;
         await this.loadOrgBacklogs();
         this.$loading(false);
         this.newNameOldBacklog = "";
@@ -372,6 +381,7 @@ export default {
       }
     },
     async handleBacklogDelete(backLog) {
+      this.loading = true;
       if (!backLog || !this.$store.state.user.id) {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
@@ -380,10 +390,14 @@ export default {
           `/api/backlogs/${this.$store.state.organization.id}/${backLog.id}`
         );
         const success = _get(response, "data.success");
+        this.loading = false;
+        this.dialogDeleteBackLog = false;
         if (!success) throw new Error(`Unable to create new organization.`);
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
+        this.loading = false;
         this.$notify({
           group: "app",
           type: "success",
@@ -394,6 +408,7 @@ export default {
       }
     },
     async handleNewBacklog() {
+      this.loading = true;
       try {
         let data = {};
         data.title = this.newBacklog.title;
@@ -402,10 +417,14 @@ export default {
           data
         );
         const success = _get(response, "data.success");
+        this.loading = false;
+        this.dialogNewBackLog = false;
         if (!success) throw new Error(`Unable to create new backlog.`);
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
+        this.loading = false;
         this.newBacklog = { title: "" };
         await this.loadOrgBacklogs();
       }
