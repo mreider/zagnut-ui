@@ -40,70 +40,119 @@
         <v-spacer class="hidden-md-and-down"></v-spacer>
 
         <!--new initiative dialog-->
-        <!-- <v-dialog v-model="dialogNewBug" max-width="850px">
+        <v-dialog v-model="dialogNewBug" max-width="850px">
           <template v-slot:activator="{ on }">
             <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
           </template>
           <v-card>
-            <v-card-title>
+            <v-card-title class="pb-0 pl-4">
               <span class="headline">New bug</span>
             </v-card-title>
 
             <v-card-text>
               <v-container grid-list-md>
                 <v-layout row wrap>
-                  <v-flex xs12 sm7>
-                    <v-text-field v-model="newInitiative.title" placeholder="Enter initiative"></v-text-field>
-                    <v-textarea v-model="newInitiative.description" placeholder="Enter hightlights"></v-textarea>
+                  <v-flex xs12 sm7 pl-3>
+                    <v-text-field v-model="newBug.title" placeholder="Enter bug" class="pt-0"></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm5>
-                    <v-layout row wrap align-center>
-                      <v-flex xs4 mt-1>
-                        <v-subheader>Vote</v-subheader>
-                      </v-flex>
-                      <v-flex xs8 mt-1>
-                        <v-btn
-                          flat
-                          icon
-                          color="blue-grey darken-3"
-                          :class="{'v-btn--active': this.btntrue === 'voteUp' }"
-                          @click="handleNewInitiativeSetField(true, 'vote')"
-                        >
-                          <v-icon>thumb_up</v-icon>
-                        </v-btn>
-                        <v-btn
-                          flat
-                          icon
-                          color="blue-grey darken-3"
-                          :class="{'v-btn--active': this.btnfalse === 'voteDown' }"
-                          @click="handleNewInitiativeSetField(false, 'vote')"
-                        >
-                          <v-icon>thumb_down</v-icon>
-                        </v-btn>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-subheader>Horizon</v-subheader>
-                      </v-flex>
-                      <v-flex xs8>
-                        <v-select
-                          :items="horizonList"
-                          item-text="horizon"
-                          @change="handleNewInitiativeSetField"
-                        ></v-select>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-subheader>Priority</v-subheader>
-                      </v-flex>
-                      <v-flex xs8>
-                        <v-select
-                          :items="objStatuses"
-                          item-text="name"
-                          @change="handleNewInitiativeSetField"
-                        ></v-select>
-                      </v-flex>
-                    </v-layout>
+                  <v-layout row wrap align-center>
+                    <v-flex xs6>
+                      <v-layout row wrap align-center>
+                        <v-flex xs12 sm4>
+                          <v-subheader>Severity:</v-subheader>
+                        </v-flex>
+                        <v-flex xs12 sm8>
+                          <v-select
+                            :items="severityArray"
+                            item-text="severity"
+                            @change="handleNewBugSetField"
+                            class="pt-0"
+                          ></v-select>
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+                    <v-flex xs6>
+                      <v-layout row wrap align-center>
+                        <v-flex xs12 sm4>
+                          <v-subheader>Status:</v-subheader>
+                        </v-flex>
+                        <v-flex xs12 sm8>
+                          <v-select
+                            :items="objStatuses"
+                            item-text="name"
+                            @change="handleNewBugSetField"
+                            class="pt-0"
+                          ></v-select>
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+                    <v-flex xs6>
+                      <v-layout row wrap align-center>
+                        <v-flex xs12 sm4>
+                          <v-subheader>Reported by:</v-subheader>
+                        </v-flex>
+                        <v-flex xs12 sm8>
+                          <v-select
+                            :items="users"
+                            item-text="`${data.item.firstName} ${data.item.lastName}`"
+                            item-value="`${data.item.firstName} ${data.item.lastName}`"
+                            @change="handleNewBugSetField"
+                            class="pt-0"
+                          >
+                            <template
+                              slot="selection"
+                              slot-scope="data"
+                            >{{ data.item.firstName}} {{data.item.lastName}}</template>
+                            <template slot="item" slot-scope="data">
+                              <v-list-tile-content>
+                                <v-list-tile-title
+                                  v-html="`${data.item.firstName} ${data.item.lastName}`"
+                                ></v-list-tile-title>
+                              </v-list-tile-content>
+                            </template>
+                          </v-select>
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+
+                    <v-flex xs6>
+                      <v-layout row wrap align-center>
+                        <v-flex xs12 sm4>
+                          <v-subheader>Assigned to:</v-subheader>
+                        </v-flex>
+                        <v-flex xs12 sm8>
+                          <v-select
+                            :items="users"
+                            item-text="assignedTo"
+                            @change="handleNewBugSetField"
+                            class="pt-0"
+                          >
+                            <template
+                              slot="selection"
+                              slot-scope="data"
+                            >{{ data.item.firstName}} {{data.item.lastName}}</template>
+                            <template slot="item" slot-scope="data">
+                              <v-list-tile-content>
+                                <v-list-tile-title
+                                  v-html="`${data.item.firstName} ${data.item.lastName}`"
+                                ></v-list-tile-title>
+                              </v-list-tile-content>
+                            </template>
+                          </v-select>
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+                  </v-layout>
+                  <!--end-->
+                  <v-flex xs12 sm7 pl-3>
+                    <v-textarea
+                      v-model="newBug.description"
+                      placeholder="Enter description"
+                      class="pt-0"
+                    ></v-textarea>
                   </v-flex>
                 </v-layout>
+                <!--end-->
               </v-container>
             </v-card-text>
 
@@ -115,20 +164,15 @@
                     class="save-and-close-button"
                     flat
                     medium
-                    @click="handleNewInitiative(false)"
+                    @click="handleNewBug(false)"
                   >Save and close</v-btn>
-                  <v-btn
-                    color="blue darken-1"
-                    flat
-                    medium
-                    @click="handleNewInitiative(true)"
-                  >Save and open</v-btn>
-                  <v-btn color="blue darken-1" flat medium @click="dialogNewInitiative=false">Cancel</v-btn>
+                  <v-btn color="blue darken-1" flat medium @click="handleNewBug(true)">Save and open</v-btn>
+                  <v-btn color="blue darken-1" flat medium @click="dialogNewBug=false">Cancel</v-btn>
                 </v-flex>
               </v-layout>
             </v-card-actions>
           </v-card>
-        </v-dialog>-->
+        </v-dialog>
       </v-toolbar>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
@@ -610,6 +654,7 @@ export default {
         const users = _get(response, "data.users");
 
         this.users = users;
+        console.log(this.users);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
