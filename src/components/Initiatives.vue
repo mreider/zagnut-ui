@@ -94,7 +94,9 @@
                         <v-select
                           :items="horizonList"
                           item-text="horizon"
-                          @change="handleNewInitiativeSetField"
+                          item-value="horizon"
+                          return-object
+                          @input="handleNewInitiativeSetField"
                         ></v-select>
                       </v-flex>
                       <v-flex xs4>
@@ -104,6 +106,8 @@
                         <v-select
                           :items="objStatuses"
                           item-text="name"
+                          item-value="name"
+                          return-object
                           @change="handleNewInitiativeSetField"
                         ></v-select>
                       </v-flex>
@@ -385,7 +389,8 @@ export default {
       showArchived: false,
       dialogNewInitiative: false,
       dialogDeleteInitiative: false,
-      loading: false
+      loading: false,
+      paramForNewCard: null
     };
   },
 
@@ -605,8 +610,19 @@ export default {
         this.loadOrgInitiatives();
       }
     },
+    setParameterForNewCard(newParam) {
+      this.paramForNewCard = newParam;
+    },
     handleNewInitiativeSetField(element, name) {
+      console.log(element);
+      if (element.hasOwnProperty("horizon")) {
+        name = "horizon";
+      }
+      if (element.hasOwnProperty("name")) {
+        name = "status";
+      }
       this.newInitiative[name] = element;
+      console.log(this.newInitiative);
       if (name === "vote") {
         this.vote = element;
         if (element === true) {

@@ -205,37 +205,37 @@
             outline
             @click="sortBugCards('title')"
             :class="{'v-btn--active': this.activatedButton === 'title' }"
-          >Initiative</v-btn>
+          >Bug</v-btn>
           <v-btn
             small
             color="primary"
             outline
             @click="sortBugCards('severity')"
             :class="{'v-btn--active': this.activatedButton === 'severity' }"
-          >Popularity</v-btn>
+          >Severity</v-btn>
           <v-btn
             small
             color="primary"
             outline
             @click="sortBugCards('status')"
             :class="{'v-btn--active': this.activatedButton === 'status' }"
-          >Importance</v-btn>
+          >Status</v-btn>
           <v-btn
             small
             color="primary"
             outline
             @click="sortBugCards('horizon')"
             :class="{'v-btn--active': this.activatedButton === 'createdAt' }"
-          >horizon</v-btn>
+          >Created</v-btn>
         </v-flex>
 
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
           <v-text-field
             label="Filter"
-            @keyup="filterBugs"
-            single-line
-            class="pt-0 pl-2 pr-2"
             v-model="filter"
+            single-line
+            class="pt-0"
+            @keyup="filterBugs"
           ></v-text-field>
           <v-btn
             small
@@ -312,7 +312,7 @@
     </v-layout>
 
     <!--old section-->
-    <b-card no-body bg-variant="light" class="card col-12">
+    <!-- <b-card no-body bg-variant="light" class="card col-12">
       <b-container class="bugs">
         <div class="row">
           <div class="col-12">
@@ -533,7 +533,7 @@
           </div>
         </b-modal>
       </b-container>
-    </b-card>
+    </b-card>-->
   </v-container>
 </template>
 
@@ -680,6 +680,7 @@ export default {
         const success = _get(response, "data.success");
         if (success) {
           const createdBug = _get(response, "data.bugs");
+          this.dialogNewBug = false;
           if (go === true) {
             this.$router.push({
               name: "bug",
@@ -726,7 +727,10 @@ export default {
       }
     },
     handleNewBugSetField(element, name) {
+      console.log(element);
+      console.log(name);
       this.newBug[name] = element;
+      console.log(this.newBug);
     },
     async loadOrgBugs() {
       try {
