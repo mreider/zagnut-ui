@@ -52,14 +52,18 @@
             <v-card-text>
               <v-container grid-list-md>
                 <v-layout row wrap>
-                  <v-flex xs12 sm7 pl-3>
-                    <v-text-field v-model="newBug.title" placeholder="Enter bug" class="pt-0"></v-text-field>
+                  <v-flex xs12 sm7>
+                    <v-text-field
+                      v-model="newBug.title"
+                      placeholder="Enter bug"
+                      class="pt-0 padding-left-sm"
+                    ></v-text-field>
                   </v-flex>
                   <v-layout row wrap align-center>
                     <v-flex xs6>
                       <v-layout row wrap align-center>
                         <v-flex xs12 sm4>
-                          <v-subheader>Severity:</v-subheader>
+                          <v-subheader class="new-bug-subheader">Severity:</v-subheader>
                         </v-flex>
                         <v-flex xs12 sm8>
                           <v-select
@@ -74,7 +78,7 @@
                     <v-flex xs6>
                       <v-layout row wrap align-center>
                         <v-flex xs12 sm4>
-                          <v-subheader>Status:</v-subheader>
+                          <v-subheader class="new-bug-subheader">Status:</v-subheader>
                         </v-flex>
                         <v-flex xs12 sm8>
                           <v-select
@@ -89,7 +93,7 @@
                     <v-flex xs6>
                       <v-layout row wrap align-center>
                         <v-flex xs12 sm4>
-                          <v-subheader>Reported by:</v-subheader>
+                          <v-subheader class="new-bug-subheader">Reported by:</v-subheader>
                         </v-flex>
                         <v-flex xs12 sm8>
                           <v-select
@@ -118,7 +122,7 @@
                     <v-flex xs6>
                       <v-layout row wrap align-center>
                         <v-flex xs12 sm4>
-                          <v-subheader>Assigned to:</v-subheader>
+                          <v-subheader class="new-bug-subheader">Assigned to:</v-subheader>
                         </v-flex>
                         <v-flex xs12 sm8>
                           <v-select
@@ -144,11 +148,11 @@
                     </v-flex>
                   </v-layout>
                   <!--end-->
-                  <v-flex xs12 sm7 pl-3>
+                  <v-flex xs12 sm7>
                     <v-textarea
                       v-model="newBug.description"
                       placeholder="Enter description"
-                      class="pt-0"
+                      class="pt-0 padding-left-sm"
                     ></v-textarea>
                   </v-flex>
                 </v-layout>
@@ -158,17 +162,15 @@
 
             <v-card-actions>
               <v-layout row wrap>
-                <v-flex xs-12>
-                  <v-btn
-                    color="blue darken-1"
-                    class="save-and-close-button"
-                    flat
-                    medium
-                    @click="handleNewBug(false)"
-                  >Save and close</v-btn>
-                  <v-btn color="blue darken-1" flat medium @click="handleNewBug(true)">Save and open</v-btn>
-                  <v-btn color="blue darken-1" flat medium @click="dialogNewBug=false">Cancel</v-btn>
-                </v-flex>
+                <v-btn
+                  color="blue darken-1"
+                  class="save-and-close-button"
+                  flat
+                  medium
+                  @click="handleNewBug(false)"
+                >Save and close</v-btn>
+                <v-btn color="blue darken-1" flat medium @click="handleNewBug(true)">Save and open</v-btn>
+                <v-btn color="blue darken-1" flat medium @click="dialogNewBug=false">Cancel</v-btn>
               </v-layout>
             </v-card-actions>
           </v-card>
@@ -925,6 +927,58 @@ export default {
     height: 2em;
     float: right;
     margin-top: 5px;
+  }
+}
+.extra-small-button {
+  width: 30px !important;
+  height: 30px !important;
+  &:focus {
+    outline: none;
+  }
+  i {
+    font-size: 15px;
+  }
+}
+.v-toolbar--card {
+  .checkbox {
+    margin-top: 15px;
+    label {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.cards-toolbar {
+  height: auto !important;
+  .v-btn {
+    @media screen and (max-width: 1264px) {
+      margin: 6px 4px;
+    }
+  }
+  .clear-filter-botton {
+    margin-bottom: 13px;
+    @media screen and (max-width: 1264px) {
+      margin-bottom: 13px;
+    }
+  }
+}
+.save-and-close-button {
+  margin-left: 14px !important;
+  @media screen and (max-width: 420px) {
+    margin-left: 9px !important;
+  }
+}
+
+.new-bug-subheader {
+  @media screen and (max-width: 420px) {
+    padding-left: 0 !important;
+  }
+}
+
+.padding-left-sm {
+  padding-left: 12px;
+  @media screen and (max-width: 420px) {
+    padding-left: 0;
   }
 }
 </style>
