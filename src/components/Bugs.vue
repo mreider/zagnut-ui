@@ -69,7 +69,9 @@
                           <v-select
                             :items="severityArray"
                             item-text="severity"
-                            @change="handleNewBugSetField"
+                            item-value="severity"
+                            @input="handleNewBugSetField"
+                            return-object
                             class="pt-0"
                           ></v-select>
                         </v-flex>
@@ -84,7 +86,9 @@
                           <v-select
                             :items="objStatuses"
                             item-text="name"
-                            @change="handleNewBugSetField"
+                            item-value="name"
+                            @input="handleNewBugSetField"
+                            return-object
                             class="pt-0"
                           ></v-select>
                         </v-flex>
@@ -100,7 +104,8 @@
                             :items="users"
                             item-text="`${data.item.firstName} ${data.item.lastName}`"
                             item-value="`${data.item.firstName} ${data.item.lastName}`"
-                            @change="handleNewBugSetField"
+                            @input="handleNewBugSetField"
+                            return-object
                             class="pt-0"
                           >
                             <template
@@ -128,6 +133,8 @@
                           <v-select
                             :items="users"
                             item-text="assignedTo"
+                            item-value="assignedTo"
+                            return-object
                             @change="handleNewBugSetField"
                             class="pt-0"
                           >
@@ -584,7 +591,12 @@ export default {
       show: false,
       currentBug: "",
       admin: false,
-      severityArray: ["P0", "P1", "P2", "P3"],
+      severityArray: [
+        { severity: "P0" },
+        { severity: "P1" },
+        { severity: "P2" },
+        { severity: "P3" }
+      ],
       users: [],
       showArchived: false,
       dialogNewBug: false,
@@ -727,8 +739,17 @@ export default {
       }
     },
     handleNewBugSetField(element, name) {
+      if (element.hasOwnProperty("severity")) {
+        name = "severity";
+        element = element[name];
+      }
+      if (element.hasOwnProperty("name")) {
+        name = "status";
+      }
+      if (element.hasOwnProperty("firstName")) {
+        name = "assignee";
+      }
       console.log(element);
-      console.log(name);
       this.newBug[name] = element;
       console.log(this.newBug);
     },
