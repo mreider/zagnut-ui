@@ -903,7 +903,7 @@ export default {
       this.initialFilteredBugs = this.filteredBugs.slice();
     },
     clearBugsFilter() {
-      this.filterBugs = null;
+      this.filteredBugs = null;
       this.totalPages = Math.ceil(this.initialBugs.length / this.perPage);
     },
     paginationFunction(event) {
