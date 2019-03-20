@@ -264,8 +264,14 @@
             </h4>
           </v-card-title>
           <div class="card-body pt-0 pb-0">
-            <p class="mb-2" @click="filterBugs(item.severity)">Severity: {{item.severity}}</p>
-            <p class="mb-2" @click="filterBugs(item.status.name)">status: {{item.status.name}}</p>
+            <p class="mb-2">
+              Severity:
+              <a href="#" @click="filterBugs(item.severity)">{{item.severity}}</a>
+            </p>
+            <p class="mb-2">
+              Status:
+              <a href="#" @click="filterBugs(item.status.name)">{{item.status.name}}</a>
+            </p>
             <p class="mb-2">
               Reported by:
               <a href="#" @click="filterBugs(item.reportedBy)">{{item.reportedBy}}</a>
