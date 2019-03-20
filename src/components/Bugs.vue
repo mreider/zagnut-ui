@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <div v-if="loading === true">
+    <div v-if="loading === true || !initialBugs.length">
       <loading-indication></loading-indication>
     </div>
 
@@ -321,6 +321,7 @@
           :length="totalPages"
           :total-visible="15"
           @input="paginationFunction"
+          v-if="initialBugs.length"
         ></v-pagination>
       </div>
     </v-layout>
@@ -641,6 +642,9 @@ export default {
   },
 
   methods: {
+    beforeCreate() {
+      this.loading = true;
+    },
     close() {
       this.dialogNewbug = false;
     },
@@ -661,8 +665,8 @@ export default {
       return username(element);
     },
     async loadOrgStatuses() {
+      this.loading === true;
       try {
-        this.$loading(true);
         const orgId = this.$store.state.organization.id;
 
         const response = await this.axios.get(`/api/statuses/bugs/${orgId}`);
@@ -672,15 +676,15 @@ export default {
 
         this.objStatuses = _get(response, "data.statuses");
       } catch (error) {
+        this.oading === false;
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
       }
     },
     async loadOrgUsers() {
+      this.loading = true;
       try {
         const orgId = this.$store.state.organization.id;
-        this.$loading(true);
         const response = await this.axios.get(`/api/org/${orgId}/users`);
 
         const success = _get(response, "data.success");
@@ -689,13 +693,15 @@ export default {
         const users = _get(response, "data.users");
 
         this.users = users;
+        this.loading = false;
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
-        this.$loading(false);
       }
     },
     async handleNewBug(go) {
+      this.loading = true;
       try {
         let data = {};
         const orgId = this.$store.state.organization.id;
@@ -721,7 +727,9 @@ export default {
           }
         }
         if (!success) throw new Error(`Unable to create new bug.`);
+        this.loading = false;
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
         this.newBug = {
@@ -738,6 +746,7 @@ export default {
       }
     },
     async handleBugDelete(bug) {
+      this.loading = true;
       if (!bug || !this.$store.state.user.id) {
       }
       try {
@@ -747,7 +756,9 @@ export default {
         let success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to delete bug.`);
         this.dialogDeleteBug = false;
+        this.loading = false;
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
         this.loadOrgBugs();
@@ -777,6 +788,7 @@ export default {
       this.newBug[name] = element;
     },
     async loadOrgBugs() {
+      this.loading = true;
       try {
         const response = await this.axios.get(
           `/api/bugs/full/${this.showArchived}/${
@@ -801,13 +813,14 @@ export default {
         this.totalRows = bugs.length;
         this.totalPages = Math.ceil(bugs.length / this.perPage);
 
-        console.log(bugs);
         this.initialBugs = bugs;
         this.initialBugsForSorting = bugs.slice();
         this.bugs = this.initialBugs.slice(0, this.perPage);
 
         this.admin = _get(response, "data.admin");
+        this.loading = false;
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
       }
