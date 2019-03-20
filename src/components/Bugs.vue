@@ -33,7 +33,7 @@
             small
             color="primary"
             outline
-            @click="sortBugCards('horizon')"
+            @click="sortBugCards('createdAt')"
             :class="{'v-btn--active': this.activatedButton === 'createdAt' }"
           >Created</v-btn>
         </div>
@@ -232,7 +232,7 @@
             small
             color="primary"
             outline
-            @click="sortBugCards('horizon')"
+            @click="sortBugCards('createdAt')"
             :class="{'v-btn--active': this.activatedButton === 'createdAt' }"
           >Created</v-btn>
         </v-flex>
@@ -754,9 +754,7 @@ export default {
         name = "assignee";
         this.assignedTo = null;
       }
-      console.log(element);
       this.newBug[name] = element;
-      console.log(this.newBug);
     },
     async loadOrgBugs() {
       try {
@@ -783,6 +781,7 @@ export default {
         this.totalRows = bugs.length;
         this.totalPages = Math.ceil(bugs.length / this.perPage);
 
+        console.log(bugs);
         this.initialBugs = bugs;
         this.initialBugsForSorting = bugs.slice();
         this.bugs = this.initialBugs.slice(0, this.perPage);
@@ -800,13 +799,14 @@ export default {
     },
     sortBugCards(bugName) {
       let param = bugName.toLowerCase();
+      console.log(bugName);
 
       function sortFunction(a, b) {
         let aParam;
         let bParam;
         if (param === "status") {
-          aParam = a[param][param].replace(/\s/g, "X").toLowerCase();
-          bParam = b[param][param].replace(/\s/g, "X").toLowerCase();
+          aParam = a[param]["name"].replace(/\s/g, "X").toLowerCase();
+          bParam = b[param]["name"].replace(/\s/g, "X").toLowerCase();
           if (aParam > bParam) {
             return -1;
           }
@@ -843,8 +843,10 @@ export default {
           this.page = 1;
         } else {
           // this.initiatives.sort(sortFunction);
+          console.log(this.initialBugsForSorting);
           this.initialBugsForSorting.sort(sortFunction);
-          this.initiatives = this.initialBugsForSorting.slice(0, this.perPage);
+          console.log(this.initialBugsForSorting);
+          this.bugs = this.initialBugsForSorting.slice(0, this.perPage);
           this.page = 1;
         }
         this.activatedButton = bugName;
@@ -860,7 +862,6 @@ export default {
       }
     },
     filterBugs(clickParam) {
-      console.log("filter fired");
       this.activatedButton = "";
       this.page = 1;
       let bugs = this.initialBugs;
