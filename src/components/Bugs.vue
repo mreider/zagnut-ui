@@ -319,6 +319,25 @@
       </div>
     </v-layout>
 
+    <v-dialog v-model="dialogDeleteBug" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="dialogDeleteBackLog = false"
+            small
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="error" flat="flat" outline @click="handleBacklogBug(currentBug)" small>Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!--old section-->
     <!-- <b-card no-body bg-variant="light" class="card col-12">
       <b-container class="bugs">

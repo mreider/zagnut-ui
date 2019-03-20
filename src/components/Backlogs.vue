@@ -25,22 +25,21 @@
         <v-spacer class="hidden-md-and-down"></v-spacer>
 
         <!--new initiative dialog-->
-        <v-dialog v-model="dialogNewBackLog" max-width="650px">
+        <v-dialog v-model="dialogNewBackLog" max-width="500px">
           <template v-slot:activator="{ on }">
             <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
           </template>
           <v-card>
-            <v-card-title>
-              <span class="headline">New backlog</span>
+            <v-card-title class="pb-0 pl-4">
+              <span class="headline new-backlog-headline">New backlog</span>
             </v-card-title>
-
             <v-card-text>
-              <v-container grid-list-md>
-                <v-layout row wrap>
-                  <v-flex xs4>
-                    <v-subheader>Title</v-subheader>
+              <v-container grid-list-md pl-3 pt-2 pb-2>
+                <v-layout row wrap align-center>
+                  <v-flex xs3 pl-0>
+                    <v-subheader>Title:</v-subheader>
                   </v-flex>
-                  <v-flex xs8>
+                  <v-flex xs9>
                     <v-text-field v-model="newBacklog.title" placeholder="Title backlog"></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -629,7 +628,13 @@ export default {
   }
 }
 .save-and-close-button {
-  margin-left: 14px !important;
+  margin-left: 0px !important;
+  @media screen and (max-width: 420px) {
+    margin-left: 9px !important;
+  }
+}
+.new-backlog-headline {
+  margin-left: 9px !important;
   @media screen and (max-width: 420px) {
     margin-left: 9px !important;
   }
