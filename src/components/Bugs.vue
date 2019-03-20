@@ -135,6 +135,7 @@
                             item-text="assignedTo"
                             item-value="assignedTo"
                             return-object
+                            v-model="assignedTo"
                             @change="handleNewBugSetField"
                             class="pt-0"
                           >
@@ -601,7 +602,8 @@ export default {
       showArchived: false,
       dialogNewBug: false,
       dialogDeleteBug: false,
-      loading: false
+      loading: false,
+      assignedTo: false
     };
   },
   async mounted() {
@@ -668,7 +670,6 @@ export default {
         const users = _get(response, "data.users");
 
         this.users = users;
-        console.log(this.users);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -746,8 +747,12 @@ export default {
       if (element.hasOwnProperty("name")) {
         name = "status";
       }
-      if (element.hasOwnProperty("firstName")) {
+      if (element.hasOwnProperty("firstName") && this.assignedTo === null) {
+        name = "reportedBy";
+      }
+      if (this.assignedTo !== null) {
         name = "assignee";
+        this.assignedTo = null;
       }
       console.log(element);
       this.newBug[name] = element;
@@ -775,7 +780,6 @@ export default {
           }
           element.createdAt = new Date(element.createdAt).toLocaleString();
         });
-        console.log(bugs);
         this.totalRows = bugs.length;
         this.totalPages = Math.ceil(bugs.length / this.perPage);
 
