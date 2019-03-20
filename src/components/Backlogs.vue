@@ -36,11 +36,15 @@
             <v-card-text>
               <v-container grid-list-md pl-3 pt-2 pb-2>
                 <v-layout row wrap align-center>
-                  <v-flex xs3 pl-0>
-                    <v-subheader>Title:</v-subheader>
+                  <v-flex xs2 pl-0>
+                    <v-subheader class="new-backlog-title">Title:</v-subheader>
                   </v-flex>
-                  <v-flex xs9>
-                    <v-text-field v-model="newBacklog.title" placeholder="Title backlog"></v-text-field>
+                  <v-flex xs10>
+                    <v-text-field
+                      v-model="newBacklog.title"
+                      placeholder="Title backlog"
+                      class="pl-4"
+                    ></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -206,15 +210,15 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogBacklogEdit" max-width="600">
+    <v-dialog v-model="dialogBacklogEdit" max-width="450">
       <v-card>
-        <v-layout row container wrap>
-          <v-flex xs12>
+        <v-layout row container wrap align-center>
+          <v-flex xs12 align-center>
             <v-text-field v-model="newNameOldBacklog" :placeholder="currentBacklog.title"></v-text-field>
           </v-flex>
-          <v-flex xs12>
+          <v-flex xs12 align-center>
             <v-checkbox
-              label="Show archived"
+              label="Archived"
               class="checkbox"
               v-model="currentBacklog.archived"
               v-if="currentBacklog"
@@ -223,15 +227,21 @@
         </v-layout>
 
         <v-card-actions>
-          <v-btn color="primary" flat="flat" outline @click="dialogBacklogEdit = false" small>Cancel</v-btn>
-          <v-spacer></v-spacer>
           <v-btn
-            color="error"
+            flat="flat"
+            outline
+            @click="dialogBacklogEdit = false"
+            small
+            class="ml-3 mb-2"
+          >Cancel</v-btn>
+          <v-btn
+            color="success"
             flat="flat"
             outline
             @click="handleBacklogEditTitle(currentBacklog, newNameOldBacklog)"
             small
-          >Edit</v-btn>
+            class="mb-2"
+          >Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -576,7 +586,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .card {
   margin-top: 50px;
 }
@@ -636,8 +646,11 @@ export default {
 }
 .new-backlog-headline {
   margin-left: 9px !important;
+}
+.new-backlog-title {
+  padding-left: 9px !important;
   @media screen and (max-width: 420px) {
-    margin-left: 9px !important;
+    padding-left: 9px !important;
   }
 }
 </style>
