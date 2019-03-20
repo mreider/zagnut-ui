@@ -66,6 +66,14 @@
                 </v-flex>
               </v-layout>
             </v-flex>
+
+            <v-flex xs4>
+              <v-checkbox label="Show archived" class="checkbox" v-model="form.archived"></v-checkbox>
+            </v-flex>
+            <v-flex xs8></v-flex>
+            <v-flex xs12>
+              <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
+            </v-flex>
           </v-layout>
         </v-container>
       </v-card-text>
@@ -74,8 +82,8 @@
         <v-layout row wrap>
           <v-flex xs-12>
             <v-btn color="blue darken-1" class="save-and-close-button" flat medium>Save and close</v-btn>
-            <v-btn color="blue darken-1" flat medium>Save and open</v-btn>
-            <v-btn color="blue darken-1" flat medium @click="dialogNewInitiative=false">Cancel</v-btn>
+            <v-btn color="blue darken-1" flat medium>Back</v-btn>
+            <v-btn color="blue darken-1" flat medium>Delete</v-btn>
           </v-flex>
         </v-layout>
       </v-card-actions>
@@ -305,11 +313,11 @@ export default {
       if (name === "vote") {
         this.vote = element;
         if (element === true) {
-          this.btntrue = "success";
+          this.btntrue = "voteUp";
           this.btnfalse = "";
         } else {
           this.btntrue = "";
-          this.btnfalse = "danger";
+          this.btnfalse = "voteDown";
         }
         await this.doVote(element);
         //  this.$nextTick();
