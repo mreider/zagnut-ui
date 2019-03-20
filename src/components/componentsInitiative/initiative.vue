@@ -1,137 +1,219 @@
 <template>
-  <b-card no-body bg-variant="light" class="card col-lg-12">
-    <div class="container row">
-      <div class="col-lg-8 col-md-8 cols-sm-6 col-xs-4">
-        <b-form-group label-for="title">
-          <b-form-input v-model="form.title" placeholder="Enter initiative" id="title">></b-form-input>
-        </b-form-group>
-        <b-form-group label-for="description">
-          <b-form-textarea
-            id="description"
-            v-model="form.description"
-            placeholder="Enter highlights"
-            :rows="3"
-            :max-rows="6"
-          ></b-form-textarea>
-        </b-form-group>
-      </div>
-      <div class="col-lg-4 col-md-8 col-sm-6 col-xs-4 row">
-        <b-form-group label="Vote:" horizontal label-size="md" :label-cols="3" class="col-lg-12">
-          <template>
-            <div style="display: inline-block; margin-left: 0px; padding-top: 0.5em">
-              <b-button
-                v-model="vote"
-                style="vertical-align: right;"
-                size="lg"
-                :variant.sync="btntrue"
-                v-on:click="handleInitiativeSetField(true, 'vote')"
-              >
-                <font-awesome-icon icon="thumbs-up"/>
-              </b-button>
-              <b-button
-                v-model="vote"
-                style="vertical-align: right;"
-                size="lg"
-                :variant.sync="btnfalse"
-                v-on:click="handleInitiativeSetField(false, 'vote')"
-              >
-                <font-awesome-icon icon="thumbs-down"/>
-              </b-button>
-              <label
-                class="center"
-                style="margin-left: 0.5em"
-                v-if="vote !== true && vote !== false"
-              >
-                <h5>votes: {{ vote > 0 ? '+' : '' }}{{vote}}</h5>
-              </label>
-            </div>
-          </template>
-        </b-form-group>
-        <b-form-group
-          label="Horizon: "
-          label-for="InitiativeHorizon"
-          horizontal
-          :label-cols="6"
-          label-size="sm"
-          class="col-6"
-          style="padding-left: 0.5em"
-        >
-          <b-dropdown
-            :text="form.horizon.horizon"
-            name="InitiativeHorizon"
-            size="sm"
-            class="horizon m-2"
+  <div>
+    <v-card>
+      <v-card-text>
+        <v-container grid-list-md>
+          <v-layout row wrap>
+            <v-flex xs12 sm7>
+              <v-text-field v-model="form.title" placeholder="Enter initiative"></v-text-field>
+              <v-textarea v-model="form.description" placeholder="Enter hightlights"></v-textarea>
+            </v-flex>
+            <v-flex xs12 sm5>
+              <v-layout row wrap align-center>
+                <v-flex xs4 mt-1>
+                  <v-subheader>Vote</v-subheader>
+                </v-flex>
+                <v-flex xs8 mt-1>
+                  <v-btn
+                    flat
+                    icon
+                    color="blue-grey darken-3"
+                    :class="{'v-btn--active': this.btntrue === 'voteUp' }"
+                    @click="handleInitiativeSetField(true, 'vote')"
+                  >
+                    <v-icon>thumb_up</v-icon>
+                  </v-btn>
+                  <v-btn
+                    flat
+                    icon
+                    color="blue-grey darken-3"
+                    :class="{'v-btn--active': this.btnfalse === 'voteDown' }"
+                    @click="handleInitiativeSetField(false, 'vote')"
+                  >
+                    <v-icon>thumb_down</v-icon>
+                  </v-btn>
+                  <label
+                    class="center"
+                    style="margin-left: 0.5em"
+                    v-if="vote !== true && vote !== false"
+                  >
+                    <h5>votes: {{ vote > 0 ? '+' : '' }}{{vote}}</h5>
+                  </label>
+                </v-flex>
+                <v-flex xs4>
+                  <v-subheader>Horizon</v-subheader>
+                </v-flex>
+                <v-flex xs8>
+                  <v-select
+                    :items="horizonList"
+                    item-text="horizon"
+                    item-value="horizon"
+                    return-object
+                    @input="handleNewInitiativeSetField"
+                  ></v-select>
+                </v-flex>
+                <v-flex xs4>
+                  <v-subheader>Priority</v-subheader>
+                </v-flex>
+                <v-flex xs8>
+                  <v-select
+                    :items="objStatuses"
+                    item-text="name"
+                    item-value="name"
+                    return-object
+                    @change="handleNewInitiativeSetField"
+                  ></v-select>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-card-text>
+
+      <v-card-actions>
+        <v-layout row wrap>
+          <v-flex xs-12>
+            <v-btn color="blue darken-1" class="save-and-close-button" flat medium>Save and close</v-btn>
+            <v-btn color="blue darken-1" flat medium>Save and open</v-btn>
+            <v-btn color="blue darken-1" flat medium @click="dialogNewInitiative=false">Cancel</v-btn>
+          </v-flex>
+        </v-layout>
+      </v-card-actions>
+    </v-card>
+    <b-card no-body bg-variant="light" class="card col-lg-12">
+      <div class="container row">
+        <div class="col-lg-8 col-md-8 cols-sm-6 col-xs-4">
+          <b-form-group label-for="title">
+            <b-form-input v-model="form.title" placeholder="Enter initiative" id="title">></b-form-input>
+          </b-form-group>
+          <b-form-group label-for="description">
+            <b-form-textarea
+              id="description"
+              v-model="form.description"
+              placeholder="Enter highlights"
+              :rows="3"
+              :max-rows="6"
+            ></b-form-textarea>
+          </b-form-group>
+        </div>
+        <div class="col-lg-4 col-md-8 col-sm-6 col-xs-4 row">
+          <b-form-group label="Vote:" horizontal label-size="md" :label-cols="3" class="col-lg-12">
+            <template>
+              <div style="display: inline-block; margin-left: 0px; padding-top: 0.5em">
+                <b-button
+                  v-model="vote"
+                  style="vertical-align: right;"
+                  size="lg"
+                  :variant.sync="btntrue"
+                  v-on:click="handleInitiativeSetField(true, 'vote')"
+                >
+                  <font-awesome-icon icon="thumbs-up"/>
+                </b-button>
+                <b-button
+                  v-model="vote"
+                  style="vertical-align: right;"
+                  size="lg"
+                  :variant.sync="btnfalse"
+                  v-on:click="handleInitiativeSetField(false, 'vote')"
+                >
+                  <font-awesome-icon icon="thumbs-down"/>
+                </b-button>
+                <label
+                  class="center"
+                  style="margin-left: 0.5em"
+                  v-if="vote !== true && vote !== false"
+                >
+                  <h5>votes: {{ vote > 0 ? '+' : '' }}{{vote}}</h5>
+                </label>
+              </div>
+            </template>
+          </b-form-group>
+          <b-form-group
+            label="Horizon: "
+            label-for="InitiativeHorizon"
+            horizontal
+            :label-cols="6"
+            label-size="sm"
+            class="col-6"
+            style="padding-left: 0.5em"
           >
-            <b-dropdown-item
-              v-for="element in horizonList"
-              v-bind:key="element.horizon"
-              @click="handleInitiativeSetField(element, 'horizon')"
+            <b-dropdown
+              :text="form.horizon.horizon"
+              name="InitiativeHorizon"
               size="sm"
-            >{{ element.horizon }}</b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
-        <b-form-group
-          label="Priority: "
-          label-for="InitiativeStatuses"
-          horizontal
-          :label-cols="5"
-          label-size="sm"
-          class="col-6"
-        >
-          <b-dropdown
-            :text="form.status.name"
-            name="InitiativeStatuses"
-            size="sm"
-            class="statuses m-2"
+              class="horizon m-2"
+            >
+              <b-dropdown-item
+                v-for="element in horizonList"
+                v-bind:key="element.horizon"
+                @click="handleInitiativeSetField(element, 'horizon')"
+                size="sm"
+              >{{ element.horizon }}</b-dropdown-item>
+            </b-dropdown>
+          </b-form-group>
+          <b-form-group
+            label="Priority: "
+            label-for="InitiativeStatuses"
+            horizontal
+            :label-cols="5"
+            label-size="sm"
+            class="col-6"
           >
-            <b-dropdown-item
-              v-for="element in objStatuses"
-              v-bind:key="element.id"
-              @click="handleInitiativeSetField(element, 'status')"
+            <b-dropdown
+              :text="form.status.name"
+              name="InitiativeStatuses"
               size="sm"
-            >{{ element.name }}</b-dropdown-item>
-          </b-dropdown>
+              class="statuses m-2"
+            >
+              <b-dropdown-item
+                v-for="element in objStatuses"
+                v-bind:key="element.id"
+                @click="handleInitiativeSetField(element, 'status')"
+                size="sm"
+              >{{ element.name }}</b-dropdown-item>
+            </b-dropdown>
+          </b-form-group>
+        </div>
+        <div class="col-8"></div>
+        <div class="col-4"></div>
+      </div>
+      <Connections :toConnectionData="toConnectionData"></Connections>
+      <div class="button-box" style="margin-top:20px;">
+        <b-form-group
+          class="float-left"
+          label="Archived: "
+          label-for="checkbox1"
+          label-size="sm"
+          :label-cols="7"
+          horizontal
+        >
+          <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived"></b-form-checkbox>
         </b-form-group>
+        <div class="float-right">
+          <b-btn
+            size="sm"
+            type="submit"
+            variant="primary"
+            @click="handleSaveInitiative()"
+          >Save & close</b-btn>
+          <b-btn size="sm" @click="$router.go(-1)">Back</b-btn>
+          <b-btn variant="danger" size="sm" v-b-modal.deleteinitiative>Delete</b-btn>
+        </div>
+        <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
       </div>
-      <div class="col-8"></div>
-      <div class="col-4"></div>
-    </div>
-    <Connections :toConnectionData="toConnectionData"></Connections>
-    <div class="button-box" style="margin-top:20px;">
-      <b-form-group
-        class="float-left"
-        label="Archived: "
-        label-for="checkbox1"
-        label-size="sm"
-        :label-cols="7"
-        horizontal
-      >
-        <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived"></b-form-checkbox>
-      </b-form-group>
-      <div class="float-right">
-        <b-btn
-          size="sm"
-          type="submit"
-          variant="primary"
-          @click="handleSaveInitiative()"
-        >Save & close</b-btn>
-        <b-btn size="sm" @click="$router.go(-1)">Back</b-btn>
-        <b-btn variant="danger" size="sm" v-b-modal.deleteinitiative>Delete</b-btn>
-      </div>
-      <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
-    </div>
-    <b-modal
-      id="deleteinitiative"
-      :title="'Wait. Are you sure you want to delete this permanently?'"
-      button-size="sm"
-      size="sm"
-      centered
-      body-class="zero-size"
-      ok-variant="danger"
-      @ok="handleInitiativeDelete()"
-      ok-title="delete"
-    ></b-modal>
-  </b-card>
+      <b-modal
+        id="deleteinitiative"
+        :title="'Wait. Are you sure you want to delete this permanently?'"
+        button-size="sm"
+        size="sm"
+        centered
+        body-class="zero-size"
+        ok-variant="danger"
+        @ok="handleInitiativeDelete()"
+        ok-title="delete"
+      ></b-modal>
+    </b-card>
+  </div>
 </template>
 
 <script>

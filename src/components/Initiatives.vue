@@ -615,7 +615,6 @@ export default {
       this.paramForNewCard = newParam;
     },
     handleNewInitiativeSetField(element, name) {
-      console.log(element);
       if (element.hasOwnProperty("horizon")) {
         name = "horizon";
       }
@@ -623,7 +622,6 @@ export default {
         name = "status";
       }
       this.newInitiative[name] = element;
-      console.log(this.newInitiative);
       if (name === "vote") {
         this.vote = element;
         if (element === true) {
@@ -799,7 +797,6 @@ export default {
             sliceFrom + this.perPage
           );
           this.filteredInitiatives = paginatedArray.slice();
-          console.log(paginatedArray);
         } else {
           paginatedArray = this.initialInitiatives.slice(
             sliceFrom,

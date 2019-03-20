@@ -349,7 +349,6 @@ export default {
     },
     setCurrentBacklog(element) {
       this.currentBacklog = element;
-      console.log(this.dialogEditBacklog);
     },
     async handleBacklogEditTitle(element, newNameOldBacklog) {
       this.loading = true;
@@ -556,8 +555,6 @@ export default {
             sliceFrom + this.perPage
           );
           this.filteredBacklogs = paginatedArray.slice();
-          console.log(paginatedArray);
-          console.log(this.filteredBacklogs);
         } else {
           paginatedArray = this.initialBacklogs.slice(
             sliceFrom,
