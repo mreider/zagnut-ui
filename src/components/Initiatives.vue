@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <div v-if="loading === true">
+    <div v-if="loading === true || !initialInitiatives.length">
       <loading-indication></loading-indication>
     </div>
     <v-layout row wrap>
@@ -291,6 +291,7 @@
           :length="totalPages"
           :total-visible="15"
           @input="paginationFunction"
+          v-if="initialInitiatives.length"
         ></v-pagination>
       </div>
     </v-layout>
