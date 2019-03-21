@@ -38,152 +38,9 @@
           >Created</v-btn>
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
-
-        <!--new initiative dialog-->
-        <v-dialog v-model="dialogNewBug" max-width="850px">
-          <template v-slot:activator="{ on }">
-            <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
-          </template>
-          <v-card>
-            <v-card-title class="pb-0 pl-4">
-              <span class="headline">New bug</span>
-            </v-card-title>
-
-            <v-card-text>
-              <v-container grid-list-md>
-                <v-layout row wrap>
-                  <v-flex xs12 sm7>
-                    <v-text-field
-                      v-model="newBug.title"
-                      placeholder="Enter bug"
-                      class="pt-0 padding-left-sm"
-                    ></v-text-field>
-                  </v-flex>
-                  <v-layout row wrap align-center>
-                    <v-flex xs6>
-                      <v-layout row wrap align-center>
-                        <v-flex xs12 sm4>
-                          <v-subheader class="new-bug-subheader">Severity:</v-subheader>
-                        </v-flex>
-                        <v-flex xs12 sm8>
-                          <v-select
-                            :items="severityArray"
-                            item-text="severity"
-                            item-value="severity"
-                            @input="handleNewBugSetField"
-                            return-object
-                            class="pt-0"
-                          ></v-select>
-                        </v-flex>
-                      </v-layout>
-                    </v-flex>
-                    <v-flex xs6>
-                      <v-layout row wrap align-center>
-                        <v-flex xs12 sm4>
-                          <v-subheader class="new-bug-subheader">Status:</v-subheader>
-                        </v-flex>
-                        <v-flex xs12 sm8>
-                          <v-select
-                            :items="objStatuses"
-                            item-text="name"
-                            item-value="name"
-                            @input="handleNewBugSetField"
-                            return-object
-                            class="pt-0"
-                          ></v-select>
-                        </v-flex>
-                      </v-layout>
-                    </v-flex>
-                    <v-flex xs6>
-                      <v-layout row wrap align-center>
-                        <v-flex xs12 sm4>
-                          <v-subheader class="new-bug-subheader">Reported by:</v-subheader>
-                        </v-flex>
-                        <v-flex xs12 sm8>
-                          <v-select
-                            :items="users"
-                            item-text="`${data.item.firstName} ${data.item.lastName}`"
-                            item-value="`${data.item.firstName} ${data.item.lastName}`"
-                            @input="handleNewBugSetField"
-                            return-object
-                            class="pt-0"
-                          >
-                            <template
-                              slot="selection"
-                              slot-scope="data"
-                            >{{ data.item.firstName}} {{data.item.lastName}}</template>
-                            <template slot="item" slot-scope="data">
-                              <v-list-tile-content>
-                                <v-list-tile-title
-                                  v-html="`${data.item.firstName} ${data.item.lastName}`"
-                                ></v-list-tile-title>
-                              </v-list-tile-content>
-                            </template>
-                          </v-select>
-                        </v-flex>
-                      </v-layout>
-                    </v-flex>
-
-                    <v-flex xs6>
-                      <v-layout row wrap align-center>
-                        <v-flex xs12 sm4>
-                          <v-subheader class="new-bug-subheader">Assigned to:</v-subheader>
-                        </v-flex>
-                        <v-flex xs12 sm8>
-                          <v-select
-                            :items="users"
-                            item-text="assignedTo"
-                            item-value="assignedTo"
-                            return-object
-                            v-model="assignedTo"
-                            @change="handleNewBugSetField"
-                            class="pt-0"
-                          >
-                            <template
-                              slot="selection"
-                              slot-scope="data"
-                            >{{ data.item.firstName}} {{data.item.lastName}}</template>
-                            <template slot="item" slot-scope="data">
-                              <v-list-tile-content>
-                                <v-list-tile-title
-                                  v-html="`${data.item.firstName} ${data.item.lastName}`"
-                                ></v-list-tile-title>
-                              </v-list-tile-content>
-                            </template>
-                          </v-select>
-                        </v-flex>
-                      </v-layout>
-                    </v-flex>
-                  </v-layout>
-                  <!--end-->
-                  <v-flex xs12 sm7>
-                    <v-textarea
-                      v-model="newBug.description"
-                      placeholder="Enter description"
-                      class="pt-0 padding-left-sm"
-                    ></v-textarea>
-                  </v-flex>
-                </v-layout>
-                <!--end-->
-              </v-container>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-layout row wrap>
-                <v-btn
-                  color="blue darken-1"
-                  class="save-and-close-button"
-                  flat
-                  medium
-                  @click="handleNewBug(false)"
-                >Save and close</v-btn>
-                <v-btn color="blue darken-1" flat medium @click="handleNewBug(true)">Save and open</v-btn>
-                <v-btn color="blue darken-1" flat medium @click="dialogNewBug=false">Cancel</v-btn>
-              </v-layout>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <v-btn small outline color="success" @click="dialogNewBug = true">New</v-btn>
       </v-toolbar>
+
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
@@ -195,12 +52,11 @@
           @click="filter = '', clearBugsFilter()"
         >Clear</v-btn>
       </v-toolbar>
+
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <!--new initiative dialog-->
           <v-btn small outline color="success" @click="dialogNewBug = true">New</v-btn>
-
           <v-checkbox
             label="Show archived"
             class="checkbox pl-2 pr-2"
@@ -257,7 +113,8 @@
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in bugCards" :key="item.id">
         <v-card>
           <v-card-title primary-title>
-            <h4 class="mb-0">Bug:
+            <h4 class="mb-0">
+              Bug:
               <router-link
                 :to="'bug/?orgId='+$store.state.organization.id +'&bugId='+ item.id"
               >{{ item.title }}</router-link>
@@ -325,6 +182,145 @@
         ></v-pagination>
       </div>
     </v-layout>
+
+    <v-dialog v-model="dialogNewBug" max-width="850px">
+      <v-card>
+        <v-card-title class="pb-0 pl-4">
+          <span class="headline">New bug</span>
+        </v-card-title>
+
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout row wrap>
+              <v-flex xs12 sm7>
+                <v-text-field
+                  v-model="newBug.title"
+                  placeholder="Enter bug"
+                  class="pt-0 padding-left-sm"
+                ></v-text-field>
+              </v-flex>
+              <v-layout row wrap align-center>
+                <v-flex xs6>
+                  <v-layout row wrap align-center>
+                    <v-flex xs12 sm4>
+                      <v-subheader class="new-bug-subheader">Severity:</v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm8>
+                      <v-select
+                        :items="severityArray"
+                        item-text="severity"
+                        item-value="severity"
+                        @input="handleNewBugSetField"
+                        return-object
+                        class="pt-0"
+                      ></v-select>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+                <v-flex xs6>
+                  <v-layout row wrap align-center>
+                    <v-flex xs12 sm4>
+                      <v-subheader class="new-bug-subheader">Status:</v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm8>
+                      <v-select
+                        :items="objStatuses"
+                        item-text="name"
+                        item-value="name"
+                        @input="handleNewBugSetField"
+                        return-object
+                        class="pt-0"
+                      ></v-select>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+                <v-flex xs6>
+                  <v-layout row wrap align-center>
+                    <v-flex xs12 sm4>
+                      <v-subheader class="new-bug-subheader">Reported by:</v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm8>
+                      <v-select
+                        :items="users"
+                        item-text="`${data.item.firstName} ${data.item.lastName}`"
+                        item-value="`${data.item.firstName} ${data.item.lastName}`"
+                        @input="handleNewBugSetField"
+                        return-object
+                        class="pt-0"
+                      >
+                        <template
+                          slot="selection"
+                          slot-scope="data"
+                        >{{ data.item.firstName}} {{data.item.lastName}}</template>
+                        <template slot="item" slot-scope="data">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              v-html="`${data.item.firstName} ${data.item.lastName}`"
+                            ></v-list-tile-title>
+                          </v-list-tile-content>
+                        </template>
+                      </v-select>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+
+                <v-flex xs6>
+                  <v-layout row wrap align-center>
+                    <v-flex xs12 sm4>
+                      <v-subheader class="new-bug-subheader">Assigned to:</v-subheader>
+                    </v-flex>
+                    <v-flex xs12 sm8>
+                      <v-select
+                        :items="users"
+                        item-text="assignedTo"
+                        item-value="assignedTo"
+                        return-object
+                        v-model="assignedTo"
+                        @change="handleNewBugSetField"
+                        class="pt-0"
+                      >
+                        <template
+                          slot="selection"
+                          slot-scope="data"
+                        >{{ data.item.firstName}} {{data.item.lastName}}</template>
+                        <template slot="item" slot-scope="data">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              v-html="`${data.item.firstName} ${data.item.lastName}`"
+                            ></v-list-tile-title>
+                          </v-list-tile-content>
+                        </template>
+                      </v-select>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+              </v-layout>
+              <v-flex xs12 sm7>
+                <v-textarea
+                  v-model="newBug.description"
+                  placeholder="Enter description"
+                  class="pt-0 padding-left-sm"
+                ></v-textarea>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-layout row wrap>
+            <v-btn
+              color="blue darken-1"
+              class="save-and-close-button"
+              flat
+              medium
+              @click="handleNewBug(false)"
+            >Save and close</v-btn>
+            <v-btn color="blue darken-1" flat medium @click="handleNewBug(true)">Save and open</v-btn>
+            <v-btn color="blue darken-1" flat medium @click="dialogNewBug=false">Cancel</v-btn>
+          </v-layout>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <v-dialog v-model="dialogDeleteBug" max-width="250">
       <v-card>
