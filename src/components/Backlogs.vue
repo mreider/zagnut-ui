@@ -23,49 +23,7 @@
           >Autor</v-btn>
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
-
-        <!--new initiative dialog-->
-        <v-dialog v-model="dialogNewBackLog" max-width="500px">
-          <template v-slot:activator="{ on }">
-            <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
-          </template>
-          <v-card>
-            <v-card-title class="pb-0 pl-4">
-              <span class="headline new-backlog-headline">New backlog</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container grid-list-md pl-3 pt-2 pb-2>
-                <v-layout row wrap align-center>
-                  <v-flex xs2 pl-0>
-                    <v-subheader class="new-backlog-title">Title:</v-subheader>
-                  </v-flex>
-                  <v-flex xs10>
-                    <v-text-field
-                      v-model="newBacklog.title"
-                      placeholder="Title backlog"
-                      class="pl-4"
-                    ></v-text-field>
-                  </v-flex>
-                </v-layout>
-              </v-container>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-layout row wrap>
-                <v-flex xs-12>
-                  <v-btn
-                    color="blue darken-1"
-                    class="save-and-close-button"
-                    flat
-                    medium
-                    @click="handleNewBacklog(false)"
-                  >Save</v-btn>
-                  <v-btn color="blue darken-1" flat medium @click="dialogNewBackLog=false">Cancel</v-btn>
-                </v-flex>
-              </v-layout>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <v-btn small outline color="success" @click="dialogNewBackLog = true">New</v-btn>
       </v-toolbar>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
@@ -186,6 +144,40 @@
       </div>
     </v-layout>
 
+    <v-dialog v-model="dialogNewBackLog" max-width="500px">
+      <v-card>
+        <v-card-title class="pb-0 pl-4">
+          <span class="headline new-backlog-headline">New backlog</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md pl-3 pt-2 pb-2>
+            <v-layout row wrap align-center>
+              <v-flex xs2 pl-0>
+                <v-subheader class="new-backlog-title">Title:</v-subheader>
+              </v-flex>
+              <v-flex xs10>
+                <v-text-field v-model="newBacklog.title" placeholder="Title backlog" class="pl-4"></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-layout row wrap>
+            <v-flex xs-12>
+              <v-btn
+                color="blue darken-1"
+                class="save-and-close-button"
+                flat
+                medium
+                @click="handleNewBacklog(false)"
+              >Save</v-btn>
+              <v-btn color="blue darken-1" flat medium @click="dialogNewBackLog=false">Cancel</v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="dialogDeleteBackLog" max-width="250">
       <v-card>
         <v-card-text
@@ -226,7 +218,6 @@
             ></v-checkbox>
           </v-flex>
         </v-layout>
-
         <v-card-actions>
           <v-btn
             flat="flat"
@@ -476,7 +467,6 @@ export default {
             .slice(0, this.perPage);
           this.page = 1;
         } else {
-          // this.initiatives.sort(sortFunction);
           this.initialBacklogsForSorting.sort(sortFunction);
           this.backlogs = this.initialBacklogsForSorting.slice(0, this.perPage);
           this.page = 1;
