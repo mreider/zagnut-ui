@@ -316,6 +316,8 @@ export default {
         this.initialBacklogs = backlogs;
         this.initialBacklogsForSorting = backlogs.slice();
         this.backlogs = this.initialBacklogs.slice(0, this.perPage);
+
+        this.paginationFunction(this.page > this.totalPages ? 1 : this.page);
       } catch (error) {
         this.loading = false;
         return this.$errorMessage.show(error);
@@ -384,7 +386,6 @@ export default {
         const success = _get(response, "data.success");
         this.loading = false;
         this.dialogDeleteBackLog = false;
-        this.page = 1;
         if (!success) throw new Error(`Unable to create new organization.`);
       } catch (error) {
         this.loading = false;
@@ -523,6 +524,7 @@ export default {
     },
     paginationFunction(event) {
       let sliceFrom = (event - 1) * this.perPage;
+      this.page = event;
       let paginatedArray;
       if (this.activatedButton === "") {
         if (this.filteredBacklogs !== null) {

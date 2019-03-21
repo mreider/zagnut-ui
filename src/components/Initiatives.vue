@@ -459,6 +459,7 @@ export default {
         this.initiatives = this.initialInitiatives.slice(0, this.perPage);
 
         this.admin = _get(response, "data.admin");
+        this.paginationFunction(this.page > this.totalPages ? 1 : this.page);
       } catch (error) {
         this.loading = false;
         return this.$errorMessage.show(error);
@@ -478,7 +479,6 @@ export default {
           }`
         );
         let success = _get(response, "data.success");
-        this.page = 1;
         this.loading = false;
         if (!success) throw new Error(`Unable delete initiative.`);
       } catch (error) {
@@ -583,7 +583,6 @@ export default {
           this.btntrue = "";
           this.btnfalse = "voteDown";
         }
-        //  this.$nextTick();
       }
     },
     async doVote(result, initiativeId) {
@@ -738,6 +737,7 @@ export default {
     },
     paginationFunction(event) {
       let sliceFrom = (event - 1) * this.perPage;
+      this.page = event;
       let paginatedArray;
       if (this.activatedButton === "") {
         if (this.filteredInitiatives !== null) {
