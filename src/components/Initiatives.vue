@@ -44,101 +44,7 @@
           >Author</v-btn>
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
-
-        <!--new initiative dialog-->
-        <v-dialog v-model="dialogNewInitiative" max-width="850px">
-          <template v-slot:activator="{ on }">
-            <v-btn small outline color="success" v-on="on" class="mr-0">New</v-btn>
-          </template>
-          <v-card>
-            <v-card-title>
-              <span class="headline">New initiative</span>
-            </v-card-title>
-
-            <v-card-text>
-              <v-container grid-list-md>
-                <v-layout row wrap>
-                  <v-flex xs12 sm7>
-                    <v-text-field v-model="newInitiative.title" placeholder="Enter initiative"></v-text-field>
-                    <v-textarea v-model="newInitiative.description" placeholder="Enter hightlights"></v-textarea>
-                  </v-flex>
-                  <v-flex xs12 sm5>
-                    <v-layout row wrap align-center>
-                      <v-flex xs4 mt-1>
-                        <v-subheader>Vote</v-subheader>
-                      </v-flex>
-                      <v-flex xs8 mt-1>
-                        <v-btn
-                          flat
-                          icon
-                          color="blue-grey darken-3"
-                          :class="{'v-btn--active': this.btntrue === 'voteUp' }"
-                          @click="handleNewInitiativeSetField(true, 'vote')"
-                        >
-                          <v-icon>thumb_up</v-icon>
-                        </v-btn>
-                        <v-btn
-                          flat
-                          icon
-                          color="blue-grey darken-3"
-                          :class="{'v-btn--active': this.btnfalse === 'voteDown' }"
-                          @click="handleNewInitiativeSetField(false, 'vote')"
-                        >
-                          <v-icon>thumb_down</v-icon>
-                        </v-btn>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-subheader>Horizon</v-subheader>
-                      </v-flex>
-                      <v-flex xs8>
-                        <v-select
-                          :items="horizonList"
-                          item-text="horizon"
-                          item-value="horizon"
-                          return-object
-                          @input="handleNewInitiativeSetField"
-                        ></v-select>
-                      </v-flex>
-                      <v-flex xs4>
-                        <v-subheader>Priority</v-subheader>
-                      </v-flex>
-                      <v-flex xs8>
-                        <v-select
-                          :items="objStatuses"
-                          item-text="name"
-                          item-value="name"
-                          return-object
-                          @change="handleNewInitiativeSetField"
-                        ></v-select>
-                      </v-flex>
-                    </v-layout>
-                  </v-flex>
-                </v-layout>
-              </v-container>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-layout row wrap>
-                <v-flex xs-12>
-                  <v-btn
-                    color="blue darken-1"
-                    class="save-and-close-button"
-                    flat
-                    medium
-                    @click="handleNewInitiative(false)"
-                  >Save and close</v-btn>
-                  <v-btn
-                    color="blue darken-1"
-                    flat
-                    medium
-                    @click="handleNewInitiative(true)"
-                  >Save and open</v-btn>
-                  <v-btn color="blue darken-1" flat medium @click="dialogNewInitiative=false">Cancel</v-btn>
-                </v-flex>
-              </v-layout>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <v-btn small outline color="success" @click="dialogNewInitiative = true">New</v-btn>
       </v-toolbar>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <v-spacer></v-spacer>
@@ -160,9 +66,7 @@
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <!--new initiative dialog-->
           <v-btn small outline color="success" @click="dialogNewInitiative = true">New</v-btn>
-
           <v-checkbox
             label="Show archived"
             class="checkbox pl-2 pr-2"
@@ -296,6 +200,96 @@
         ></v-pagination>
       </div>
     </v-layout>
+
+    <v-dialog v-model="dialogNewInitiative" max-width="850px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">New initiative</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout row wrap>
+              <v-flex xs12 sm7>
+                <v-text-field v-model="newInitiative.title" placeholder="Enter initiative"></v-text-field>
+                <v-textarea v-model="newInitiative.description" placeholder="Enter hightlights"></v-textarea>
+              </v-flex>
+              <v-flex xs12 sm5>
+                <v-layout row wrap align-center>
+                  <v-flex xs4 mt-1>
+                    <v-subheader>Vote</v-subheader>
+                  </v-flex>
+                  <v-flex xs8 mt-1>
+                    <v-btn
+                      flat
+                      icon
+                      color="blue-grey darken-3"
+                      :class="{'v-btn--active': this.btntrue === 'voteUp' }"
+                      @click="handleNewInitiativeSetField(true, 'vote')"
+                    >
+                      <v-icon>thumb_up</v-icon>
+                    </v-btn>
+                    <v-btn
+                      flat
+                      icon
+                      color="blue-grey darken-3"
+                      :class="{'v-btn--active': this.btnfalse === 'voteDown' }"
+                      @click="handleNewInitiativeSetField(false, 'vote')"
+                    >
+                      <v-icon>thumb_down</v-icon>
+                    </v-btn>
+                  </v-flex>
+                  <v-flex xs4>
+                    <v-subheader>Horizon</v-subheader>
+                  </v-flex>
+                  <v-flex xs8>
+                    <v-select
+                      :items="horizonList"
+                      item-text="horizon"
+                      item-value="horizon"
+                      return-object
+                      @input="handleNewInitiativeSetField"
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs4>
+                    <v-subheader>Priority</v-subheader>
+                  </v-flex>
+                  <v-flex xs8>
+                    <v-select
+                      :items="objStatuses"
+                      item-text="name"
+                      item-value="name"
+                      return-object
+                      @change="handleNewInitiativeSetField"
+                    ></v-select>
+                  </v-flex>
+                </v-layout>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-layout row wrap>
+            <v-flex xs-12>
+              <v-btn
+                color="blue darken-1"
+                class="save-and-close-button"
+                flat
+                medium
+                @click="handleNewInitiative(false)"
+              >Save and close</v-btn>
+              <v-btn
+                color="blue darken-1"
+                flat
+                medium
+                @click="handleNewInitiative(true)"
+              >Save and open</v-btn>
+              <v-btn color="blue darken-1" flat medium @click="dialogNewInitiative=false">Cancel</v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <v-dialog v-model="dialogDeleteInitiative" max-width="250">
       <v-card>
