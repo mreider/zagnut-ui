@@ -467,6 +467,7 @@ export default {
       }
     },
     async handleInitiativeDelete(initiative) {
+      this.loading = true;
       if (!initiative || !this.$store.state.user.id) {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
@@ -477,6 +478,8 @@ export default {
           }`
         );
         let success = _get(response, "data.success");
+        this.page = 1;
+        this.loading = false;
         if (!success) throw new Error(`Unable delete initiative.`);
       } catch (error) {
         return this.$errorMessage.show(error);
