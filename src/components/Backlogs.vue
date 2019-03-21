@@ -384,6 +384,7 @@ export default {
         const success = _get(response, "data.success");
         this.loading = false;
         this.dialogDeleteBackLog = false;
+        this.page = 1;
         if (!success) throw new Error(`Unable to create new organization.`);
       } catch (error) {
         this.loading = false;

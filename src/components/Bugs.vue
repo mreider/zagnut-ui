@@ -109,6 +109,7 @@
           >Clear</v-btn>
         </v-flex>
       </v-layout>
+
       <!--cards section-->
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in bugCards" :key="item.id">
         <v-card>
@@ -527,6 +528,7 @@ export default {
         );
         let success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to delete bug.`);
+        this.page = 1;
         this.dialogDeleteBug = false;
         this.loading = false;
       } catch (error) {
