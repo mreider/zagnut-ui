@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <div v-if="loading === true || !initialBugs.length">
+    <div v-if="loading === true">
       <loading-indication></loading-indication>
     </div>
 
@@ -352,24 +352,9 @@ export default {
       initialBugsForSorting: [],
       initialFilteredBugs: null,
       filteredBugs: null,
-      bugsFields: [
-        {
-          key: "title",
-          sortable: true,
-          thStyle: { width: "15%" },
-          label: "Bug"
-        },
-        // { key: 'description', label: 'Highlights', sortable: true, thStyle: { width: '35%' } },
-        { key: "severity", sortable: true },
-        { key: "status", sortable: true },
-        { key: "reportedBy", sortable: false, label: "Reported by" },
-        { key: "assignedTo", sortable: false, label: "Assigned to" },
-        { key: "createdAt", sortable: true, label: "Created" }
-      ],
       filter: null,
       objStatuses: [],
       page: 1,
-      currentPage: 1,
       totalPages: 1,
       perPage: 8,
       newBug: {

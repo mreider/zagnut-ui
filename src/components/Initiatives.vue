@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <div v-if="loading === true || !initialInitiatives.length">
+    <div v-if="loading === true">
       <loading-indication></loading-indication>
     </div>
     <v-layout row wrap>
