@@ -5,88 +5,168 @@
                     aria-controls="collapse4"
                     :aria-expanded="showComments ? 'true' : 'false'">
                 Show comments
-    </b-btn> -->
+    </b-btn>-->
+    <v-layout row wrap v-for="element in comments" :key="element.id">
+      <v-flex xs7>
+        <v-textarea
+          :ref="'comment' + element.id"
+          :id="'comment' + element.id"
+          :disabled="element.readOnly"
+          box
+          v-model="element.comment"
+          name="input-7-4"
+          label="Comment: "
+          value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
+        ></v-textarea>
+        <span>{{labelComment(element)}}</span>
+      </v-flex>
+      <v-flex xs5 align-content-end>
+        <v-btn
+          flat
+          icon
+          color="indigo"
+          v-if="$store.state.user.id === element.createdBy && element.readOnly"
+          @click="handleReadOnly(element)"
+        >
+          <v-icon>edit</v-icon>
+        </v-btn>
+        <v-btn
+          flat
+          icon
+          color="cyan"
+          v-if="!element.readOnly"
+          @click="handleUpdateComment(element)"
+        >
+          <v-icon>save</v-icon>
+        </v-btn>
+        <v-btn
+          flat
+          icon
+          color="pink"
+          v-if="toCommentsData.admin"
+          @click="handleDeleteComment(element)"
+        >
+          <v-icon>delete</v-icon>
+        </v-btn>
+      </v-flex>
+    </v-layout>
+
+    <!--comments-->
     <b-collapse class="mt-2" v-model="showComments" id="collapse4">
       <b-form-group
-          v-for="element in comments"
-          v-bind:key="element.id"
-          breakpoint="lg"
-          :description="labelComment(element)"
-          description-size="sm"
-          description-class="font-weight-bold pt-0"
-          class="container-fluid"
+        v-for="element in comments"
+        v-bind:key="element.id"
+        breakpoint="lg"
+        :description="labelComment(element)"
+        description-size="sm"
+        description-class="font-weight-bold pt-0"
+        class="container-fluid"
+      >
+        <vue-tribute :options="options" @tribute-replaced="tributeReplaced(element)">
+          <b-form-textarea
+            class="text-left"
+            v-model="element.comment"
+            :ref="'comment' + element.id"
+            :id="'comment' + element.id"
+            v-bind:readonly="element.readOnly"
+          ></b-form-textarea>
+        </vue-tribute>
+        <div style="float: right;">
+          <b-button
+            style="bottom"
+            variant="primary"
+            size="sm"
+            v-if="$store.state.user.id === element.createdBy && element.readOnly"
+            @click="handleReadOnly(element)"
           >
-          <vue-tribute :options="options" @tribute-replaced="tributeReplaced(element)">
-            <b-form-textarea class="text-left" v-model="element.comment" :ref="'comment' + element.id" :id="'comment' + element.id" v-bind:readonly="element.readOnly"></b-form-textarea>
-          </vue-tribute>
-          <div style="float: right;">
-            <b-button style="bottom" variant="primary" size="sm" v-if="$store.state.user.id === element.createdBy && element.readOnly" @click="handleReadOnly(element)"><font-awesome-icon icon="pencil-alt" /> </b-button>
-            <b-button style="bottom" variant="success" size="sm" v-if="!element.readOnly" @click="handleUpdateComment(element)"><font-awesome-icon icon="save" /></b-button>
-            <b-button style="bottom" variant="danger" size="sm" v-if="toCommentsData.admin" @click="handleDeleteComment(element)"><font-awesome-icon icon="trash-alt" /></b-button>
-          </div>
+            <font-awesome-icon icon="pencil-alt"/>
+          </b-button>
+          <b-button
+            style="bottom"
+            variant="success"
+            size="sm"
+            v-if="!element.readOnly"
+            @click="handleUpdateComment(element)"
+          >
+            <font-awesome-icon icon="save"/>
+          </b-button>
+          <b-button
+            style="bottom"
+            variant="danger"
+            size="sm"
+            v-if="toCommentsData.admin"
+            @click="handleDeleteComment(element)"
+          >
+            <font-awesome-icon icon="trash-alt"/>
+          </b-button>
+        </div>
       </b-form-group>
     </b-collapse>
-    <b-collapse class="mt-2"  v-model="addComment" id="collapse5">
+
+    <!--edit comment-->
+    <b-collapse class="mt-2" v-model="addComment" id="collapse5">
       <vue-tribute :options="options">
-        <b-form-textarea id="newComment"
+        <b-form-textarea
+          id="newComment"
           v-model="newComment"
           placeholder="Enter comment text"
           :rows="2"
           class="text-left"
           :ref="newComment"
-          ></b-form-textarea>
-        </vue-tribute>
-        <div style="float: right; padding-bottom:1em">
-          <b-button style="bottom"  variant="primary" size="sm" @click="handleNewComment(newComment)"><font-awesome-icon icon="save" /> Add comment</b-button>
-        </div>
+        ></b-form-textarea>
+      </vue-tribute>
+      <div style="float: right; padding-bottom:1em">
+        <b-button style="bottom" variant="primary" size="sm" @click="handleNewComment(newComment)">
+          <font-awesome-icon icon="save"/>Add comment
+        </b-button>
+      </div>
     </b-collapse>
   </div>
 </template>
 
 <script>
-import _get from 'lodash/get';
-import _ from 'lodash';
-import { username } from '@/utils';
-import VueTribute from 'vue-tribute';
+import _get from "lodash/get";
+import _ from "lodash";
+import { username } from "@/utils";
+import VueTribute from "vue-tribute";
 export default {
-  name: 'comments',
-  props: ['toCommentsData'],
+  name: "comments",
+  props: ["toCommentsData"],
   data() {
     return {
-      comments: [{ comment: '', readOnly: true }],
+      comments: [{ comment: "", readOnly: true }],
       showComments: true,
       addComment: true,
-      newComment: '',
+      newComment: "",
       mailers: [],
       users: [],
       options: {
-        selectTemplate: function (item) {
+        selectTemplate: function(item) {
           // mailers.push(item.original.value);
-          return '@' + item.original.key + '.';
+          return "@" + item.original.key + ".";
         },
         values: []
       }
     };
   },
-  async mounted () {
+  async mounted() {
     await this.loadOrgUsers();
     await this.loadComments();
   },
-  computed: {
-  },
+  computed: {},
 
   methods: {
     tributeReplaced(element) {
-    // init change for vue-tribute
-      let input = document.getElementById('comment' + element.id);
-      let e = document.createEvent('HTMLEvents');
-      e.initEvent('input', true, true);
+      // init change for vue-tribute
+      let input = document.getElementById("comment" + element.id);
+      let e = document.createEvent("HTMLEvents");
+      e.initEvent("input", true, true);
       input.dispatchEvent(e);
-    // init change for vue-tribute
+      // init change for vue-tribute
     },
     labelComment(element) {
-      let label = username(_.find(this.users, { 'userId': element.createdBy }));
-      label = label + ' ' + new Date(element.createdAt).toLocaleString();
+      let label = username(_.find(this.users, { userId: element.createdBy }));
+      label = label + " " + new Date(element.createdAt).toLocaleString();
       return label;
     },
     async loadOrgUsers() {
@@ -95,14 +175,18 @@ export default {
         this.$loading(true);
         const response = await this.axios.get(`/api/org/${orgId}/users`);
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        const users = _get(response, 'data.users');
+        const users = _get(response, "data.users");
         this.users = users;
         this.options.values.length = 0;
         users.forEach(el => {
-          this.options.values.push({value: el.email, key: username(el), string: '@' + username(el) + '.'});
+          this.options.values.push({
+            value: el.email,
+            key: username(el),
+            string: "@" + username(el) + "."
+          });
         });
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -115,18 +199,25 @@ export default {
         el.readOnly = true;
       });
       element.readOnly = false;
-      this.$refs['comment' + element.id][0].focus();
+      this.$refs["comment" + element.id][0].focus();
     },
     async loadComments() {
       const orgId = this.$route.query.orgId;
       if (orgId) {
         this.$loading(true);
         try {
-          const response = await this.axios.get('/api/comments/get/' + this.toCommentsData.name + '/' + orgId + '/' + this.toCommentsData.id);
+          const response = await this.axios.get(
+            "/api/comments/get/" +
+              this.toCommentsData.name +
+              "/" +
+              orgId +
+              "/" +
+              this.toCommentsData.id
+          );
 
-          let success = _get(response, 'data.success');
-          if (!success) this.$errorMessage.show('Unable to load comments');
-          let comments = _get(response, 'data.comments');
+          let success = _get(response, "data.success");
+          if (!success) this.$errorMessage.show("Unable to load comments");
+          let comments = _get(response, "data.comments");
           comments.forEach(element => {
             element.readOnly = true;
           });
@@ -137,17 +228,20 @@ export default {
         } finally {
           this.$loading(false);
         }
-      };
+      }
     },
     async handleUpdateComment(element) {
       try {
         this.$loading(true);
 
         this.findEmailAndReturnMailers(element.comment);
-        const response = await this.axios.put(`/api/comments/edit/${element.id}`, { comment: element.comment, mailers: this.mailers });
+        const response = await this.axios.put(
+          `/api/comments/edit/${element.id}`,
+          { comment: element.comment, mailers: this.mailers }
+        );
         this.mailers = [];
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to update comment.`);
 
         // this.$notify({group: 'app', type: 'success', text: 'Comment updated'});
@@ -166,10 +260,18 @@ export default {
         this.$loading(true);
         this.findEmailAndReturnMailers(newComment);
 
-        const response = await this.axios.post('/api/comments/new/' + this.toCommentsData.name + '/' + orgId + '/' + id, { comment: newComment, mailers: this.mailers });
+        const response = await this.axios.post(
+          "/api/comments/new/" +
+            this.toCommentsData.name +
+            "/" +
+            orgId +
+            "/" +
+            id,
+          { comment: newComment, mailers: this.mailers }
+        );
         this.mailers = [];
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to create comment.`);
 
         // this.$notify({group: 'app', type: 'success', text: 'Comment created'});
@@ -178,7 +280,7 @@ export default {
       } finally {
         this.$loading(false);
         await this.loadComments();
-        this.newComment = '';
+        this.newComment = "";
         // this.addComment = false;
       }
     },
@@ -187,12 +289,18 @@ export default {
       try {
         this.$loading(true);
 
-        const response = await this.axios.delete('/api/comments/delete/' + orgId + '/' + element.id);
+        const response = await this.axios.delete(
+          "/api/comments/delete/" + orgId + "/" + element.id
+        );
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to delete comment.`);
 
-        this.$notify({group: 'app', type: 'success', text: 'Comment deleted'});
+        this.$notify({
+          group: "app",
+          type: "success",
+          text: "Comment deleted"
+        });
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -205,23 +313,21 @@ export default {
       this.mailers.length = 0;
       if (result) {
         result.forEach(el => {
-          let item = _.find(this.options.values, { 'string': el });
+          let item = _.find(this.options.values, { string: el });
           if (item) this.mailers.push(item.value);
         });
         this.mailers = _.union(this.mailers);
-      };
+      }
     }
   },
   components: {
     VueTribute
   },
-  watch: {
-  }
+  watch: {}
 };
-
 </script>
 <style lang="scss">
 .hidden_header {
-      display: none;
-    }
+  display: none;
+}
 </style>
