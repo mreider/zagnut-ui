@@ -49,7 +49,7 @@
                     item-text="horizon"
                     item-value="horizon"
                     return-object
-                    @input="handleNewInitiativeSetField"
+                    @input="handleInitiativeSetField"
                   ></v-select>
                 </v-flex>
                 <v-flex xs4>
@@ -61,14 +61,14 @@
                     item-text="name"
                     item-value="name"
                     return-object
-                    @change="handleNewInitiativeSetField"
+                    @change="handleInitiativeSetField"
                   ></v-select>
                 </v-flex>
               </v-layout>
             </v-flex>
 
             <v-flex xs4>
-              <v-checkbox label="Show archived" class="checkbox" v-model="form.archived"></v-checkbox>
+              <v-checkbox label="Archived" class="checkbox" v-model="form.archived"></v-checkbox>
             </v-flex>
             <v-flex xs8></v-flex>
             <v-flex xs12>

@@ -16,9 +16,8 @@
           v-model="element.comment"
           name="input-7-4"
           label="Comment: "
-          value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
         ></v-textarea>
-        <span>{{labelComment(element)}}</span>
+        <label class="label-comment">{{labelComment(element)}}</label>
       </v-flex>
       <v-flex xs5 align-content-end>
         <v-btn
@@ -50,77 +49,31 @@
         </v-btn>
       </v-flex>
     </v-layout>
-
-    <!--comments-->
-    <b-collapse class="mt-2" v-model="showComments" id="collapse4">
-      <b-form-group
-        v-for="element in comments"
-        v-bind:key="element.id"
-        breakpoint="lg"
-        :description="labelComment(element)"
-        description-size="sm"
-        description-class="font-weight-bold pt-0"
-        class="container-fluid"
-      >
-        <vue-tribute :options="options" @tribute-replaced="tributeReplaced(element)">
-          <b-form-textarea
-            class="text-left"
-            v-model="element.comment"
-            :ref="'comment' + element.id"
-            :id="'comment' + element.id"
-            v-bind:readonly="element.readOnly"
-          ></b-form-textarea>
-        </vue-tribute>
-        <div style="float: right;">
-          <b-button
-            style="bottom"
-            variant="primary"
-            size="sm"
-            v-if="$store.state.user.id === element.createdBy && element.readOnly"
-            @click="handleReadOnly(element)"
-          >
-            <font-awesome-icon icon="pencil-alt"/>
-          </b-button>
-          <b-button
-            style="bottom"
-            variant="success"
-            size="sm"
-            v-if="!element.readOnly"
-            @click="handleUpdateComment(element)"
-          >
-            <font-awesome-icon icon="save"/>
-          </b-button>
-          <b-button
-            style="bottom"
-            variant="danger"
-            size="sm"
-            v-if="toCommentsData.admin"
-            @click="handleDeleteComment(element)"
-          >
-            <font-awesome-icon icon="trash-alt"/>
-          </b-button>
-        </div>
-      </b-form-group>
-    </b-collapse>
-
-    <!--edit comment-->
-    <b-collapse class="mt-2" v-model="addComment" id="collapse5">
-      <vue-tribute :options="options">
-        <b-form-textarea
+    <v-layout row wrap>
+      <v-flex xs7 mt-4>
+        <v-textarea
           id="newComment"
           v-model="newComment"
+          label="New comment: "
           placeholder="Enter comment text"
           :rows="2"
           class="text-left"
           :ref="newComment"
-        ></b-form-textarea>
-      </vue-tribute>
-      <div style="float: right; padding-bottom:1em">
-        <b-button style="bottom" variant="primary" size="sm" @click="handleNewComment(newComment)">
-          <font-awesome-icon icon="save"/>Add comment
-        </b-button>
-      </div>
-    </b-collapse>
+          outline
+        ></v-textarea>
+      </v-flex>
+      <v-flex xs5 align-content-end>
+        <v-btn
+          flat
+          icon
+          color="primary"
+          v-if="toCommentsData.admin"
+          @click="handleNewComment(newComment)"
+        >
+          <v-icon>add</v-icon>
+        </v-btn>
+      </v-flex>
+    </v-layout>
   </div>
 </template>
 
@@ -329,5 +282,9 @@ export default {
 <style lang="scss">
 .hidden_header {
   display: none;
+}
+.label-comment {
+  display: block;
+  margin-top: -15px;
 }
 </style>
