@@ -369,8 +369,8 @@ export default {
       filter: null,
       objStatuses: [],
       page: 1,
-      currentPage: 0,
-      totalPages: 4,
+      currentPage: 1,
+      totalPages: 1,
       perPage: 8,
       newBug: {
         title: "",
@@ -527,7 +527,6 @@ export default {
         );
         let success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to delete bug.`);
-        this.page = 1;
         this.dialogDeleteBug = false;
         this.loading = false;
       } catch (error) {
@@ -590,6 +589,7 @@ export default {
         this.bugs = this.initialBugs.slice(0, this.perPage);
 
         this.admin = _get(response, "data.admin");
+        this.paginationFunction(this.page > this.totalPages ? 1 : this.page);
         this.loading = false;
       } catch (error) {
         this.loading = false;
@@ -704,6 +704,7 @@ export default {
     },
     paginationFunction(event) {
       let sliceFrom = (event - 1) * this.perPage;
+      this.page = event;
       let paginatedArray;
       if (this.activatedButton === "") {
         if (this.filteredBugs !== null) {
