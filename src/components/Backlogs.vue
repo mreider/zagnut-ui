@@ -132,7 +132,8 @@
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in backlogsCards" :key="item.id">
         <v-card>
           <v-card-title primary-title>
-            <h4 class="mb-0">Backlog:
+            <h4 class="mb-0">
+              Backlog:
               <router-link
                 :to="'items/?orgId='+$store.state.organization.id +'&backlogid='+ item.id"
               >{{ item.title }}</router-link>
@@ -255,9 +256,6 @@ export default {
   name: "Backlogs",
   data() {
     return {
-      selected: [],
-      options: [],
-      users: [],
       newBacklog: { title: "" },
       backlogs: [],
       activatedButton: "",
@@ -265,10 +263,6 @@ export default {
       initialBacklogsForSorting: [],
       initialFilteredBacklogs: null,
       filteredBacklogs: null,
-      backlogsFields: [
-        { key: "title", sortable: true, label: "Backlog" },
-        { key: "author", sortable: true }
-      ],
       newNameOldBacklog: "",
       currentBacklog: "",
       filter: null,
@@ -277,7 +271,6 @@ export default {
       perPage: 8,
       showArchived: false,
       currentPage: 1,
-      totalRows: 0,
       loading: false,
       dialogBacklogEdit: false,
       dialogDeleteBackLog: false,
@@ -327,7 +320,6 @@ export default {
           }
         });
 
-        this.totalRows = backlogs.length;
         this.totalPages = Math.ceil(backlogs.length / this.perPage);
 
         this.initialBacklogs = backlogs;
@@ -440,13 +432,6 @@ export default {
     },
     handleUsername(element) {
       return username(element);
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.backlogs.forEach(element => {
-        element.totalRows = filteredItems.length;
-        element.currentPage = 1;
-      });
     },
     sortBacklogsCards(backlogName) {
       let param = backlogName.toLowerCase();
