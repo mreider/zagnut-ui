@@ -370,7 +370,6 @@ export default {
       objStatuses: [],
       page: 1,
       currentPage: 0,
-      totalRows: 0,
       totalPages: 4,
       perPage: 8,
       newBug: {
@@ -584,7 +583,6 @@ export default {
           }
           element.createdAt = new Date(element.createdAt).toLocaleString();
         });
-        this.totalRows = bugs.length;
         this.totalPages = Math.ceil(bugs.length / this.perPage);
 
         this.initialBugs = bugs;
@@ -598,11 +596,6 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
       }
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
     },
     sortBugCards(bugName) {
       let param = bugName.toLowerCase();
@@ -724,6 +717,7 @@ export default {
             sliceFrom,
             sliceFrom + this.perPage
           );
+          this.bugs = paginatedArray;
         }
       } else {
         if (this.filteredBugs !== null) {
@@ -737,9 +731,9 @@ export default {
             sliceFrom,
             sliceFrom + this.perPage
           );
+          this.bugs = paginatedArray;
         }
       }
-      this.bugs = paginatedArray;
     }
   },
 
