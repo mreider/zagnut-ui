@@ -226,7 +226,8 @@
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in intiativeCards" :key="item.id">
         <v-card>
           <v-card-title primary-title>
-            <h4 class="mb-0">Initiative:
+            <h4 class="mb-0">
+              Initiative:
               <router-link
                 :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ item.id"
               >{{ item.title }}</router-link>
@@ -296,21 +297,6 @@
       </div>
     </v-layout>
 
-    <!--old bootstrap section-->
-    <div class="initiatives">
-      <b-modal
-        id="delete"
-        :title="'Wait. Are you sure you want to delete this permanently?'"
-        button-size="sm"
-        size="sm"
-        centered
-        body-class="zero-size"
-        ok-variant="danger"
-        @ok="handleInitiativeDelete(currentInitiative)"
-        ok-title="delete"
-      ></b-modal>
-    </div>
-
     <v-dialog v-model="dialogDeleteInitiative" max-width="250">
       <v-card>
         <v-card-text
@@ -346,31 +332,16 @@ export default {
   name: "Initiatives",
   data() {
     return {
-      initiativesIsSorted: false,
       activatedButton: "",
       initialInitiatives: [],
       initiatives: [],
       initialInitiativesForSorting: [],
       initialFilteredInitiatives: null,
       filteredInitiatives: null,
-      initiativesFields: [
-        {
-          key: "title",
-          sortable: true,
-          thStyle: { width: "15%" },
-          label: "Initiative"
-        },
-        // { key: 'description', label: 'Highlights', sortable: true, thStyle: { width: '35%' } },
-        { key: "popularity", sortable: true },
-        { key: "importance", sortable: true },
-        { key: "horizon", sortable: true },
-        { key: "author", sortable: true }
-      ],
       filter: null,
       objStatuses: [],
       page: 1,
       currentPage: 0,
-      totalRows: 0,
       totalPages: 4,
       perPage: 8,
       newInitiative: {
@@ -402,11 +373,7 @@ export default {
         : this.initiatives;
     }
   },
-  watch: {
-    // dialog(val) {
-    //   val || this.close();
-    // }
-  },
+  watch: {},
   async mounted() {
     await this.loadOrgStatuses();
     await this.loadOrgInitiatives();
@@ -422,11 +389,6 @@ export default {
     },
     setCurrentInitiative(element) {
       this.currentInitiative = element;
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
     },
     handleCloseNew() {
       this.$refs.modalnew.hide();
@@ -476,8 +438,6 @@ export default {
     },
     async loadOrgInitiatives() {
       try {
-        // this.$loading(true);
-        // this.loading = true;
         const response = await this.axios.get(
           `/api/initiatives/all/${this.showArchived}/${
             this.$store.state.organization.id
@@ -498,7 +458,6 @@ export default {
             horizon: this.getHorizonName(new Date(element.horizon))
           };
         });
-        this.totalRows = initiatives.length;
         this.totalPages = Math.ceil(initiatives.length / this.perPage);
 
         this.initialInitiatives = initiatives;
@@ -511,7 +470,6 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.loading = false;
-        // this.$loading(false);
       }
     },
     async handleInitiativeDelete(initiative) {
@@ -542,7 +500,6 @@ export default {
     async loadOrgStatuses() {
       this.loading = true;
       try {
-        // this.$loading(true);
         const orgId = this.$store.state.organization.id;
 
         const response = await this.axios.get(
@@ -557,8 +514,6 @@ export default {
         this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
-        // this.loading = false;
-        // this.$loading(false);
       }
     },
     async handleNewInitiative(go) {
@@ -636,7 +591,6 @@ export default {
     },
     async doVote(result, initiativeId) {
       try {
-        // this.$loading(true);
         const response = await this.axios.post(
           `/api/votes/initiatives/` + initiativeId + "/" + String(result)
         );
@@ -646,7 +600,6 @@ export default {
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
-        // this.$loading(false);
       }
     },
     getHorizonName(d) {
@@ -718,7 +671,6 @@ export default {
             .slice(0, this.perPage);
           this.page = 1;
         } else {
-          // this.initiatives.sort(sortFunction);
           this.initialInitiativesForSorting.sort(sortFunction);
           this.initiatives = this.initialInitiativesForSorting.slice(
             0,
