@@ -17,9 +17,45 @@
               </v-list-tile-content>
             </v-list-tile>
           </v-list>
+          <v-card-actions>
+            <v-btn
+              flat
+              color="primary"
+              small
+              outline
+              @click="setCurrentConnectionType(element.key)"
+              class="ml-2"
+            >Link {{element.key}}</v-btn>
+            <v-btn
+              flat
+              color="pink"
+              small
+              outline
+              @click="deleteConnectionDialog = true"
+            >Remove seleted</v-btn>
+          </v-card-actions>
         </v-card>
       </v-flex>
     </v-layout>
+
+    <v-dialog v-model="deleteConnectionDialog" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="deleteConnectionDialog = false"
+            small
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="error" flat="flat" outline @click="handleDeleteConnections()" small>Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <b-card no-body class="connections col-lg-12 col-md-8 col-sm-6 col-xs-4" bg-variant="light">
       <b-card
@@ -138,7 +174,8 @@ export default {
       currentPage: 0,
       totalRows: 0,
       perPage: 10,
-      showArchived: false
+      showArchived: false,
+      deleteConnectionDialog: false
     };
   },
   async mounted() {
@@ -435,8 +472,10 @@ export default {
           }
         );
         const success = _get(response, "data.success");
+        this.deleteConnectionDialog = false;
         if (!success) throw new Error(`Unable to add connection.`);
       } catch (error) {
+        this.deleteConnectionDialog = false;
         return this.$errorMessage.show(error);
       } finally {
         this.relations = [];
