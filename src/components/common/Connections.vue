@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-layout row wrap>
-      <v-flex xs12 sm6>
+      <v-flex xs12>
         <v-card v-for="element in relations" v-bind:key="element.key">
           <v-list subheader two-line>
             <v-subheader>Linked {{element.key}}s</v-subheader>
@@ -24,7 +24,7 @@
               small
               outline
               @click="setCurrentConnectionType(element.key)"
-              class="ml-2"
+              class="ml-2 mb-3"
             >Link {{element.key}}</v-btn>
             <v-btn
               flat
@@ -32,6 +32,7 @@
               small
               outline
               @click="deleteConnectionDialog = true"
+              class="mb-3"
             >Remove seleted</v-btn>
           </v-card-actions>
         </v-card>
@@ -57,8 +58,8 @@
       </v-card>
     </v-dialog>
 
-    <b-card no-body class="connections col-lg-12 col-md-8 col-sm-6 col-xs-4" bg-variant="light">
-      <b-card
+    <div no-body class="connections col-lg-12 col-md-8 col-sm-6 col-xs-4" bg-variant="light">
+      <!-- <b-card
         v-for="element in relations"
         v-bind:key="element.key"
         class="col-lg-12 col-sm-12 col-md-12 col-xs-12"
@@ -85,7 +86,7 @@
             <router-link :to="item.href">{{item.title}}</router-link>
           </b-form-checkbox>
         </div>
-      </b-card>
+      </b-card>-->
 
       <b-modal
         id="modalnew"
@@ -141,7 +142,7 @@
           class="my-0"
         />
       </b-modal>
-      <b-modal
+      <!-- <b-modal
         id="delete"
         button-size="sm"
         title="Delete connections?"
@@ -150,8 +151,8 @@
         ok-variant="warning"
         ok-title="Delete"
         @ok="handleDeleteConnections()"
-      ></b-modal>
-    </b-card>
+      ></b-modal>-->
+    </div>
   </div>
 </template>
 

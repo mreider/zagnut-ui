@@ -71,8 +71,11 @@
               <v-checkbox label="Archived" class="checkbox" v-model="form.archived"></v-checkbox>
             </v-flex>
             <v-flex xs8></v-flex>
-            <v-flex xs12>
+            <v-flex xs8>
               <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
+            </v-flex>
+            <v-flex xs4>
+              <Connections :toConnectionData="toConnectionData"></Connections>
             </v-flex>
           </v-layout>
         </v-container>
@@ -81,14 +84,40 @@
       <v-card-actions>
         <v-layout row wrap>
           <v-flex xs-12>
-            <v-btn color="blue darken-1" class="save-and-close-button" flat medium>Save and close</v-btn>
-            <v-btn color="blue darken-1" flat medium>Back</v-btn>
-            <v-btn color="blue darken-1" flat medium>Delete</v-btn>
+            <v-btn
+              color="blue darken-1"
+              class="save-and-close-button"
+              @click="handleSaveInitiative()"
+              flat
+              medium
+            >Save and close</v-btn>
+            <v-btn color="blue darken-1" flat medium @click="$router.go(-1)">Back</v-btn>
+            <v-btn color="blue darken-1" flat medium @click="dialogDeleteInitiative = true">Delete</v-btn>
           </v-flex>
         </v-layout>
       </v-card-actions>
     </v-card>
-    <b-card no-body bg-variant="light" class="card col-lg-12">
+
+    <v-dialog v-model="dialogDeleteInitiative" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="dialogDeleteInitiative = false"
+            small
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="error" flat="flat" outline @click="handleInitiativeDelete()" small>Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- <b-card no-body bg-variant="light" class="card col-lg-12">
       <div class="container row">
         <div class="col-lg-8 col-md-8 cols-sm-6 col-xs-4">
           <b-form-group label-for="title">
@@ -220,7 +249,7 @@
         @ok="handleInitiativeDelete()"
         ok-title="delete"
       ></b-modal>
-    </b-card>
+    </b-card>-->
   </div>
 </template>
 
@@ -256,7 +285,8 @@ export default {
         vote: null,
         archived: false
       },
-      admin: false
+      admin: false,
+      dialogDeleteInitiative: false
     };
   },
   async mounted() {
@@ -280,8 +310,10 @@ export default {
           }`
         );
         let success = _get(response, "data.success");
+        this.dialogDeleteInitiative = false;
         if (!success) throw new Error(`Unable delete initiative.`);
       } catch (error) {
+        this.dialogDeleteInitiative = false;
         return this.$errorMessage.show(error);
       } finally {
         this.$notify({

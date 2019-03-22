@@ -7,7 +7,7 @@
                 Show comments
     </b-btn>-->
     <v-layout row wrap v-for="element in comments" :key="element.id">
-      <v-flex xs7>
+      <v-flex xs9>
         <v-textarea
           :ref="'comment' + element.id"
           :id="'comment' + element.id"
@@ -19,7 +19,7 @@
         ></v-textarea>
         <label class="label-comment">{{labelComment(element)}}</label>
       </v-flex>
-      <v-flex xs5 align-content-end>
+      <v-flex xs3 align-content-end>
         <v-btn
           flat
           icon
@@ -50,7 +50,7 @@
       </v-flex>
     </v-layout>
     <v-layout row wrap>
-      <v-flex xs7 mt-4>
+      <v-flex xs9 mt-4>
         <v-textarea
           id="newComment"
           v-model="newComment"
@@ -62,7 +62,7 @@
           outline
         ></v-textarea>
       </v-flex>
-      <v-flex xs5 align-content-end>
+      <v-flex xs3 align-content-end>
         <v-btn
           flat
           icon
