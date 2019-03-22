@@ -1,114 +1,166 @@
 <template>
-  <b-card  no-body class="connections col-lg-12 col-md-8 col-sm-6 col-xs-4" bg-variant="light">
-     <b-card  v-for="element in relations" v-bind:key="element.key" class="col-lg-12 col-sm-12 col-md-12 col-xs-12" style="margin-top: 1em; margin-bottom: 1em">
+  <div>
+    <v-layout row wrap>
+      <v-flex xs12 sm6>
+        <v-card v-for="element in relations" v-bind:key="element.key">
+          <v-list subheader two-line>
+            <v-subheader>Linked {{element.key}}s</v-subheader>
+            <v-list-tile v-for="item in element.data" v-bind:key="item.id">
+              <v-list-tile-action>
+                <v-checkbox v-model="item.selected"></v-checkbox>
+              </v-list-tile-action>
+
+              <v-list-tile-content @click="invites = !invites">
+                <v-list-tile-sub-title>
+                  <router-link :to="item.href">{{item.title}}</router-link>
+                </v-list-tile-sub-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-card>
+      </v-flex>
+    </v-layout>
+
+    <b-card no-body class="connections col-lg-12 col-md-8 col-sm-6 col-xs-4" bg-variant="light">
+      <b-card
+        v-for="element in relations"
+        v-bind:key="element.key"
+        class="col-lg-12 col-sm-12 col-md-12 col-xs-12"
+        style="margin-top: 1em; margin-bottom: 1em"
+      >
         <div class="float-right">
-          <b-btn size="sm" style="width: 10em" @click="setCurrentConnectionType(element.key)">Link {{element.key}}</b-btn>
-        <br>
-          <b-btn style="margin-top: 0.5em; width: 10em;" variant="danger" size="sm" v-b-modal.delete>Remove seleted</b-btn>
+          <b-btn
+            size="sm"
+            style="width: 10em"
+            @click="setCurrentConnectionType(element.key)"
+          >Link {{element.key}}</b-btn>
+          <br>
+          <b-btn
+            style="margin-top: 0.5em; width: 10em;"
+            variant="danger"
+            size="sm"
+            v-b-modal.delete
+          >Remove seleted</b-btn>
         </div>
         <br>
-        <div v-for="item in element.data" v-bind:key="item.id" class="" style="margin-top: 1em">
-          <b-form-checkbox v-model="item.selected">   <router-link :to="item.href">{{item.title}}</router-link>  </b-form-checkbox>
+
+        <div v-for="item in element.data" v-bind:key="item.id" class style="margin-top: 1em">
+          <b-form-checkbox v-model="item.selected">
+            <router-link :to="item.href">{{item.title}}</router-link>
+          </b-form-checkbox>
         </div>
       </b-card>
-    <b-modal id="modalnew"
-              button-size="sm"
-              :title="'Link ' + currentConnectionType + 's'"
-              size="lg"
-              centered
-              @ok="handleNewConnections()"
-              ok-title="Link selected"
-              ref="modalnew"
-              >
+
+      <b-modal
+        id="modalnew"
+        button-size="sm"
+        :title="'Link ' + currentConnectionType + 's'"
+        size="lg"
+        centered
+        @ok="handleNewConnections()"
+        ok-title="Link selected"
+        ref="modalnew"
+      >
         <div class="col-lg-7 col-md-4">
-          <b-form-checkbox style="float-right" id="checkbox0" v-model="showArchived" @change="reload"> Show archived </b-form-checkbox>
+          <b-form-checkbox
+            style="float-right"
+            id="checkbox0"
+            v-model="showArchived"
+            @change="reload"
+          >Show archived</b-form-checkbox>
         </div>
 
-        <b-input-group  class="col-lg-5 col-md-4">
-          <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter" />
+        <b-input-group class="col-lg-5 col-md-4">
+          <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter"/>
           <b-input-group-append>
-            <b-btn size="sm" class="btnHeader "  :disabled="!filter" @click="filter = ''">Clear</b-btn>
+            <b-btn size="sm" class="btnHeader" :disabled="!filter" @click="filter = ''">Clear</b-btn>
           </b-input-group-append>
-        </b-input-group >
+        </b-input-group>
 
-      <b-table  bordered
-                fixed
-                responsive
-                :items="connectionTable"
-                :fields="connectionsFieldToAdd"
-                :filter="filter"
-                :current-page="currentPage"
-                :per-page="perPage"
-                @filtered="onFiltered"
-                style="margin-top:5px;"
-                >
+        <b-table
+          bordered
+          fixed
+          responsive
+          :items="connectionTable"
+          :fields="connectionsFieldToAdd"
+          :filter="filter"
+          :current-page="currentPage"
+          :per-page="perPage"
+          @filtered="onFiltered"
+          style="margin-top:5px;"
+        >
           <template slot="title" slot-scope="data">
-            <b-form-checkbox v-model="data.item.selected">  <router-link :to="data.item.href"> {{data.item.title}} </router-link> </b-form-checkbox>
+            <b-form-checkbox v-model="data.item.selected">
+              <router-link :to="data.item.href">{{data.item.title}}</router-link>
+            </b-form-checkbox>
           </template>
           <template slot="description" slot-scope="data">
             <router-link :to="data.item.href">{{data.item.title}}</router-link>
           </template>
-      </b-table>
-      <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
-    </b-modal>
-    <b-modal id="delete"
-                    button-size="sm"
-                    title="Delete connections?"
-                    size="sm"
-                    centered
-                    ok-variant="warning"
-                    ok-title="Delete"
-                    @ok="handleDeleteConnections()"
-          >
-    </b-modal>
-
-  </b-card>
+        </b-table>
+        <b-pagination
+          :total-rows="totalRows"
+          :per-page="perPage"
+          v-model="currentPage"
+          class="my-0"
+        />
+      </b-modal>
+      <b-modal
+        id="delete"
+        button-size="sm"
+        title="Delete connections?"
+        size="sm"
+        centered
+        ok-variant="warning"
+        ok-title="Delete"
+        @ok="handleDeleteConnections()"
+      ></b-modal>
+    </b-card>
+  </div>
 </template>
 
 <script>
-import _get from 'lodash/get';
-import _ from 'lodash';
+import _get from "lodash/get";
+import _ from "lodash";
 export default {
-  name: 'connections',
-  props: ['toConnectionData'],
+  name: "connections",
+  props: ["toConnectionData"],
   data() {
     return {
       relations: [],
-      connectionsFieldToAdd:
-      [
-        { key: 'title', sortable: true, label: '' },
-        { key: 'description', sortable: true }
+      connectionsFieldToAdd: [
+        { key: "title", sortable: true, label: "" },
+        { key: "description", sortable: true }
       ],
-      currentConnectionType: '',
+      currentConnectionType: "",
       connectionTable: [],
-      filter: '',
+      filter: "",
       currentPage: 0,
       totalRows: 0,
       perPage: 10,
       showArchived: false
     };
   },
-  async mounted () {
+  async mounted() {
     await this.loadRelaitedList();
   },
-  computed: {
-  },
+  computed: {},
 
   methods: {
     async reload(checked) {
       this.showArchived = checked;
       let element = this.currentConnectionType;
-      if (element === 'backlog') {
+      if (element === "backlog") {
         await this.loadOrgBacklogs(element);
-      } else if (element === 'initiative') {
+      } else if (element === "initiative") {
         await this.loadOrgInitiatives(element);
-      } else if (element === 'item') {
+      } else if (element === "item") {
         await this.loadOrgItems(element);
-      } else if (element === 'bug') {
+      } else if (element === "bug") {
         await this.loadOrgBugs(element);
-      };
+      }
       this.connectionsFieldToAdd.forEach(el => {
-        if (el.key === 'title') el.label = element;
+        if (el.key === "title") el.label = element;
       });
     },
     async loadRelaitedList() {
@@ -119,21 +171,21 @@ export default {
     },
     async setCurrentConnectionType(element) {
       this.currentConnectionType = element;
-      if (element === 'backlog') {
+      if (element === "backlog") {
         await this.loadOrgBacklogs(element);
-      } else if (element === 'initiative') {
+      } else if (element === "initiative") {
         await this.loadOrgInitiatives(element);
-      } else if (element === 'item') {
+      } else if (element === "item") {
         await this.loadOrgItems(element);
-      } else if (element === 'bug') {
+      } else if (element === "bug") {
         await this.loadOrgBugs(element);
-      };
+      }
       this.connectionsFieldToAdd.forEach(el => {
-        if (el.key === 'title') el.label = element;
+        if (el.key === "title") el.label = element;
       });
       this.$refs.modalnew.show();
     },
-    onFiltered (filteredItems) {
+    onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
@@ -150,17 +202,24 @@ export default {
     async loadOrgItems() {
       const orgId = this.$route.query.orgId;
       try {
-        const response = await this.axios.get(`/api/items/all/${this.showArchived}/backlogs/${orgId}`);
+        const response = await this.axios.get(
+          `/api/items/all/${this.showArchived}/backlogs/${orgId}`
+        );
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        let items = _get(response, 'data.items');
+        let items = _get(response, "data.items");
         items.forEach(element => {
           element.selected = false;
-          element.href = '/items' + '/item/?orgId=' + this.$store.state.organization.id + '&itemId=' + element.id;
+          element.href =
+            "/items" +
+            "/item/?orgId=" +
+            this.$store.state.organization.id +
+            "&itemId=" +
+            element.id;
         });
-        items = await this.deleteConnected('item', items);
+        items = await this.deleteConnected("item", items);
 
         this.connectionTable = items;
       } catch (error) {
@@ -171,18 +230,20 @@ export default {
     async loadOrgBugs() {
       const orgId = this.$route.query.orgId;
       try {
-        const response = await this.axios.get(`/api/bugs/full/${this.showArchived}/${orgId}` + '/false');
+        const response = await this.axios.get(
+          `/api/bugs/full/${this.showArchived}/${orgId}` + "/false"
+        );
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        let bugs = _get(response, 'data.bugs');
+        let bugs = _get(response, "data.bugs");
         bugs.forEach(element => {
           element.selected = false;
-          element.href = '/bug/?orgId=' + orgId + '&bugId=' + element.id;
+          element.href = "/bug/?orgId=" + orgId + "&bugId=" + element.id;
         });
 
-        bugs = await this.deleteConnected('bug', bugs);
+        bugs = await this.deleteConnected("bug", bugs);
 
         this.connectionTable = bugs;
       } catch (error) {
@@ -192,16 +253,20 @@ export default {
     },
     async loadOrgBacklogs() {
       try {
-        const response = await this.axios.get(`/api/backlogs/${this.showArchived}/${this.$store.state.organization.id}`);
+        const response = await this.axios.get(
+          `/api/backlogs/${this.showArchived}/${
+            this.$store.state.organization.id
+          }`
+        );
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to load user's baclogs.`);
 
-        let backlogs = _get(response, 'data.backlogs');
+        let backlogs = _get(response, "data.backlogs");
         backlogs.forEach(element => {
           element.selected = false;
         });
-        backlogs = await this.deleteConnected('backlog', backlogs);
+        backlogs = await this.deleteConnected("backlog", backlogs);
         this.connectionTable = backlogs;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -210,17 +275,25 @@ export default {
     },
     async loadOrgInitiatives() {
       try {
-        const response = await this.axios.get(`/api/initiatives/all/${this.showArchived}/${this.$store.state.organization.id}`);
+        const response = await this.axios.get(
+          `/api/initiatives/all/${this.showArchived}/${
+            this.$store.state.organization.id
+          }`
+        );
 
-        const success = _get(response, 'data.success');
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        let initiatives = _get(response, 'data.initiatives');
+        let initiatives = _get(response, "data.initiatives");
         initiatives.forEach(element => {
-          element.href = '/initiative/?orgId=' + this.$store.state.organization.id + '&initiativeid=' + element.id;
+          element.href =
+            "/initiative/?orgId=" +
+            this.$store.state.organization.id +
+            "&initiativeid=" +
+            element.id;
           element.selected = false;
         });
-        initiatives = await this.deleteConnected('initiative', initiatives);
+        initiatives = await this.deleteConnected("initiative", initiatives);
         this.connectionTable = initiatives;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -230,11 +303,18 @@ export default {
     async getConnection(element) {
       // const string = ;
       try {
-        const response = await this.axios.get('/api/connections/' + this.toConnectionData.name + '/' + element + '/' + this.toConnectionData.id);
-        let success = _get(response, 'data.success');
+        const response = await this.axios.get(
+          "/api/connections/" +
+            this.toConnectionData.name +
+            "/" +
+            element +
+            "/" +
+            this.toConnectionData.id
+        );
+        let success = _get(response, "data.success");
 
-        if (!success) this.$errorMessage.show('Unable to load connections');
-        let connections = _get(response, 'data.info');
+        if (!success) this.$errorMessage.show("Unable to load connections");
+        let connections = _get(response, "data.info");
 
         let newObj = {};
         newObj.key = element;
@@ -242,13 +322,25 @@ export default {
 
         connections.forEach(el => {
           el.selected = false;
-          if (element === 'initiative') {
-            el.href = '/initiative/?orgId=' + this.$store.state.organization.id + '&initiativeid=' + el.id;
-          } else if (element === 'item') {
-            el.href = '/items/item/?orgId=' + this.$store.state.organization.id + '&itemId=' + el.id;
-          } else if (element === 'bug') {
-            el.href = '/bug/?orgId=' + this.$store.state.organization.id + '&bugId=' + el.id;
-          };
+          if (element === "initiative") {
+            el.href =
+              "/initiative/?orgId=" +
+              this.$store.state.organization.id +
+              "&initiativeid=" +
+              el.id;
+          } else if (element === "item") {
+            el.href =
+              "/items/item/?orgId=" +
+              this.$store.state.organization.id +
+              "&itemId=" +
+              el.id;
+          } else if (element === "bug") {
+            el.href =
+              "/bug/?orgId=" +
+              this.$store.state.organization.id +
+              "&bugId=" +
+              el.id;
+          }
         });
 
         this.relations.push(newObj);
@@ -264,25 +356,37 @@ export default {
         let arrInitiatives = [];
         let arrBugs = [];
 
-        if (this.currentConnectionType === 'backlog') {
+        if (this.currentConnectionType === "backlog") {
           this.connectionTable.forEach(element => {
             if (element.selected) arrBacklogs.push(element.id);
           });
-        } else if (this.currentConnectionType === 'initiative') {
+        } else if (this.currentConnectionType === "initiative") {
           this.connectionTable.forEach(element => {
             if (element.selected) arrInitiatives.push(element.id);
           });
-        } else if (this.currentConnectionType === 'item') {
+        } else if (this.currentConnectionType === "item") {
           this.connectionTable.forEach(element => {
             if (element.selected) arrItems.push(element.id);
           });
-        } else if (this.currentConnectionType === 'bug') {
+        } else if (this.currentConnectionType === "bug") {
           this.connectionTable.forEach(element => {
             if (element.selected) arrBugs.push(element.id);
           });
-        };
-        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, bugs: arrBugs, delete: false });
-        const success = _get(response, 'data.success');
+        }
+        const response = await this.axios.post(
+          "/api/connections/" +
+            this.toConnectionData.name +
+            "/" +
+            this.toConnectionData.id,
+          {
+            items: arrItems,
+            initiatives: arrInitiatives,
+            backlogs: arrBacklogs,
+            bugs: arrBugs,
+            delete: false
+          }
+        );
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to add connection.`);
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -299,26 +403,38 @@ export default {
         let arrBugs = [];
 
         this.relations.forEach(element => {
-          if (element.key === 'backlog') {
+          if (element.key === "backlog") {
             element.data.forEach(el => {
               if (el.selected) arrBacklogs.push(el.id);
             });
-          } else if (element.key === 'initiative') {
+          } else if (element.key === "initiative") {
             element.data.forEach(el => {
               if (el.selected) arrInitiatives.push(el.id);
             });
-          } else if (element.key === 'item') {
+          } else if (element.key === "item") {
             element.data.forEach(el => {
               if (el.selected) arrItems.push(el.id);
             });
-          } else if (element.key === 'bug') {
+          } else if (element.key === "bug") {
             element.data.forEach(el => {
               if (el.selected) arrBugs.push(el.id);
             });
-          };
+          }
         });
-        const response = await this.axios.post('/api/connections/' + this.toConnectionData.name + '/' + this.toConnectionData.id, { items: arrItems, initiatives: arrInitiatives, backlogs: arrBacklogs, bugs: arrBugs, delete: true });
-        const success = _get(response, 'data.success');
+        const response = await this.axios.post(
+          "/api/connections/" +
+            this.toConnectionData.name +
+            "/" +
+            this.toConnectionData.id,
+          {
+            items: arrItems,
+            initiatives: arrInitiatives,
+            backlogs: arrBacklogs,
+            bugs: arrBugs,
+            delete: true
+          }
+        );
+        const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to add connection.`);
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -329,21 +445,19 @@ export default {
     }
   },
 
-  components: {
-  },
-  watch: {
-  }
+  components: {},
+  watch: {}
 };
 </script>
 
 <style lang="scss">
 .btnHeader {
-      width: 4.5em;
-      height: 2em;
-      float: right;
-      margin-top:5px;
-    }
+  width: 4.5em;
+  height: 2em;
+  float: right;
+  margin-top: 5px;
+}
 .hidden_header {
-      display: none;
-    }
+  display: none;
+}
 </style>
