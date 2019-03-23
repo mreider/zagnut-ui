@@ -63,23 +63,26 @@
           >Clear</v-btn>
         </v-flex>
       </v-layout>
-
-      <!--cards section-->
-      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="element in selected" :key="element.id">
-        hello
-        <!-- <v-card>
+    </v-layout>
+    <!--cards section-->
+    <v-layout row wrap v-for="element in selected" :key="element.id">
+      <v-flex xs12>
+        <h5 class="backlogs-cards-header">{{ element.name }}</h5>
+      </v-flex>
+      <v-flex xs6 sm4 md2 lg2 pl-1 pr-1 pt-3 v-for="item in element.filteredItems" :key="item.id">
+        <v-card>
           <v-card-title primary-title>
-            <h4 class="mb-0">
-              Backlog:
+            <h5 class="mb-0">
+              Title:
               <router-link
-                :to="'items/?orgId='+$store.state.organization.id +'&backlogid='+ item.id"
-              >{{ element.title }}</router-link>
-            </h4>
+                :to="'item/?orgId='+$store.state.organization.id +'&itemid='+ item.id"
+              >{{ item.title }}</router-link>
+            </h5>
           </v-card-title>
           <div class="card-body pt-0 pb-0">
             <p class="mb-2">
               Author:
-              <a href="#" @click="filterItems(element.author)">{{element.author }}</a>
+              <a href="#" @click="filterItems(item.author)">{{item.author }}</a>
             </p>
           </div>
           <v-card-actions class="pl-3 pb-2">
@@ -90,26 +93,109 @@
               dark
               small
               color="primary"
-              @click="setCurrentItems(item), dialogItemEdit = true"
+              :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ item.id"
             >
               <i class="material-icons">edit</i>
             </v-btn>
             <v-btn
-              v-if="$store.state.user.id ===  item.createdBy || admin"
               class="delete-button extra-small-button"
               outline
               fab
               dark
               small
               color="primary"
-              @click="setCurrentBacklog(item), dialogDeleteItem = true"
+              @click="setCurrentItem(item), dialogDeleteItem = true"
             >
               <i class="material-icons">delete</i>
             </v-btn>
           </v-card-actions>
-        </v-card>-->
+        </v-card>
       </v-flex>
     </v-layout>
+
+    <v-dialog v-model="dialogNewItem" max-width="850px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{currentItem.title}}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout row wrap>
+              <v-flex xs12 sm7>
+                <v-text-field v-model="newItem.title" placeholder="Title item"></v-text-field>
+                <v-textarea v-model="newItem.description" placeholder="Title description"></v-textarea>
+              </v-flex>
+              <v-flex xs12 sm5>
+                <v-layout row wrap align-center>
+                  <v-flex xs4>
+                    <v-subheader>Status</v-subheader>
+                  </v-flex>
+                  <v-flex xs8>
+                    <v-select
+                      :items="objStatuses"
+                      item-text="name"
+                      item-value="name"
+                      @input="handleItemNewItemSetField($event, 'status')"
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs4>
+                    <v-subheader>Assignee:</v-subheader>
+                  </v-flex>
+                  <v-flex xs8>
+                    <v-select
+                      :items="users"
+                      item-text="`${data.item.firstName} ${data.item.lastName}`"
+                      item-value="`${data.item.firstName} ${data.item.lastName}`"
+                      @input="handleItemNewItemSetField"
+                      return-object
+                      class="pt-0"
+                    >
+                      <template
+                        slot="selection"
+                        slot-scope="data"
+                      >{{ data.item.firstName}} {{data.item.lastName}}</template>
+                      <template slot="item" slot-scope="data">
+                        <v-list-tile-content>
+                          <v-list-tile-title
+                            v-html="`${data.item.firstName} ${data.item.lastName}`"
+                          ></v-list-tile-title>
+                        </v-list-tile-content>
+                      </template>
+                    </v-select>
+                  </v-flex>
+                  <v-flex xs4>
+                    <v-subheader>Points:</v-subheader>
+                  </v-flex>
+                  <v-flex xs8>
+                    <v-select
+                      :items="pointsVar"
+                      :item-text="String(newItem.points)"
+                      :item-value="String(newItem.points)"
+                      @input="handleItemNewItemSetField($event, 'points')"
+                    ></v-select>
+                  </v-flex>
+                </v-layout>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-layout row wrap>
+            <v-flex xs-12>
+              <v-btn
+                color="blue darken-1"
+                class="save-and-close-button"
+                flat
+                medium
+                @click="handleNewItem()"
+              >Save and close</v-btn>
+              <v-btn color="blue darken-1" flat medium @click="dialogNewItem=false">Cancel</v-btn>
+            </v-flex>
+          </v-layout>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <b-card bg-variant="light" class="card col-lg-12">
       <div class="Items">
@@ -353,8 +439,8 @@ export default {
     await this.loadOrgStatuses(true);
     this.selected.forEach(element => {
       this.options.push({ text: element.name, value: element });
-      console.log(this.options);
     });
+    console.log(this.selected);
   },
 
   computed: {},
@@ -640,6 +726,21 @@ export default {
     label {
       margin-bottom: 0;
     }
+  }
+}
+
+.backlogs-cards-header {
+  margin: 15px 10px 0 10px;
+}
+
+.extra-small-button {
+  width: 30px !important;
+  height: 30px !important;
+  &:focus {
+    outline: none;
+  }
+  i {
+    font-size: 15px;
   }
 }
 </style>
