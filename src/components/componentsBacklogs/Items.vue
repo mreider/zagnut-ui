@@ -135,6 +135,7 @@
                       :items="objStatuses"
                       item-text="name"
                       item-value="name"
+                      return-object
                       @input="handleItemNewItemSetField($event, 'status')"
                     ></v-select>
                   </v-flex>
@@ -146,8 +147,7 @@
                       :items="users"
                       item-text="`${data.item.firstName} ${data.item.lastName}`"
                       item-value="`${data.item.firstName} ${data.item.lastName}`"
-                      @input="handleItemNewItemSetField"
-                      return-object
+                      @input="handleItemNewItemSetField($event, 'assignee')"
                       class="pt-0"
                     >
                       <template
@@ -562,6 +562,7 @@ export default {
       }
     },
     async handleItemNewItemSetField(element, name) {
+      console.log(element, name);
       this.newItem[name] = element;
     },
     setCurrentItem(element) {
