@@ -12,8 +12,15 @@
         <v-btn small outline color="success" @click="dialogNewItem = true">New</v-btn>
       </v-toolbar>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
         <div v-for="item in options" :key="item.id">
-          <v-checkbox v-model="selected" :label="item.text" class="checkbox" :value="item.value"></v-checkbox>
+          <v-checkbox
+            v-model="selected"
+            :label="item.text"
+            class="checkbox mr-2"
+            :value="item.value"
+          ></v-checkbox>
         </div>
       </v-toolbar>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
