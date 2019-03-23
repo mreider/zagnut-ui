@@ -197,6 +197,25 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="dialogDeleteItem" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="dialogDeleteBackLog = false"
+            small
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="error" flat="flat" outline @click="handleItemDelete(currentItem)" small>Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <b-card bg-variant="light" class="card col-lg-12">
       <div class="Items">
         <div class="row">
@@ -562,7 +581,6 @@ export default {
       }
     },
     async handleItemNewItemSetField(element, name) {
-      console.log(element, name);
       this.newItem[name] = element;
     },
     setCurrentItem(element) {
