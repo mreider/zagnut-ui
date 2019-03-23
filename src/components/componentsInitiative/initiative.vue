@@ -71,10 +71,10 @@
               <v-checkbox label="Archived" class="checkbox" v-model="form.archived"></v-checkbox>
             </v-flex>
             <v-flex xs8></v-flex>
-            <v-flex xs8>
+            <v-flex xs12 sm8>
               <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
             </v-flex>
-            <v-flex xs4>
+            <v-flex xs12 sm4>
               <Connections :toConnectionData="toConnectionData"></Connections>
             </v-flex>
           </v-layout>
