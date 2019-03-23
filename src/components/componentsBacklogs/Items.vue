@@ -1,196 +1,293 @@
 <template>
-  <b-card bg-variant="light" class="card col-lg-12">
-    <div class="Items">
-      <div class="row">
-        <label class="header col-10">
-          <h2>{{ this.title }}</h2>
-        </label>
-        <div class="col-2">
-          <b-btn class="float-right btnHeader" variant="primary" size="sm" v-b-modal.modalnew>New</b-btn>
-          <b-btn
-            class="float-right btnHeader"
-            variant="secondary"
-            size="sm"
-            @click="$router.go(-1)"
-          >close</b-btn>
-        </div>
-
-        <div class="col-6">
-          <b-form-checkbox
-            style="float-right"
-            id="checkbox0"
+  <v-container fluid>
+    <div v-if="loading === true">
+      <loading-indication></loading-indication>
+    </div>
+    <v-layout row wrap>
+      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
+        <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
+        <v-spacer class="hidden-md-and-down"></v-spacer>
+        <v-btn small outline color="success" @click="dialogNewItem = true">New</v-btn>
+      </v-toolbar>
+      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-text-field label="Filter" v-model="filter" single-line class="pt-0" @keyup="filterItems"></v-text-field>
+        <v-btn
+          small
+          outline
+          class="pt-0 mt-0 clear-filter-botton"
+          @click="filter = '', clearItemsFilter()"
+        >Clear</v-btn>
+      </v-toolbar>
+      <!--toolbar for mobile sizes-->
+      <v-layout row wrap justify-center>
+        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
+          <!--new initiative dialog-->
+          <v-btn small outline color="success" @click="dialogNewBackLog = true">New</v-btn>
+          <v-checkbox
+            label="Show archived"
+            class="checkbox pl-2 pr-2"
             v-model="showArchived"
             @change="reload"
-          >Show archived</b-form-checkbox>
-        </div>
+          ></v-checkbox>
+        </v-flex>
+        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
+          <v-text-field
+            label="Filter"
+            @keyup="filterItems"
+            single-line
+            class="pt-0 pl-2 pr-2"
+            v-model="filter"
+          ></v-text-field>
+          <v-btn
+            small
+            outline
+            class="pt-0 mt-0 clear-filter-botton"
+            @click="filter = '', clearItemsFilter()"
+          >Clear</v-btn>
+        </v-flex>
+      </v-layout>
 
-        <div class="col-6">
-          <b-form-group label="Show: " label-for="statuses" class="float-right">
-            <b-form-checkbox-group
-              id="statuses"
-              name="statuses"
-              v-model="selected"
-              :options="options"
-              class="float-right"
-            ></b-form-checkbox-group>
-          </b-form-group>
-        </div>
+      <!--cards section-->
+      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in Items" :key="item.id">
+        <v-card>
+          <v-card-title primary-title>
+            <h4 class="mb-0">
+              Backlog:
+              <router-link
+                :to="'items/?orgId='+$store.state.organization.id +'&backlogid='+ item.id"
+              >{{ item.title }}</router-link>
+            </h4>
+          </v-card-title>
+          <div class="card-body pt-0 pb-0">
+            <p class="mb-2">
+              Author:
+              <a href="#" @click="filterItems(item.author)">{{item.author }}</a>
+            </p>
+          </div>
+          <v-card-actions class="pl-3 pb-2">
+            <v-btn
+              class="edit-button extra-small-button"
+              outline
+              fab
+              dark
+              small
+              color="primary"
+              @click="setCurrentItems(item), dialogItemEdit = true"
+            >
+              <i class="material-icons">edit</i>
+            </v-btn>
+            <v-btn
+              v-if="$store.state.user.id ===  item.createdBy || admin"
+              class="delete-button extra-small-button"
+              outline
+              fab
+              dark
+              small
+              color="primary"
+              @click="setCurrentBacklog(item), dialogDeleteItem = true"
+            >
+              <i class="material-icons">delete</i>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
 
-        <div class="col-6"></div>
-        <b-input-group class="col-6">
-          <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter"/>
-          <b-input-group-append>
-            <b-btn size="sm" class="btnHeader" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-          </b-input-group-append>
-        </b-input-group>
-      </div>
-      <div v-for="element in selected" v-bind:key="element.id" class="row">
-        <h6>{{ element.name }}</h6>
-        <b-table
-          bordered
-          fixed
-          responsive
-          :items="element.filteredItems"
-          :fields="itemsFields"
-          thead-class="hidden_header"
-          :filter="filter"
-        >
-          <template slot="title" slot-scope="data" class="col-8">
-            <router-link
-              :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id"
-              v-on:click="setCurrentItem(data.item)"
-            >{{ data.item.title }}</router-link>
-          </template>
-          <template slot="author" slot-scope="data" class="col-4">
-            <a :href="`#`" v-on:click="filter = data.item.author">{{ data.item.author }}</a>
-            <div style="float: right;">
-              <b-button
-                style="vertical-align: right;"
-                variant="primary"
-                size="sm"
+    <b-card bg-variant="light" class="card col-lg-12">
+      <div class="Items">
+        <div class="row">
+          <label class="header col-10">
+            <h2>{{ this.title }}</h2>
+          </label>
+          <div class="col-2">
+            <b-btn class="float-right btnHeader" variant="primary" size="sm" v-b-modal.modalnew>New</b-btn>
+            <b-btn
+              class="float-right btnHeader"
+              variant="secondary"
+              size="sm"
+              @click="$router.go(-1)"
+            >close</b-btn>
+          </div>
+
+          <div class="col-6">
+            <b-form-checkbox
+              style="float-right"
+              id="checkbox0"
+              v-model="showArchived"
+              @change="reload"
+            >Show archived</b-form-checkbox>
+          </div>
+
+          <div class="col-6">
+            <b-form-group label="Show: " label-for="statuses" class="float-right">
+              <b-form-checkbox-group
+                id="statuses"
+                name="statuses"
+                v-model="selected"
+                :options="options"
+                class="float-right"
+              ></b-form-checkbox-group>
+            </b-form-group>
+          </div>
+
+          <div class="col-6"></div>
+          <b-input-group class="col-6">
+            <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter"/>
+            <b-input-group-append>
+              <b-btn size="sm" class="btnHeader" :disabled="!filter" @click="filter = ''">Clear</b-btn>
+            </b-input-group-append>
+          </b-input-group>
+        </div>
+        <div v-for="element in selected" v-bind:key="element.id" class="row">
+          <h6>{{ element.name }}</h6>
+          <b-table
+            bordered
+            fixed
+            responsive
+            :items="element.filteredItems"
+            :fields="itemsFields"
+            thead-class="hidden_header"
+            :filter="filter"
+          >
+            <template slot="title" slot-scope="data" class="col-8">
+              <router-link
                 :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id"
-              >
-                <font-awesome-icon icon="pencil-alt"/>
-              </b-button>
-              <b-button
-                style="bottom"
-                variant="danger"
-                size="sm"
-                v-b-modal.delete
-                @click="setCurrentItem(data.item)"
-              >
-                <font-awesome-icon icon="trash-alt"/>
-              </b-button>
-            </div>
-          </template>
-        </b-table>
-      </div>
+                v-on:click="setCurrentItem(data.item)"
+              >{{ data.item.title }}</router-link>
+            </template>
+            <template slot="author" slot-scope="data" class="col-4">
+              <a :href="`#`" v-on:click="filter = data.item.author">{{ data.item.author }}</a>
+              <div style="float: right;">
+                <b-button
+                  style="vertical-align: right;"
+                  variant="primary"
+                  size="sm"
+                  :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id"
+                >
+                  <font-awesome-icon icon="pencil-alt"/>
+                </b-button>
+                <b-button
+                  style="bottom"
+                  variant="danger"
+                  size="sm"
+                  v-b-modal.delete
+                  @click="setCurrentItem(data.item)"
+                >
+                  <font-awesome-icon icon="trash-alt"/>
+                </b-button>
+              </div>
+            </template>
+          </b-table>
+        </div>
 
-      <b-modal
-        id="edit"
-        title="Edit"
-        button-size="sm"
-        size="sm"
-        centered
-        ok-variant="submit"
-        @ok="handleItemEditTitle(currentItem, newNameOldItem)"
-        ok-title="submit"
-      >
-        <b-form-input v-model="newNameOldItem" :placeholder="currentItem.title"></b-form-input>
-      </b-modal>
-      <b-modal
-        id="delete"
-        :title="'Wait. Are you sure you want to delete this permanently?'"
-        button-size="sm"
-        size="sm"
-        centered
-        body-class="zero-size"
-        ok-variant="danger"
-        @ok="handleItemDelete(currentItem)"
-        ok-title="delete"
-      ></b-modal>
+        <b-modal
+          id="edit"
+          title="Edit"
+          button-size="sm"
+          size="sm"
+          centered
+          ok-variant="submit"
+          @ok="handleItemEditTitle(currentItem, newNameOldItem)"
+          ok-title="submit"
+        >
+          <b-form-input v-model="newNameOldItem" :placeholder="currentItem.title"></b-form-input>
+        </b-modal>
+        <b-modal
+          id="delete"
+          :title="'Wait. Are you sure you want to delete this permanently?'"
+          button-size="sm"
+          size="sm"
+          centered
+          body-class="zero-size"
+          ok-variant="danger"
+          @ok="handleItemDelete(currentItem)"
+          ok-title="delete"
+        ></b-modal>
 
-      <b-modal
-        id="modalnew"
-        button-size="sm"
-        title="New item"
-        @ok="handleNewItem()"
-        size="lg"
-        centered
-      >
-        <b-form-group label="Title: " label-for="title" horizontal>
-          <b-form-input v-model="newItem.title" placeholder="Title item" id="title">></b-form-input>
-        </b-form-group>
-        <div>
-          <b-form-group label="Description: " label-for="description" horizontal>
-            <b-form-textarea
-              id="description"
-              v-model="newItem.description"
-              placeholder="Title description"
-              :rows="3"
-              :max-rows="6"
-            ></b-form-textarea>
+        <b-modal
+          id="modalnew"
+          button-size="sm"
+          title="New item"
+          @ok="handleNewItem()"
+          size="lg"
+          centered
+        >
+          <b-form-group label="Title: " label-for="title" horizontal>
+            <b-form-input v-model="newItem.title" placeholder="Title item" id="title">></b-form-input>
           </b-form-group>
-        </div>
-
-        <div class="newItemtable row">
-          <div class="col">
-            <b-form-group label="Status: " label-for="labelStatus">
-              <b-dropdown
-                :text="newItem.status.name"
-                name="newItemStatuses"
-                size="sm"
-                class="statuses m-2"
-              >
-                <b-dropdown-item
-                  v-for="element in objStatuses"
-                  v-bind:key="element.id"
-                  @click="handleItemNewItemSetField(element, 'status')"
-                  size="sm"
-                >{{ element.name }}</b-dropdown-item>
-              </b-dropdown>
+          <div>
+            <b-form-group label="Description: " label-for="description" horizontal>
+              <b-form-textarea
+                id="description"
+                v-model="newItem.description"
+                placeholder="Title description"
+                :rows="3"
+                :max-rows="6"
+              ></b-form-textarea>
             </b-form-group>
           </div>
 
-          <div class="col">
-            <b-form-group label="Assignee: " label-for="newItemAssignee">
-              <b-dropdown
-                :text="handleUsername(newItem.assignee)"
-                name="newItemAssignee"
-                size="sm"
-                class="users m-2"
-              >
-                <b-dropdown-item
-                  v-for="element in users"
-                  v-bind:key="element.userId"
-                  @click="handleItemNewItemSetField(element, 'assignee')"
+          <div class="newItemtable row">
+            <div class="col">
+              <b-form-group label="Status: " label-for="labelStatus">
+                <b-dropdown
+                  :text="newItem.status.name"
+                  name="newItemStatuses"
                   size="sm"
-                >{{ handleUsername(element) }}</b-dropdown-item>
-              </b-dropdown>
-            </b-form-group>
-          </div>
+                  class="statuses m-2"
+                >
+                  <b-dropdown-item
+                    v-for="element in objStatuses"
+                    v-bind:key="element.id"
+                    @click="handleItemNewItemSetField(element, 'status')"
+                    size="sm"
+                  >{{ element.name }}</b-dropdown-item>
+                </b-dropdown>
+              </b-form-group>
+            </div>
 
-          <div class="col">
-            <b-form-group label="Points: " label-for="newItemPoints">
-              <b-dropdown
-                :text="String(newItem.points)"
-                name="newItemPoints"
-                size="sm"
-                class="points m-2"
-              >
-                <b-dropdown-item
-                  v-for="element in pointsVar"
-                  v-bind:key="element"
-                  @click="handleItemNewItemSetField(element, 'points')"
+            <div class="col">
+              <b-form-group label="Assignee: " label-for="newItemAssignee">
+                <b-dropdown
+                  :text="handleUsername(newItem.assignee)"
+                  name="newItemAssignee"
                   size="sm"
-                >{{ element }}</b-dropdown-item>
-              </b-dropdown>
-            </b-form-group>
+                  class="users m-2"
+                >
+                  <b-dropdown-item
+                    v-for="element in users"
+                    v-bind:key="element.userId"
+                    @click="handleItemNewItemSetField(element, 'assignee')"
+                    size="sm"
+                  >{{ handleUsername(element) }}</b-dropdown-item>
+                </b-dropdown>
+              </b-form-group>
+            </div>
+
+            <div class="col">
+              <b-form-group label="Points: " label-for="newItemPoints">
+                <b-dropdown
+                  :text="String(newItem.points)"
+                  name="newItemPoints"
+                  size="sm"
+                  class="points m-2"
+                >
+                  <b-dropdown-item
+                    v-for="element in pointsVar"
+                    v-bind:key="element"
+                    @click="handleItemNewItemSetField(element, 'points')"
+                    size="sm"
+                  >{{ element }}</b-dropdown-item>
+                </b-dropdown>
+              </b-form-group>
+            </div>
           </div>
-        </div>
-      </b-modal>
-    </div>
-  </b-card>
+        </b-modal>
+      </div>
+    </b-card>
+  </v-container>
 </template>
 
 <script>
@@ -202,6 +299,13 @@ export default {
   name: "Items",
   data() {
     return {
+      loading: false,
+      dialogNewItem: false,
+      dialogItemEdit: false,
+      dialogDeleteItem: false,
+      initialBItems: [],
+      initialFilteredItems: null,
+      filteredItems: null,
       objStatuses: [],
       groupByList: ["Status", "Stategic initiative"],
       currentGroupBy: "Status",
@@ -450,6 +554,39 @@ export default {
         element.totalRows = filteredItems.length;
         element.currentPage = 1;
       });
+    },
+    filterItems(clickParam) {
+      let items = this.initialitems;
+      let filterInputValue;
+
+      if (typeof clickParam === "string") {
+        filterInputValue = clickParam;
+      } else {
+        filterInputValue = this.filter;
+      }
+
+      let filterKeys = ["title", "author"];
+      for (let i = 0, len = items.length; i < len; i++) {
+        this.filteredItems = items.filter(function(obj) {
+          return filterKeys.some(function(key) {
+            if (typeof obj[key] === "string" || typeof obj[key] === "number") {
+              return obj[key]
+                .toString()
+                .toLowerCase()
+                .includes(filterInputValue.toLowerCase());
+            }
+            if (typeof obj[key] === "object") {
+              return obj[key]["horizon"]
+                .toLowerCase()
+                .includes(filterInputValue.toLowerCase());
+            }
+          });
+        });
+      }
+      this.initialFilteredItems = this.filteredItems.slice();
+    },
+    clearItemsFilter() {
+      this.filteredItems = null;
     }
   },
   watch: {
