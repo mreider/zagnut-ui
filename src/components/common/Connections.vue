@@ -140,9 +140,6 @@ export default {
       currentConnectionType: "",
       connectionTable: [],
       filter: "",
-      // currentPage: 0,
-      // totalRows: 0,
-      // perPage: 10,
       showArchived: false,
       deleteConnectionDialog: false,
       modalnew: false
@@ -151,20 +148,7 @@ export default {
   async mounted() {
     await this.loadRelaitedList();
   },
-  computed: {
-    pages() {
-      if (
-        this.pagination.rowsPerPage == null ||
-        this.pagination.totalItems == null
-      ) {
-        return 0;
-      }
-
-      return Math.ceil(
-        this.pagination.totalItems / this.pagination.rowsPerPage
-      );
-    }
-  },
+  computed: {},
   methods: {
     async reload(checked) {
       this.showArchived = checked;
@@ -406,6 +390,7 @@ export default {
           }
         );
         const success = _get(response, "data.success");
+        this.modalnew = false;
         if (!success) throw new Error(`Unable to add connection.`);
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -450,10 +435,7 @@ export default {
             initiatives: arrInitiatives,
             backlogs: arrBacklogs,
             bugs: arrBugs,
-            delete: true,
-            pagination: {
-              rowsPerPage: 10
-            }
+            delete: true
           }
         );
         const success = _get(response, "data.success");

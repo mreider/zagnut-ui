@@ -1,11 +1,5 @@
 <template>
   <div>
-    <!-- <b-btn @click="showComments = !showComments"
-                    :class="showComments ? 'collapsed' : null"
-                    aria-controls="collapse4"
-                    :aria-expanded="showComments ? 'true' : 'false'">
-                Show comments
-    </b-btn>-->
     <v-layout row wrap v-for="element in comments" :key="element.id">
       <v-flex xs9>
         <v-textarea
