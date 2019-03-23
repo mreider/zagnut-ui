@@ -553,7 +553,7 @@ export default {
     margin-bottom: 0;
   }
   .save-and-close-button {
-    margin-left: 20px;
+    margin-left: 30px;
     @media screen and (max-width: 420px) {
       margin-left: 28px;
     }

@@ -5,11 +5,19 @@
     </div>
     <v-layout row wrap>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
-        <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
+        <h3>{{ this.title }}</h3>
+
         <v-spacer class="hidden-md-and-down"></v-spacer>
+        <v-btn small outline color="pink" @click="$router.go(-1)">close</v-btn>
         <v-btn small outline color="success" @click="dialogNewItem = true">New</v-btn>
       </v-toolbar>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
+        <div v-for="item in options" :key="item.id">
+          <v-checkbox v-model="selected" :label="item.text" class="checkbox" :value="item.value"></v-checkbox>
+        </div>
+      </v-toolbar>
+      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
+        <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
         <v-text-field label="Filter" v-model="filter" single-line class="pt-0" @keyup="filterItems"></v-text-field>
@@ -50,20 +58,21 @@
       </v-layout>
 
       <!--cards section-->
-      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in Items" :key="item.id">
-        <v-card>
+      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="element in selected" :key="element.id">
+        hello
+        <!-- <v-card>
           <v-card-title primary-title>
             <h4 class="mb-0">
               Backlog:
               <router-link
                 :to="'items/?orgId='+$store.state.organization.id +'&backlogid='+ item.id"
-              >{{ item.title }}</router-link>
+              >{{ element.title }}</router-link>
             </h4>
           </v-card-title>
           <div class="card-body pt-0 pb-0">
             <p class="mb-2">
               Author:
-              <a href="#" @click="filterItems(item.author)">{{item.author }}</a>
+              <a href="#" @click="filterItems(element.author)">{{element.author }}</a>
             </p>
           </div>
           <v-card-actions class="pl-3 pb-2">
@@ -91,7 +100,7 @@
               <i class="material-icons">delete</i>
             </v-btn>
           </v-card-actions>
-        </v-card>
+        </v-card>-->
       </v-flex>
     </v-layout>
 
@@ -337,6 +346,7 @@ export default {
     await this.loadOrgStatuses(true);
     this.selected.forEach(element => {
       this.options.push({ text: element.name, value: element });
+      console.log(this.options);
     });
   },
 
@@ -616,6 +626,13 @@ export default {
   }
   .hidden_header {
     display: none;
+  }
+}
+.v-toolbar__content {
+  .checkbox {
+    label {
+      margin-bottom: 0;
+    }
   }
 }
 </style>
