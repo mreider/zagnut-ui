@@ -63,6 +63,7 @@
           color="primary"
           v-if="toCommentsData.admin"
           @click="handleNewComment(newComment)"
+          class="add-comment-button"
         >
           <v-icon>add</v-icon>
         </v-btn>
@@ -280,5 +281,14 @@ export default {
 .label-comment {
   display: block;
   margin-top: -15px;
+}
+.add-comment-button {
+  @media screen and (max-width: 420px) {
+    margin-top: -25px;
+    margin-left: 0px;
+  }
+}
+.v-btn__content {
+  font-size: 10px;
 }
 </style>

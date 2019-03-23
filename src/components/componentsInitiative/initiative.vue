@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card>
+    <v-card class="initiative-card">
       <v-card-text>
         <v-container grid-list-md>
           <v-layout row wrap>
@@ -71,10 +71,10 @@
               <v-checkbox label="Archived" class="checkbox" v-model="form.archived"></v-checkbox>
             </v-flex>
             <v-flex xs8></v-flex>
-            <v-flex xs12 sm8>
+            <v-flex sm12 md8>
               <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
             </v-flex>
-            <v-flex xs12 sm4>
+            <v-flex sm12 md4>
               <Connections :toConnectionData="toConnectionData"></Connections>
             </v-flex>
           </v-layout>
@@ -89,10 +89,20 @@
               class="save-and-close-button"
               @click="handleSaveInitiative()"
               flat
+              small
               medium
+              outline
             >Save and close</v-btn>
-            <v-btn color="blue darken-1" flat medium @click="$router.go(-1)">Back</v-btn>
-            <v-btn color="blue darken-1" flat medium @click="dialogDeleteInitiative = true">Delete</v-btn>
+            <v-btn color="blue darken-1" small flat medium @click="$router.go(-1)" outline>Back</v-btn>
+            <v-btn
+              color="blue darken-1"
+              flat
+              medium
+              small
+              @click="dialogDeleteInitiative = true"
+              outline
+              class="delete-button"
+            >Delete</v-btn>
           </v-flex>
         </v-layout>
       </v-card-actions>
@@ -536,5 +546,26 @@ export default {
 .description {
   outline: 0in;
   border: 1px solid lightblue;
+}
+.initiative-card {
+  padding-bottom: 20px;
+  label.v-label.theme--light {
+    margin-bottom: 0;
+  }
+  .save-and-close-button {
+    margin-left: 20px;
+    @media screen and (max-width: 420px) {
+      margin-left: 28px;
+    }
+  }
+  .delete-button {
+    @media screen and (max-width: 322px) {
+      margin-left: 28px !important;
+      margin-top: 10px;
+    }
+  }
+  .v-list__tile.theme--light {
+    height: 35px;
+  }
 }
 </style>
