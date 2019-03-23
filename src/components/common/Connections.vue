@@ -58,101 +58,65 @@
       </v-card>
     </v-dialog>
 
-    <div no-body class="connections col-lg-12 col-md-8 col-sm-6 col-xs-4" bg-variant="light">
-      <!-- <b-card
-        v-for="element in relations"
-        v-bind:key="element.key"
-        class="col-lg-12 col-sm-12 col-md-12 col-xs-12"
-        style="margin-top: 1em; margin-bottom: 1em"
-      >
-        <div class="float-right">
-          <b-btn
-            size="sm"
-            style="width: 10em"
-            @click="setCurrentConnectionType(element.key)"
-          >Link {{element.key}}</b-btn>
-          <br>
-          <b-btn
-            style="margin-top: 0.5em; width: 10em;"
-            variant="danger"
-            size="sm"
-            v-b-modal.delete
-          >Remove seleted</b-btn>
-        </div>
-        <br>
-
-        <div v-for="item in element.data" v-bind:key="item.id" class style="margin-top: 1em">
-          <b-form-checkbox v-model="item.selected">
-            <router-link :to="item.href">{{item.title}}</router-link>
-          </b-form-checkbox>
-        </div>
-      </b-card>-->
-
-      <b-modal
-        id="modalnew"
-        button-size="sm"
-        :title="'Link ' + currentConnectionType + 's'"
-        size="lg"
-        centered
-        @ok="handleNewConnections()"
-        ok-title="Link selected"
-        ref="modalnew"
-      >
-        <div class="col-lg-7 col-md-4">
-          <b-form-checkbox
-            style="float-right"
-            id="checkbox0"
+    <v-dialog v-model="modalnew" max-width="850px">
+      <v-card>
+        <v-card-title>
+          <v-checkbox
+            label="Show archived"
+            class="checkbox pl-2 pr-2"
             v-model="showArchived"
             @change="reload"
-          >Show archived</b-form-checkbox>
+          ></v-checkbox>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="filter"
+            append-icon="search"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+        </v-card-title>
+        <v-data-table
+          :headers="connectionsDataTableHeaders"
+          :items="connectionTable"
+          :search="filter"
+        >
+          <template v-slot:items="props">
+            <td>
+              <div style="display:flex; flex-direction:row; width:10px;">
+                <v-checkbox v-model="props.item.selected" primary hide-details></v-checkbox>
+                <router-link :to="props.item.href" class="pt-1">{{props.item.title}}</router-link>
+              </div>
+            </td>
+            <td>
+              <router-link :to="props.item.href">{{props.item.title}}</router-link>
+            </td>
+          </template>
+        </v-data-table>
+        <div class="text-xs-center pt-2">
+          <!-- <v-pagination v-model="pagination.page"></v-pagination> -->
         </div>
 
-        <b-input-group class="col-lg-5 col-md-4">
-          <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter"/>
-          <b-input-group-append>
-            <b-btn size="sm" class="btnHeader" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-          </b-input-group-append>
-        </b-input-group>
-
-        <b-table
-          bordered
-          fixed
-          responsive
-          :items="connectionTable"
-          :fields="connectionsFieldToAdd"
-          :filter="filter"
-          :current-page="currentPage"
-          :per-page="perPage"
-          @filtered="onFiltered"
-          style="margin-top:5px;"
-        >
-          <template slot="title" slot-scope="data">
-            <b-form-checkbox v-model="data.item.selected">
-              <router-link :to="data.item.href">{{data.item.title}}</router-link>
-            </b-form-checkbox>
-          </template>
-          <template slot="description" slot-scope="data">
-            <router-link :to="data.item.href">{{data.item.title}}</router-link>
-          </template>
-        </b-table>
-        <b-pagination
-          :total-rows="totalRows"
-          :per-page="perPage"
-          v-model="currentPage"
-          class="my-0"
-        />
-      </b-modal>
-      <!-- <b-modal
-        id="delete"
-        button-size="sm"
-        title="Delete connections?"
-        size="sm"
-        centered
-        ok-variant="warning"
-        ok-title="Delete"
-        @ok="handleDeleteConnections()"
-      ></b-modal>-->
-    </div>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="modalnew = false"
+            small
+            class="ml-3 mb-3"
+          >Cancel</v-btn>
+          <v-btn
+            color="error"
+            flat="flat"
+            outline
+            @click="handleNewConnections()"
+            small
+            class="mb-3"
+          >Link selected</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -165,6 +129,10 @@ export default {
   data() {
     return {
       relations: [],
+      connectionsDataTableHeaders: [
+        { text: "title", value: "title" },
+        { text: "description", value: "title" }
+      ],
       connectionsFieldToAdd: [
         { key: "title", sortable: true, label: "" },
         { key: "description", sortable: true }
@@ -172,18 +140,31 @@ export default {
       currentConnectionType: "",
       connectionTable: [],
       filter: "",
-      currentPage: 0,
-      totalRows: 0,
-      perPage: 10,
+      // currentPage: 0,
+      // totalRows: 0,
+      // perPage: 10,
       showArchived: false,
-      deleteConnectionDialog: false
+      deleteConnectionDialog: false,
+      modalnew: false
     };
   },
   async mounted() {
     await this.loadRelaitedList();
   },
-  computed: {},
+  computed: {
+    pages() {
+      if (
+        this.pagination.rowsPerPage == null ||
+        this.pagination.totalItems == null
+      ) {
+        return 0;
+      }
 
+      return Math.ceil(
+        this.pagination.totalItems / this.pagination.rowsPerPage
+      );
+    }
+  },
   methods: {
     async reload(checked) {
       this.showArchived = checked;
@@ -221,7 +202,7 @@ export default {
       this.connectionsFieldToAdd.forEach(el => {
         if (el.key === "title") el.label = element;
       });
-      this.$refs.modalnew.show();
+      this.modalnew = true;
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -469,7 +450,10 @@ export default {
             initiatives: arrInitiatives,
             backlogs: arrBacklogs,
             bugs: arrBugs,
-            delete: true
+            delete: true,
+            pagination: {
+              rowsPerPage: 10
+            }
           }
         );
         const success = _get(response, "data.success");
@@ -484,7 +468,6 @@ export default {
       }
     }
   },
-
   components: {},
   watch: {}
 };
