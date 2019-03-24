@@ -503,6 +503,9 @@ export default {
     filterItems(clickParam) {
       let items = JSON.parse(JSON.stringify(this.initialSelected.slice()));
       let filterInputValue;
+      this.initialFilteredSelected = JSON.parse(
+        JSON.stringify(this.initialSelected.slice())
+      );
 
       if (typeof clickParam === "string") {
         filterInputValue = clickParam;
@@ -559,11 +562,11 @@ export default {
         items[i].filteredItems = filteredItem;
         this.filteredSelected = items.slice();
       }
-      console.log(this.filteredSelected);
-      this.initialFilteredSelected = this.filteredSelected.slice();
     },
     clearItemsFilter() {
-      this.filteredItems = null;
+      this.filteredItems = this.initialFilteredSelected;
+      console.log(this.filteredItems);
+      this.loadOrgStatuses();
     }
   },
   watch: {
