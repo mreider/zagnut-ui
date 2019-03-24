@@ -1,9 +1,8 @@
 <template>
   <v-app id="app">
-    <div class="loading" v-if="$store.state.loading">
-      <div class="vue-loading-msg">Loading ...</div>
+    <div v-if="$store.state.loading">
+      <loading-indication></loading-indication>
     </div>
-
     <div class="notifications-container">
       <notifications group="error" width="405px" position="bottom right"/>
       <notifications group="app" width="405px" position="bottom right"/>
