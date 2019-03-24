@@ -1,121 +1,242 @@
 <template>
-  <b-card no-body bg-variant="light" class="card col-lg-12">
-    <div class="col-lg-8 col-md-8">
-      <b-form-input
-        placeholder="Enter title"
-        v-model="form.title"
-        id="title"
-        class="text-left description"
-        style="margin-top: 1em;"
-      ></b-form-input>
-      <label
-        class="left"
-      >Created by {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
-    </div>
-    <div class="col-lg-4 col-md-0"></div>
-    <b-row>
-      <b-col col lg="3" sm="6" md="8" xl="3">
-        <b-form-group
-          label="Status: "
-          label-for="labelStatus"
-          label-size="sm"
-          :label-cols="3"
-          horizontal
-        >
-          <b-dropdown :text="currentStatus" name="itemStatus" size="sm" class="statuses m-2">
-            <b-dropdown-item
-              v-for="element in objStatuses"
-              v-bind:key="element.id"
-              @click="handleItemSetField(element, 'status')"
-              size="sm"
-            >{{ element.name }}</b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
-      </b-col>
-      <b-col col lg="3" sm="6" md="8" xl="3">
-        <b-form-group
-          label="Assignee: "
-          label-for="ItemAssignee"
-          label-size="sm"
-          :label-cols="4"
-          horizontal
-        >
-          <b-dropdown
-            :text="handleUsername(form.assignee)"
-            name="ItemAssignee"
-            size="sm"
-            class="users m-2"
-          >
-            <b-dropdown-item
-              class="float-right"
-              v-for="element in users"
-              v-bind:key="element.userId"
-              @click="handleItemSetField(element, 'assignee')"
-              size="sm"
-            >{{ handleUsername(element) }}</b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
-      </b-col>
-      <b-col col lg="3" sm="6" md="8" xl="3">
-        <b-form-group
-          label="Points: "
-          label-for="ItemPoints"
-          label-size="sm"
-          :label-cols="3"
-          horizontal
-        >
-          <b-dropdown :text="String(form.points)" name="ItemPoints" size="sm" class="points m-2">
-            <b-dropdown-item
-              v-for="element in pointsVar"
-              v-bind:key="element"
-              @click="handleItemSetField(element, 'points')"
-              size="sm"
-            >{{ element }}</b-dropdown-item>
-          </b-dropdown>
-        </b-form-group>
-      </b-col>
-    </b-row>
-    <div class="col-12">
-      <b-form-textarea
-        v-model="form.description"
-        id="description"
-        :rows="6"
-        :max-rows="8"
-        class="description text-left"
-        placeholder="Enter description"
-      ></b-form-textarea>
-    </div>
-    <Connections :toConnectionData="toConnectionData"></Connections>
-    <div class="button-box" style="margin-top:20px;">
-      <b-form-group
-        label="Archived: "
-        class="float-left"
-        label-for="checkbox1"
-        label-size="sm"
-        :label-cols="7"
-        horizontal
-      >
-        <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived"></b-form-checkbox>
-      </b-form-group>
-      <div class="float-right">
-        <b-btn size="sm" type="submit" variant="primary" @click="handleSaveItem()">Save & close</b-btn>
-        <b-btn size="sm" @click="$router.go(-1)">Back</b-btn>
-        <b-btn variant="danger" size="sm" v-b-modal.deleteitem>Delete</b-btn>
+  <v-container fluid>
+    <v-layout row wrap>
+      <v-flex xs12>
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{form.title}}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-layout row wrap>
+                <v-flex xs12 sm7>
+                  <v-text-field v-model="form.title" placeholder="Title item"></v-text-field>
+                  <label
+                    class="text-left"
+                  >Created by {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
+                </v-flex>
+                <v-flex xs12 sm5>
+                  <v-layout row wrap align-center>
+                    <v-flex xs4>
+                      <v-subheader>Status</v-subheader>
+                    </v-flex>
+                    <v-flex xs8>
+                      <v-select
+                        :items="objStatuses"
+                        item-text="name"
+                        item-value="name"
+                        return-object
+                        @input="handleItemSetField($event, 'status')"
+                      ></v-select>
+                    </v-flex>
+                    <v-flex xs4>
+                      <v-subheader>Assignee:</v-subheader>
+                    </v-flex>
+                    <v-flex xs8>
+                      <v-select
+                        :items="users"
+                        item-text="`${data.item.firstName} ${data.item.lastName}`"
+                        item-value="`${data.item.firstName} ${data.item.lastName}`"
+                        @input="handleItemSetField($event, 'assignee')"
+                        class="pt-0"
+                      >
+                        <template
+                          slot="selection"
+                          slot-scope="data"
+                        >{{ data.item.firstName}} {{data.item.lastName}}</template>
+                        <template slot="item" slot-scope="data">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              v-html="`${data.item.firstName} ${data.item.lastName}`"
+                            ></v-list-tile-title>
+                          </v-list-tile-content>
+                        </template>
+                      </v-select>
+                    </v-flex>
+                    <v-flex xs4>
+                      <v-subheader>Points:</v-subheader>
+                    </v-flex>
+                    <v-flex xs8>
+                      <v-select
+                        :items="pointsVar"
+                        :item-text="String(points)"
+                        :item-value="String(points)"
+                        @input="handleItemSetField($event, 'points')"
+                      ></v-select>
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+                <v-flex xs12>
+                  <v-textarea v-model="form.description" placeholder="Title description"></v-textarea>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+      <v-container pl-3 pr-3 pt-0 pb-0>
+        <v-flex xs12>
+          <Connections :toConnectionData="toConnectionData"></Connections>
+        </v-flex>
+      </v-container>
+      <v-flex xs12>
+        <v-card class="comments-card">
+          <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
+          <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
+          <v-card-actions>
+            <v-layout row wrap>
+              <v-btn
+                color="blue darken-1"
+                class="save-and-close-button"
+                flat
+                medium
+                @click="handleSaveItem()"
+              >Save and close</v-btn>
+              <v-btn color="blue darken-1" flat medium @click="$router.go(-1)">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat medium @click="dialogDeleteItem = true">Delete</v-btn>
+            </v-layout>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+
+    <v-dialog v-model="dialogDeleteItem" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="dialogDeleteBackLog = false"
+            small
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="error" flat="flat" outline @click="handleItemDelete()" small>Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <b-card no-body bg-variant="light" class="card col-lg-12">
+      <div class="col-lg-8 col-md-8">
+        <b-form-input
+          placeholder="Enter title"
+          v-model="form.title"
+          id="title"
+          class="text-left description"
+          style="margin-top: 1em;"
+        ></b-form-input>
+        <label
+          class="left"
+        >Created by {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
       </div>
-      <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
-    </div>
-    <b-modal
-      id="deleteitem"
-      :title="'Wait. Are you sure you want to delete this permanently?'"
-      button-size="sm"
-      size="sm"
-      centered
-      body-class="zero-size"
-      ok-variant="danger"
-      @ok="handleItemDelete()"
-      ok-title="delete"
-    ></b-modal>
-  </b-card>
+      <div class="col-lg-4 col-md-0"></div>
+      <b-row>
+        <b-col col lg="3" sm="6" md="8" xl="3">
+          <b-form-group
+            label="Status: "
+            label-for="labelStatus"
+            label-size="sm"
+            :label-cols="3"
+            horizontal
+          >
+            <b-dropdown :text="currentStatus" name="itemStatus" size="sm" class="statuses m-2">
+              <b-dropdown-item
+                v-for="element in objStatuses"
+                v-bind:key="element.id"
+                @click="handleItemSetField(element, 'status')"
+                size="sm"
+              >{{ element.name }}</b-dropdown-item>
+            </b-dropdown>
+          </b-form-group>
+        </b-col>
+        <b-col col lg="3" sm="6" md="8" xl="3">
+          <b-form-group
+            label="Assignee: "
+            label-for="ItemAssignee"
+            label-size="sm"
+            :label-cols="4"
+            horizontal
+          >
+            <b-dropdown
+              :text="handleUsername(form.assignee)"
+              name="ItemAssignee"
+              size="sm"
+              class="users m-2"
+            >
+              <b-dropdown-item
+                class="float-right"
+                v-for="element in users"
+                v-bind:key="element.userId"
+                @click="handleItemSetField(element, 'assignee')"
+                size="sm"
+              >{{ handleUsername(element) }}</b-dropdown-item>
+            </b-dropdown>
+          </b-form-group>
+        </b-col>
+        <b-col col lg="3" sm="6" md="8" xl="3">
+          <b-form-group
+            label="Points: "
+            label-for="ItemPoints"
+            label-size="sm"
+            :label-cols="3"
+            horizontal
+          >
+            <b-dropdown :text="String(form.points)" name="ItemPoints" size="sm" class="points m-2">
+              <b-dropdown-item
+                v-for="element in pointsVar"
+                v-bind:key="element"
+                @click="handleItemSetField(element, 'points')"
+                size="sm"
+              >{{ element }}</b-dropdown-item>
+            </b-dropdown>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <div class="col-12">
+        <b-form-textarea
+          v-model="form.description"
+          id="description"
+          :rows="6"
+          :max-rows="8"
+          class="description text-left"
+          placeholder="Enter description"
+        ></b-form-textarea>
+      </div>
+      <Connections :toConnectionData="toConnectionData"></Connections>
+      <div class="button-box" style="margin-top:20px;">
+        <b-form-group
+          label="Archived: "
+          class="float-left"
+          label-for="checkbox1"
+          label-size="sm"
+          :label-cols="7"
+          horizontal
+        >
+          <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived"></b-form-checkbox>
+        </b-form-group>
+        <div class="float-right">
+          <b-btn size="sm" type="submit" variant="primary" @click="handleSaveItem()">Save & close</b-btn>
+          <b-btn size="sm" @click="$router.go(-1)">Back</b-btn>
+          <b-btn variant="danger" size="sm" v-b-modal.deleteitem>Delete</b-btn>
+        </div>
+        <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
+      </div>
+      <b-modal
+        id="deleteitem"
+        :title="'Wait. Are you sure you want to delete this permanently?'"
+        button-size="sm"
+        size="sm"
+        centered
+        body-class="zero-size"
+        ok-variant="danger"
+        @ok="handleItemDelete()"
+        ok-title="delete"
+      ></b-modal>
+    </b-card>
+  </v-container>
 </template>
 
 <script>
@@ -144,6 +265,7 @@ export default {
       users: [],
       pointsVar: ["0", "1", "2", "3", "5", "8", "13", "21"],
       points: "",
+      dialogDeleteItem: false,
       form: {
         title: "",
         description: "",
@@ -339,5 +461,8 @@ export default {
   outline: 0in;
   border: 1px solid lightblue;
   padding-left: 10px;
+}
+.comments-card {
+  padding: 20px 0 0 30px;
 }
 </style>
