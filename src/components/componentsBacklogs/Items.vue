@@ -514,7 +514,7 @@ export default {
       }
       let filterKeys = ["title", "author"];
       for (let i = 0, len = items.length; i < len; i++) {
-        let filteredItem = items[i].filteredItems.filter(obj => {
+        let filteredItems = items[i].filteredItems.filter(obj => {
           return filterKeys.some(function(key) {
             return obj[key]
               .toString()
@@ -522,14 +522,11 @@ export default {
               .includes(filterInputValue.toLowerCase());
           });
         });
-        items[i].filteredItems = filteredItem;
+        items[i].filteredItems = filteredItems;
         this.filteredSelected = items.slice();
       }
     },
     clearItemsFilter() {
-      // this.filteredItems = this.initialFilteredSelected;
-      // console.log(this.filteredItems);
-      // this.loadOrgStatuses();
       this.filterItems("");
     }
   },
