@@ -435,6 +435,7 @@ export default {
         );
 
         const success = _get(response, "data.success");
+        this.dialogItemEdit = false;
         if (!success) throw new Error(`Unable to update item.`);
 
         this.$notify({ group: "app", type: "success", text: "Saved" });
@@ -456,6 +457,7 @@ export default {
           `/api/items/${this.$store.state.organization.id}/${item.id}`
         );
         let success = _get(response, "data.success");
+        this.dialogDeleteItem = false;
         if (!success) throw new Error(`Unable to delete item.`);
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -484,6 +486,7 @@ export default {
           data
         );
         const success = _get(response, "data.success");
+        this.dialogNewItem = false;
         if (!success) throw new Error(`Unable to create new item.`);
       } catch (error) {
         return this.$errorMessage.show(error);
