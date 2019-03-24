@@ -1,8 +1,5 @@
 <template>
   <v-container fluid>
-    <div v-if="loading === true">
-      <loading-indication></loading-indication>
-    </div>
     <v-layout row wrap>
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <h3>{{ this.title }}</h3>
@@ -84,7 +81,7 @@
             <h5 class="mb-0">
               Title:
               <router-link
-                :to="'item/?orgId='+$store.state.organization.id +'&itemid='+ item.id"
+                :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ item.id"
               >{{ item.title }}</router-link>
             </h5>
           </v-card-title>
@@ -236,7 +233,6 @@ export default {
   name: "Items",
   data() {
     return {
-      loading: false,
       dialogNewItem: false,
       dialogItemEdit: false,
       dialogDeleteItem: false,
@@ -449,6 +445,7 @@ export default {
       }
     },
     async handleItemDelete(item) {
+      this.$loading(true);
       if (!item || !this.$store.state.user.id) {
         // return this.$notify({group: 'error', type: 'err', text: 'Empty new organization name field'});
       }
