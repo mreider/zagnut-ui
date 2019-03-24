@@ -512,44 +512,7 @@ export default {
       } else {
         filterInputValue = this.filter;
       }
-
       let filterKeys = ["title", "author"];
-      // this.filteredSelected = items.map(obj => {
-      //   this.filteredSelected = obj.filteredItems.filter(internalObj => {
-      //     filterKeys.some(key => {
-      //       return internalObj[key]
-      //         .toString()
-      //         .toLowerCase()
-      //         .includes(filterInputValue.toLowerCase());
-      //     });
-      //   });
-      // });
-      // this.filteredSelected = items.filter(obj => {
-      //   for (let item of obj.filteredItems) {
-      //     // if (
-      //     //   item.title
-      //     //     .toString()
-      //     //     .toLowerCase()
-      //     //     .includes(filterInputValue.toLowerCase()) ||
-      //     //   item.author
-      //     //     .toString()
-      //     //     .toLowerCase()
-      //     //     .includes(filterInputValue.toLowerCase())
-      //     // ) {
-      //     //   return true;
-      //     // }
-      //     return filterKeys.some(key => {
-      //       return item[key]
-      //         .toString()
-      //         .toLowerCase()
-      //         .includes(filterInputValue.toLowerCase());
-      //     });
-      //     // if (ifTrue === true) {
-      //     //   console.log(item);
-      //     //   return true;
-      //     // }
-      //   }
-      // });
       for (let i = 0, len = items.length; i < len; i++) {
         let filteredItem = items[i].filteredItems.filter(obj => {
           return filterKeys.some(function(key) {
