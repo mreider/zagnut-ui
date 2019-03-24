@@ -527,9 +527,10 @@ export default {
       }
     },
     clearItemsFilter() {
-      this.filteredItems = this.initialFilteredSelected;
-      console.log(this.filteredItems);
-      this.loadOrgStatuses();
+      // this.filteredItems = this.initialFilteredSelected;
+      // console.log(this.filteredItems);
+      // this.loadOrgStatuses();
+      this.filterItems("");
     }
   },
   watch: {
