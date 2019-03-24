@@ -39,22 +39,31 @@
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
           <!--new initiative dialog-->
-          <v-btn small outline color="success" @click="dialogNewBackLog = true">New</v-btn>
+          <v-btn small outline color="pink" @click="$router.go(-1)">close</v-btn>
+          <v-btn small outline color="success" @click="dialogNewItem = true">New</v-btn>
+        </v-flex>
+        <v-flex
+          xs6
+          v-for="item in options"
+          :key="item.id"
+          class="cards-toolbar-mobile hidden-md-and-up pl-4"
+        >
           <v-checkbox
-            label="Show archived"
-            class="checkbox pl-2 pr-2"
-            v-model="showArchived"
-            @change="reload"
+            v-model="selected"
+            :label="item.text"
+            class="checkbox mr-2"
+            :value="item.value"
           ></v-checkbox>
         </v-flex>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
           <v-text-field
             label="Filter"
-            @keyup="filterItems"
+            v-model="filter"
             single-line
             class="pt-0 pl-2 pr-2"
-            v-model="filter"
+            @keyup="filterItems"
           ></v-text-field>
+
           <v-btn
             small
             outline
