@@ -2,7 +2,7 @@
   <div>
     <v-layout row wrap>
       <v-flex xs12>
-        <div v-for="element in relations" v-bind:key="element.key">
+        <v-card v-for="element in relations" v-bind:key="element.key">
           <v-list subheader two-line>
             <v-subheader>Linked {{element.key}}s</v-subheader>
             <v-list-tile v-for="item in element.data" v-bind:key="item.id">
@@ -35,7 +35,7 @@
               class="mb-3"
             >Remove seleted</v-btn>
           </v-card-actions>
-        </div>
+        </v-card>
       </v-flex>
     </v-layout>
 
