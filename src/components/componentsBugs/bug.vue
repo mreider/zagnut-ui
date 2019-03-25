@@ -14,6 +14,11 @@
                   <label
                     class="text-left"
                   >Created by {{handleUsername(form.reportedBy)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
+                  <v-textarea
+                    v-model="form.description"
+                    placeholder="Title description"
+                    class="mt-3"
+                  ></v-textarea>
                 </v-flex>
                 <v-flex xs12 sm5>
                   <v-layout row wrap align-center>
@@ -97,9 +102,6 @@
                       </v-select>
                     </v-flex>
                   </v-layout>
-                </v-flex>
-                <v-flex xs12>
-                  <v-textarea v-model="form.description" placeholder="Title description"></v-textarea>
                 </v-flex>
               </v-layout>
             </v-container>
