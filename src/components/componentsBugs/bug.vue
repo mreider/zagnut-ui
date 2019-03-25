@@ -22,11 +22,11 @@
                     </v-flex>
                     <v-flex xs8>
                       <v-select
-                        :items="objStatuses"
-                        item-text="severity"
-                        item-value="severity"
-                        return-object
+                        :items="severityArray"
+                        item-text="element"
+                        item-value="element"
                         @input="handleBugSetField($event, 'severity')"
+                        class="pt-0"
                       ></v-select>
                     </v-flex>
                     <v-flex xs4>
@@ -35,11 +35,18 @@
                     <v-flex xs8>
                       <v-select
                         :items="objStatuses"
-                        item-text="name"
-                        item-value="name"
-                        return-object
-                        @input="handleItemSetField($event, 'status')"
-                      ></v-select>
+                        item-text="`${data.item.name}`"
+                        item-value="`${data.item.name}`"
+                        @input="handleBugSetField($event, 'status')"
+                        class="pt-0"
+                      >
+                        <template slot="selection" slot-scope="data">{{ data.item.name}}</template>
+                        <template slot="item" slot-scope="data">
+                          <v-list-tile-content>
+                            <v-list-tile-title v-html="`${data.item.name}`"></v-list-tile-title>
+                          </v-list-tile-content>
+                        </template>
+                      </v-select>
                     </v-flex>
                     <v-flex xs4>
                       <v-subheader>Reported by:</v-subheader>
@@ -118,26 +125,20 @@
                 @click="handleSaveBug()"
               >Save and close</v-btn>
               <v-btn color="blue darken-1" flat medium @click="$router.go(-1)">Back</v-btn>
-              <v-btn color="blue darken-1" flat medium @click="dialogDeleteItem = true">Delete</v-btn>
+              <v-btn color="blue darken-1" flat medium @click="dialogDeleteBug = true">Delete</v-btn>
             </v-layout>
           </v-card-actions>
         </v-card>
       </v-flex>
     </v-layout>
 
-    <v-dialog v-model="dialogDeleteItem" max-width="250">
+    <v-dialog v-model="dialogDeleteBug" max-width="250">
       <v-card>
         <v-card-text
           class="text-xs-center subheading"
         >Wait. Are you sure you want to delete this permanently?</v-card-text>
         <v-card-actions>
-          <v-btn
-            color="primary"
-            flat="flat"
-            outline
-            @click="dialogDeleteBackLog = false"
-            small
-          >Cancel</v-btn>
+          <v-btn color="primary" flat="flat" outline @click="dialogDeleteBug = false" small>Cancel</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="error" flat="flat" outline @click="handleBugDelete()" small>Yes</v-btn>
         </v-card-actions>
@@ -280,6 +281,7 @@ export default {
   name: "bug",
   data() {
     return {
+      dialogDeleteBug: false,
       toConnectionData: {
         name: "bug",
         id: this.$route.query.bugId,
@@ -364,6 +366,7 @@ export default {
       }
     },
     handleBugSetField(element, name) {
+      console.log(element, name);
       this.form[name] = element;
     },
     async handleSaveBug() {
@@ -454,5 +457,9 @@ export default {
 .description {
   outline: 0in;
   border: 1px solid lightblue;
+}
+
+.comments-card {
+  padding-left: 25px;
 }
 </style>
