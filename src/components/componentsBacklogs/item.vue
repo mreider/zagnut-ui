@@ -71,31 +71,36 @@
                     </v-flex>
                   </v-layout>
                 </v-flex>
+                <v-flex xs4>
+                  <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
+                </v-flex>
+                <v-flex xs12>
+                  <Connections :toConnectionData="toConnectionData"></Connections>
+                </v-flex>
+                <v-flex xs12>
+                  <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
+                </v-flex>
               </v-layout>
             </v-container>
           </v-card-text>
-        </v-card>
-      </v-flex>
-      <v-container pl-3 pr-3 pt-0 pb-0>
-        <v-flex xs12>
-          <Connections :toConnectionData="toConnectionData"></Connections>
-        </v-flex>
-      </v-container>
-      <v-flex xs12>
-        <v-card class="comments-card">
-          <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
-          <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
           <v-card-actions>
-            <v-layout row wrap>
+            <v-layout row wrap mb-3>
               <v-btn
                 color="blue darken-1"
                 class="save-and-close-button"
                 flat
-                medium
+                small
+                outline
                 @click="handleSaveItem()"
               >Save and close</v-btn>
-              <v-btn color="blue darken-1" flat medium @click="$router.go(-1)">Cancel</v-btn>
-              <v-btn color="blue darken-1" flat medium @click="dialogDeleteItem = true">Delete</v-btn>
+              <v-btn color="blue darken-1" flat small outline @click="$router.go(-1)">Cancel</v-btn>
+              <v-btn
+                color="blue darken-1"
+                flat
+                small
+                outline
+                @click="dialogDeleteItem = true"
+              >Delete</v-btn>
             </v-layout>
           </v-card-actions>
         </v-card>
