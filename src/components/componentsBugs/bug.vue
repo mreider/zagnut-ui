@@ -103,31 +103,31 @@
                     </v-flex>
                   </v-layout>
                 </v-flex>
+                <v-flex xs4>
+                  <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
+                </v-flex>
+                <v-flex xs12>
+                  <Connections :toConnectionData="toConnectionData"></Connections>
+                </v-flex>
+                <v-flex xs12>
+                  <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
+                  <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
+                </v-flex>
               </v-layout>
             </v-container>
           </v-card-text>
-        </v-card>
-      </v-flex>
-      <v-container pl-3 pr-3 pt-0 pb-0>
-        <v-flex xs12>
-          <Connections :toConnectionData="toConnectionData"></Connections>
-        </v-flex>
-      </v-container>
-      <v-flex xs12>
-        <v-card class="comments-card">
-          <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
-          <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
           <v-card-actions>
-            <v-layout row wrap>
+            <v-layout row wrap mb-3>
               <v-btn
                 color="blue darken-1"
                 class="save-and-close-button"
                 flat
-                medium
+                outline
+                small
                 @click="handleSaveBug()"
               >Save and close</v-btn>
-              <v-btn color="blue darken-1" flat medium @click="$router.go(-1)">Back</v-btn>
-              <v-btn color="blue darken-1" flat medium @click="dialogDeleteBug = true">Delete</v-btn>
+              <v-btn color="blue darken-1" flat small outline @click="$router.go(-1)">Back</v-btn>
+              <v-btn color="blue darken-1" flat small outline @click="dialogDeleteBug = true">Delete</v-btn>
             </v-layout>
           </v-card-actions>
         </v-card>
@@ -146,130 +146,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <div class="bug">
-      <b-card no-body bg-variant="light" class="card">
-        <b-container>
-          <b-row>
-            <b-col col lg="7" sm="12" md="7" xl="7">
-              <b-form-group label-for="title">
-                <b-form-input v-model="form.title" placeholder="Enter bug" id="title">></b-form-input>
-                <label
-                  class="left"
-                >Created by {{handleUsername(form.reportedBy)}} on {{form.createdAt}}</label>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col col lg="3" sm="6" md="3" xl="3">
-              <b-form-group label="Severity" label-for="formSeverity" label-size="sm">
-                <b-dropdown
-                  :text="form.severity"
-                  name="formSeverity"
-                  size="sm"
-                  class="severity m-2"
-                >
-                  <b-dropdown-item
-                    v-for="element in severityArray"
-                    v-bind:key="element"
-                    @click="handleBugSetField(element, 'severity')"
-                    size="sm"
-                  >{{ element }}</b-dropdown-item>
-                </b-dropdown>
-              </b-form-group>
-            </b-col>
-            <b-col col lg="3" sm="6" md="3" xl="3">
-              <b-form-group label="Status" label-for="formStatus" label-size="sm">
-                <b-dropdown :text="form.status.name" name="formStatus" size="sm" class="status m-2">
-                  <b-dropdown-item
-                    v-for="element in objStatuses"
-                    v-bind:key="element.id"
-                    @click="handleBugSetField(element, 'status')"
-                    size="sm"
-                  >{{ element.name }}</b-dropdown-item>
-                </b-dropdown>
-              </b-form-group>
-            </b-col>
-            <b-col col lg="3" sm="5" md="3" xl="3">
-              <b-form-group label="Reported by: " label-for="formgReportedBy" label-size="sm">
-                <b-dropdown
-                  :text="handleUsername(form.reportedBy)"
-                  name="formReportedBy"
-                  size="sm"
-                  class="users m-2"
-                >
-                  <b-dropdown-item
-                    v-for="element in users"
-                    v-bind:key="element.id"
-                    @click="handleBugSetField(element, 'reportedBy')"
-                    size="sm"
-                  >{{ handleUsername(element) }}</b-dropdown-item>
-                </b-dropdown>
-              </b-form-group>
-            </b-col>
-            <b-col col lg="3" sm="5" md="3" xl="3">
-              <b-form-group label="Assigned to: " label-for="formAssignedTo" label-size="sm">
-                <b-dropdown
-                  :text="handleUsername(form.assignee)"
-                  name="formgAssignedTo"
-                  size="sm"
-                  class="users m-2"
-                >
-                  <b-dropdown-item
-                    v-for="element in users"
-                    v-bind:key="element.id"
-                    @click="handleBugSetField(element, 'assignee')"
-                    size="sm"
-                  >{{ handleUsername(element) }}</b-dropdown-item>
-                </b-dropdown>
-              </b-form-group>
-            </b-col>
-          </b-row>
-        </b-container>
-
-        <b-form-group label-for="description" class="col-lg-12">
-          <b-form-textarea
-            id="description"
-            v-model="form.description"
-            placeholder="Enter description"
-            :rows="3"
-            :max-rows="6"
-          ></b-form-textarea>
-        </b-form-group>
-        <div class="col-12">
-          <Connections :toConnectionData="toConnectionData"></Connections>
-        </div>
-        <div class="button-box col-12" style="margin-top:20px;">
-          <b-form-group
-            class="float-left"
-            label="Archived: "
-            label-for="checkbox1"
-            label-size="sm"
-            :label-cols="7"
-            horizontal
-          >
-            <b-form-checkbox id="checkbox1" class="m-2" v-model="form.archived"></b-form-checkbox>
-          </b-form-group>
-          <div class="float-right">
-            <b-btn size="sm" type="submit" variant="primary" @click="handleSaveBug()">Save & close</b-btn>
-            <b-btn size="sm" @click="$router.go(-1)">Back</b-btn>
-            <b-btn variant="danger" size="sm" v-b-modal.deletebug>Delete</b-btn>
-          </div>
-          <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
-        </div>
-      </b-card>
-      <b-modal
-        id="deletebug"
-        :title="'Wait. Are you sure you want to delete this permanently?'"
-        button-size="sm"
-        size="sm"
-        centered
-        body-class="zero-size"
-        ok-variant="danger"
-        @ok="handleBugDelete()"
-        ok-title="delete"
-      ></b-modal>
-    </div>
   </v-container>
 </template>
 
