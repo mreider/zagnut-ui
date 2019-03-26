@@ -83,10 +83,11 @@
         >
           <template v-slot:items="props">
             <td>
-              <div style="display:flex; flex-direction:row; width:10px;">
-                <v-checkbox v-model="props.item.selected" primary hide-details></v-checkbox>
-                <router-link :to="props.item.href" class="pt-1">{{props.item.title}}</router-link>
-              </div>
+              <v-checkbox v-model="props.item.selected" primary hide-details>
+                <template v-slot:label>
+                  <router-link :to="props.item.href" class="pt-1">{{props.item.title}}</router-link>
+                </template>
+              </v-checkbox>
             </td>
             <td>
               <router-link :to="props.item.href">{{props.item.title}}</router-link>
@@ -99,7 +100,7 @@
 
         <v-card-actions>
           <v-btn
-            color="primary"
+            color="error"
             flat="flat"
             outline
             @click="modalnew = false"
@@ -107,7 +108,7 @@
             class="ml-3 mb-3"
           >Cancel</v-btn>
           <v-btn
-            color="error"
+            color="primary"
             flat="flat"
             outline
             @click="handleNewConnections()"
