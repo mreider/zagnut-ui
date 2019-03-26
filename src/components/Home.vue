@@ -1,27 +1,28 @@
 <template>
-  <b-card class="home" bg-variant="light">
-    <div class="col-lg-12 col-md-8 col-sm-6 col-xs-4">
-      <div class="img center" style="margin-top: 3em" v-if="showImg">
-        <img src="/static/home.png" width="500" height="500" alt="home">
-      </div>
-      <div v-for="element in rss" v-bind:key="element.name" class="col-12" style="margin-top: 1em">
-        <h4>{{ element.name }}</h4>
-        <b-card
-          v-for="item in element.items"
-          v-bind:key="item.link"
-          class="col-12"
-          style="margin-top: 1em"
-        >
-          {{ item.title }}
-          <b-media style="word-wrap: break-word">
-            <div style="word-wrap: break-word">
-              <p v-html="item.content"></p>
+  <v-container grid-list-xs>
+    <v-layout row wrap v-for="element in rss" v-bind:key="element.name" pl-4 pr-4>
+      <v-flex xs12>
+        <h4 class="mb-4 ml-1">{{ element.name }}</h4>
+      </v-flex>
+      <v-flex xs12 sm12 v-for="item in element.items" v-bind:key="item.link" mb-4>
+        <v-card>
+          <v-card-title>
+            <div>
+              <span class="grey--text">{{ item.title }}</span>
             </div>
-          </b-media>
-        </b-card>
-      </div>
-    </div>
-  </b-card>
+          </v-card-title>
+          <v-card-text>
+            <p v-html="item.content"></p>
+          </v-card-text>
+          <v-card-actions>
+            <a :href="item.link" class="read-more-link">
+              <v-btn flat outline color="blue darken-3">Read more</v-btn>
+            </a>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -56,6 +57,7 @@ export default {
           });
         });
         this.rss = rss;
+        console.log(this.rss);
         if (!success) this.showImg = true;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -68,5 +70,15 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
+.understrap-read-more-link {
+  display: none !important;
+}
+.read-more-link {
+  text-decoration: none;
+  margin-bottom: 7px;
+  &:hover {
+    text-decoration: none;
+  }
+}
 </style>
