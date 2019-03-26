@@ -431,4 +431,9 @@ export default {
     margin-left: 28px;
   }
 }
+.v-btn__content {
+  @media screen and (max-width: 320px) {
+    font-size: 9px !important;
+  }
+}
 </style>

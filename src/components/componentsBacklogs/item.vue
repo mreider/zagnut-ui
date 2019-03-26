@@ -23,7 +23,7 @@
                 <v-flex xs12 sm5>
                   <v-layout row wrap align-center>
                     <v-flex xs4>
-                      <v-subheader>Status</v-subheader>
+                      <v-subheader class="select-box-subheader">Status</v-subheader>
                     </v-flex>
                     <v-flex xs8>
                       <v-select
@@ -35,7 +35,7 @@
                       ></v-select>
                     </v-flex>
                     <v-flex xs4>
-                      <v-subheader>Assignee:</v-subheader>
+                      <v-subheader class="select-box-subheader">Assignee:</v-subheader>
                     </v-flex>
                     <v-flex xs8>
                       <v-select
@@ -59,7 +59,7 @@
                       </v-select>
                     </v-flex>
                     <v-flex xs4>
-                      <v-subheader>Points:</v-subheader>
+                      <v-subheader class="select-box-subheader">Points:</v-subheader>
                     </v-flex>
                     <v-flex xs8>
                       <v-select
@@ -88,7 +88,7 @@
             <v-layout row wrap mb-3>
               <v-btn
                 color="blue darken-1"
-                class="save-and-close-button__backlog-component"
+                id="save-and-close-button__backlog-component"
                 flat
                 small
                 outline
@@ -101,6 +101,7 @@
                 small
                 outline
                 @click="dialogDeleteItem = true"
+                id="delete-button__backlog-component"
               >Delete</v-btn>
             </v-layout>
           </v-card-actions>
@@ -355,10 +356,28 @@ export default {
 .comments-card {
   padding: 20px 0 0 30px;
 }
-.save-and-close-button__backlog-component {
+#save-and-close-button__backlog-component {
   margin-left: 31px !important;
   @media screen and (max-width: 420px) {
     margin-left: 28px;
+  }
+}
+
+#delete-button__backlog-component {
+  @media screen and (max-width: 322px) {
+    margin: 10px 0 0 30px;
+  }
+}
+
+.select-box-subheader {
+  @media screen and (max-width: 420px) {
+    padding-left: 0;
+  }
+}
+
+.v-btn__content {
+  @media screen and (max-width: 320px) {
+    font-size: 9px !important;
   }
 }
 </style>

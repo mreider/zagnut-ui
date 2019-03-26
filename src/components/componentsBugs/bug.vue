@@ -23,7 +23,7 @@
                 <v-flex xs12 sm5>
                   <v-layout row wrap align-center>
                     <v-flex xs4>
-                      <v-subheader>Severity</v-subheader>
+                      <v-subheader class="select-box-subheader">Severity</v-subheader>
                     </v-flex>
                     <v-flex xs8>
                       <v-select
@@ -35,7 +35,7 @@
                       ></v-select>
                     </v-flex>
                     <v-flex xs4>
-                      <v-subheader>Status</v-subheader>
+                      <v-subheader class="select-box-subheader">Status</v-subheader>
                     </v-flex>
                     <v-flex xs8>
                       <v-select
@@ -54,7 +54,7 @@
                       </v-select>
                     </v-flex>
                     <v-flex xs4>
-                      <v-subheader>Reported by:</v-subheader>
+                      <v-subheader class="select-box-subheader">Reported by:</v-subheader>
                     </v-flex>
                     <v-flex xs8>
                       <v-select
@@ -78,7 +78,7 @@
                       </v-select>
                     </v-flex>
                     <v-flex xs4>
-                      <v-subheader>Assignee:</v-subheader>
+                      <v-subheader class="select-box-subheader">Assignee:</v-subheader>
                     </v-flex>
                     <v-flex xs8>
                       <v-select
@@ -127,7 +127,14 @@
                 @click="handleSaveBug()"
               >Save and close</v-btn>
               <v-btn color="blue darken-1" flat small outline @click="$router.go(-1)">Back</v-btn>
-              <v-btn color="blue darken-1" flat small outline @click="dialogDeleteBug = true">Delete</v-btn>
+              <v-btn
+                color="blue darken-1"
+                flat
+                small
+                outline
+                @click="dialogDeleteBug = true"
+                id="delete-button__bug-component"
+              >Delete</v-btn>
             </v-layout>
           </v-card-actions>
         </v-card>
@@ -344,7 +351,25 @@ export default {
 #save-and-close-button__bug-component {
   margin-left: 31px !important;
   @media screen and (max-width: 420px) {
-    margin-left: 28px;
+    margin-left: 15px !important;
+  }
+}
+.select-box-subheader {
+  @media screen and (max-width: 420px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+#delete-button__bug-component {
+  @media screen and (max-width: 320px) {
+    margin: 10px 0 0 15px;
+  }
+}
+
+.v-btn__content {
+  @media screen and (max-width: 320px) {
+    font-size: 9px !important;
   }
 }
 </style>
