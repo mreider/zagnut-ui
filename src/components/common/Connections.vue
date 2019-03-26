@@ -465,4 +465,7 @@ export default {
 .hidden_header {
   display: none;
 }
+.v-list__tile.theme--light {
+  height: 35px;
+}
 </style>

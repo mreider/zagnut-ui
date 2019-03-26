@@ -120,7 +120,7 @@
             <v-layout row wrap mb-3>
               <v-btn
                 color="blue darken-1"
-                class="save-and-close-button"
+                id="save-and-close-button__bug-component"
                 flat
                 outline
                 small
@@ -339,5 +339,12 @@ export default {
 
 .comments-card {
   padding-left: 25px;
+}
+
+#save-and-close-button__bug-component {
+  margin-left: 31px !important;
+  @media screen and (max-width: 420px) {
+    margin-left: 28px;
+  }
 }
 </style>
