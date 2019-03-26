@@ -15,7 +15,7 @@
             <p v-html="item.content"></p>
           </v-card-text>
           <v-card-actions>
-            <a :href="item.link" class="read-more-link">
+            <a :href="item.link" class="read-more-link" target="_blank">
               <v-btn flat outline color="blue darken-3">Read more</v-btn>
             </a>
           </v-card-actions>
