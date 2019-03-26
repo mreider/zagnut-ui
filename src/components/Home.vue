@@ -1,6 +1,9 @@
 <template>
   <v-container grid-list-xs>
-    <v-layout row wrap v-for="element in rss" v-bind:key="element.name" pl-4 pr-4>
+    <div v-if="loading === true">
+      <loading-indication></loading-indication>
+    </div>
+    <v-layout row wrap v-for="element in rss" v-bind:key="element.name" class="news-layout">
       <v-flex xs12>
         <h4 class="mb-4 ml-1">{{ element.name }}</h4>
       </v-flex>
@@ -16,7 +19,7 @@
           </v-card-text>
           <v-card-actions>
             <a :href="item.link" class="read-more-link" target="_blank">
-              <v-btn flat outline color="blue darken-3">Read more</v-btn>
+              <v-btn flat small outline color="blue darken-3">Read more</v-btn>
             </a>
           </v-card-actions>
         </v-card>
@@ -32,7 +35,8 @@ export default {
   data() {
     return {
       rss: [],
-      showImg: false
+      showImg: false,
+      loading: false
     };
   },
 
@@ -42,6 +46,7 @@ export default {
   },
   methods: {
     async loadFeed() {
+      this.loading = true;
       try {
         // this.$loading(true);
         if (!success) this.showImg = false;
@@ -58,8 +63,10 @@ export default {
         });
         this.rss = rss;
         console.log(this.rss);
+        this.loading = false;
         if (!success) this.showImg = true;
       } catch (error) {
+        this.loading = false;
         return this.$errorMessage.show(error);
       } finally {
         // this.$loading(false);
@@ -77,8 +84,18 @@ export default {
 .read-more-link {
   text-decoration: none;
   margin-bottom: 7px;
+  margin-left: 8px;
   &:hover {
     text-decoration: none;
+  }
+}
+.news-layout {
+  padding: 0 65px 0 65px;
+  @media screen and (max-width: 768px) {
+    padding: 0 15px 0 15px;
+  }
+  @media screen and (max-width: 420px) {
+    padding: 0 0 0 0;
   }
 }
 </style>
