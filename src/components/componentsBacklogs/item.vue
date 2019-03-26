@@ -75,7 +75,6 @@
                   <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
                 </v-flex>
                 <v-flex xs8></v-flex>
-
                 <v-flex sm12 md8>
                   <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
                 </v-flex>
