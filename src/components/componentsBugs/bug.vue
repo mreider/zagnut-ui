@@ -106,12 +106,12 @@
                 <v-flex xs4>
                   <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
                 </v-flex>
-                <v-flex xs12>
-                  <Connections :toConnectionData="toConnectionData"></Connections>
-                </v-flex>
-                <v-flex xs12>
+                <v-flex xs8></v-flex>
+                <v-flex sm12 md8>
                   <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
-                  <v-checkbox label="Archived: " v-model="form.archived"></v-checkbox>
+                </v-flex>
+                <v-flex sm12 md4>
+                  <Connections :toConnectionData="toConnectionData"></Connections>
                 </v-flex>
               </v-layout>
             </v-container>
