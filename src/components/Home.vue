@@ -95,7 +95,7 @@ export default {
     padding: 0 15px 0 15px;
   }
   @media screen and (max-width: 420px) {
-    padding: 0 0 0 0;
+    padding: 0;
   }
 }
 </style>
