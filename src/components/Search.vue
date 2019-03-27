@@ -96,71 +96,6 @@
         ></v-pagination>
       </div>
     </v-layout>
-
-    <b-card bg-variant="light" class="card" style="margin-top:2em;">
-      <div class="row">
-        <div class="col-5">
-          <b-form-checkbox
-            style="margin-top:2px;"
-            id="checkbox0"
-            class="mb-2 float-left"
-            v-model="showArchived"
-            @change="reload"
-          >Show archived</b-form-checkbox>
-          <b-dropdown :text="currentVarriant" size="sm" class="col-1">
-            <b-dropdown-item
-              v-for="oneVar in variants"
-              v-bind:key="oneVar"
-              @click="handleChangeView(oneVar)"
-            >{{ oneVar }}</b-dropdown-item>
-          </b-dropdown>
-        </div>
-
-        <b-input-group class="col-6">
-          <b-form-input size="sm" v-model="filter" style="margin-top:5px;" placeholder="Filter"/>
-          <b-input-group-append>
-            <b-btn size="sm" class="btnHeader" :disabled="!filter" @click="filter = ''">Clear</b-btn>
-          </b-input-group-append>
-        </b-input-group>
-      </div>
-      <b-table
-        bordered
-        fixed
-        responsive
-        :fields="itemsFields"
-        :items="results"
-        :filter="filter"
-        stacked="sm"
-        :current-page="currentPage"
-        :per-page="perPage"
-        @filtered="onFiltered"
-        style="margin-top: 0.5em"
-      >
-        <template slot="title" slot-scope="data" class="col-8">
-          <router-link :to="handleGetHref(data.item)">{{ data.item.title }}</router-link>
-        </template>
-        <template slot="author" slot-scope="data" class="col-4">
-          <!-- <a :href="`#`" v-on:click="filter = data.item.author"> -->
-          {{ handleUsername(data.item.author) }}
-          <!-- </a> -->
-          <div style="float: right;">
-            <!-- <b-button style="vertical-align: right;" variant="primary" size="sm" :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ data.item.id"> <font-awesome-icon icon="pencil-alt" /> </b-button> -->
-            <!-- <b-button style="bottom" variant="danger" size="sm" v-b-modal.delete @click="setCurrentItem(data.item)"><font-awesome-icon icon="trash-alt" /></b-button> -->
-          </div>
-        </template>
-        <template
-          slot="assignee"
-          slot-scope="data"
-          class="col-2"
-        >{{ handleUsername(data.item.assignee) }}</template>
-        <template slot="ownerId" slot-scope="data" class="col-2">
-          <router-link
-            :to="handleGetHref(data.item, (data.item.type === 'items') ? true : false)"
-          >{{( data.item.ownerId) }}</router-link>
-        </template>
-      </b-table>
-      <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0"/>
-    </b-card>
   </v-container>
 </template>
 
@@ -230,8 +165,10 @@ export default {
     handleChangeView(value) {
       if (value === "all") {
         this.filter = "";
+        this.filterSearchResults(this.filter);
       } else {
         this.filter = value;
+        this.filterSearchResults(this.filter);
       }
       this.currentVarriant = value;
     },
@@ -323,6 +260,8 @@ export default {
     filterSearchResults(clickParam) {
       this.page = 1;
       let searchResults = this.initialSearchResults;
+      console.log("searchResults)");
+      console.log(searchResults);
 
       let filterInputValue;
 
@@ -350,7 +289,10 @@ export default {
                 .toLowerCase()
                 .includes(filterInputValue.toLowerCase());
             }
-            if (typeof obj[key] === "object") {
+            if (
+              typeof obj[key] === "object" &&
+              obj[key].hasOwnProperty("lastName")
+            ) {
               return obj[key]["lastName"]
                 .toLowerCase()
                 .includes(filterInputValue.toLowerCase());
@@ -385,7 +327,7 @@ export default {
             sliceFrom,
             sliceFrom + this.perPage
           );
-          this.searchResults = paginatedArray;
+          this.results = paginatedArray;
         }
       } else {
         if (this.filteredSearchResults !== null) {
