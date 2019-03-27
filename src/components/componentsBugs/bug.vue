@@ -251,7 +251,6 @@ export default {
       }
     },
     handleBugSetField(element, name) {
-      console.log(element, name);
       this.form[name] = element;
     },
     async handleSaveBug() {
@@ -281,7 +280,6 @@ export default {
         );
         const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to update bug.`);
-        // this.$notify({group: 'app', type: 'success', text: 'Item updated'});
         const newComment = this.$refs["comments_ref"].newComment;
         if (newComment) {
           this.$refs["comments_ref"].handleNewComment(
