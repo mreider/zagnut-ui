@@ -27,36 +27,19 @@
     <v-navigation-drawer v-model="drawer" absolute temporary>
       <v-list class="pt-0" dense>
         <v-divider></v-divider>
+
         <v-list-tile
-          :to="{ path: '/initiatives' }"
+          v-for="item in drawerLinkItems"
+          :key="item.title"
+          :to="{ path: item.link }"
           @click="drawer = false"
           class="navigation-drawer-link"
         >
           <v-list-tile-action>
-            <v-icon>announcement</v-icon>
+            <v-icon>{{item.icon}}</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Initiatives</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile
-          :to="{ path: '/backlogs' }"
-          @click="drawer = false"
-          class="navigation-drawer-link"
-        >
-          <v-list-tile-action>
-            <v-icon>horizontal_split</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Backlogs</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{ path: '/bugs' }" @click="drawer = false" class="navigation-drawer-link">
-          <v-list-tile-action>
-            <v-icon>bug_report</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Bugs</v-list-tile-title>
+            <v-list-tile-title>{{item.title}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
 
@@ -91,57 +74,6 @@
       </v-list>
     </v-navigation-drawer>
   </v-layout>
-
-  <!-- <b-navbar toggleable="md" type="dark" variant="info">
-      <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
-
-      <b-navbar-brand :to="{ path: '/' }">PM415</b-navbar-brand>
-
-      <b-collapse is-nav id="nav_collapse">
-        <b-navbar-nav>
-          <b-nav-item :to="{ path: '/initiatives' }">Initiatives</b-nav-item>
-          <b-nav-item :to="{ path: '/ideas' }">Ideas</b-nav-item>
-          <b-nav-item :to="{ path: '/backlogs' }">Backlogs</b-nav-item>
-          <b-nav-item :to="{ path: '/bugs' }">Bugs</b-nav-item>
-          <b-nav-item>
-            <b-input-group>
-              <b-form-input
-                size="sm"
-                @keydown.enter.native="goSearch(searchText)"
-                v-model="searchText"
-                placeholder="Search"
-                style="background-color: white"
-              />
-              <b-input-group-append>
-                <b-btn
-                  size="sm"
-                  class="success SearchBtn btn btn-default"
-                  @click="goSearch(searchText)"
-                >
-                  <font-awesome-icon icon="search" aria-hidden="true"/>
-                </b-btn>
-              </b-input-group-append>
-            </b-input-group>
-          </b-nav-item>
-        </b-navbar-nav>
-
-        <b-navbar-nav class="ml-auto">
-          <b-nav-item-dropdown :text="$store.state.organization.name" right>
-            <b-dropdown-item
-              href="#"
-              v-for="org in $store.state.user.organizations"
-              v-bind:key="org.id"
-              @click="handleOrgChange(org)"
-            >{{ org.name }}</b-dropdown-item>
-          </b-nav-item-dropdown>
-
-          <b-nav-item-dropdown :text="username" right>
-            <b-dropdown-item :to="{ path: '/settings' }">Settings</b-dropdown-item>
-            <b-dropdown-item @click="handleLogout">Logout</b-dropdown-item>
-          </b-nav-item-dropdown>
-        </b-navbar-nav>
-      </b-collapse>
-  </b-navbar>-->
 </template>
 
 <script>
@@ -155,7 +87,24 @@ export default {
   data() {
     return {
       searchText: "",
-      drawer: false
+      drawer: false,
+      drawerLinkItems: [
+        {
+          title: "Initiatives",
+          icon: "announcement",
+          link: "/initiatives"
+        },
+        {
+          title: "Backlogs",
+          icon: "horizontal_split",
+          link: "/backlogs"
+        },
+        {
+          title: "Bugs",
+          icon: "bug_report",
+          link: "/bugs"
+        }
+      ]
     };
   },
 
