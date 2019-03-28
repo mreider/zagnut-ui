@@ -62,7 +62,6 @@ export default {
           });
         });
         this.rss = rss;
-        console.log(this.rss);
         this.loading = false;
         if (!success) this.showImg = true;
       } catch (error) {

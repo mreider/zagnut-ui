@@ -255,8 +255,6 @@ export default {
 
           this.results = this.initialSearchResults.slice(0, this.perPage);
 
-          console.log(this.results);
-
           this.totalRows = results.length;
         } catch (error) {
           return this.$errorMessage.show(error);
@@ -270,8 +268,6 @@ export default {
     filterSearchResults(clickParam) {
       this.page = 1;
       let searchResults = this.initialSearchResults;
-      console.log("searchResults)");
-      console.log(searchResults);
 
       let filterInputValue;
 

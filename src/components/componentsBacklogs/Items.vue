@@ -278,7 +278,6 @@ export default {
 
   computed: {
     selectedCards: function() {
-      console.log(this.selected);
       return this.filteredSelected !== null
         ? this.filteredSelected
         : this.selected;
@@ -339,10 +338,8 @@ export default {
         });
         if (firstLoad) {
           this.selected = this.objStatuses;
-          console.log(this.selected);
           this.initialSelected = this.objStatusesj;
           this.filteredSelected = this.objStatusesj;
-          console.log(this.filteredSelected);
         }
         if (!firstLoad) {
           this.selected.forEach(element => {
