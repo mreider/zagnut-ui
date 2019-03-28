@@ -61,7 +61,17 @@
           >Clear</v-btn>
         </v-flex>
       </v-layout>
-      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in searchResults" :key="item.id">
+      <v-flex
+        xs12
+        sm6
+        md4
+        lg3
+        pl-1
+        pr-1
+        pt-3
+        v-for="item in searchResults"
+        :key="item.id + item.type"
+      >
         <v-card>
           <v-card-title primary-title>
             <h4 class="mb-0">Type: {{item.type}}</h4>
