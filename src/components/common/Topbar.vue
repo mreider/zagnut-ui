@@ -27,7 +27,6 @@
     <v-navigation-drawer v-model="drawer" absolute temporary>
       <v-list class="pt-0" dense>
         <v-divider></v-divider>
-
         <v-list-tile
           v-for="item in drawerLinkItems"
           :key="item.title"
@@ -42,7 +41,6 @@
             <v-list-tile-title>{{item.title}}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-
         <v-list-group no-action sub-group>
           <template v-slot:activator>
             <v-list-tile>
