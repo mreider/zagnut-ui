@@ -4,11 +4,11 @@
       <v-card-text>
         <v-container grid-list-md>
           <v-layout row wrap>
-            <v-flex xs12 sm7>
+            <v-flex xs12>
               <v-text-field v-model="form.title" placeholder="Enter initiative"></v-text-field>
               <v-textarea v-model="form.description" placeholder="Enter hightlights"></v-textarea>
             </v-flex>
-            <v-flex xs12 sm5>
+            <v-flex xs12>
               <v-layout row wrap align-center>
                 <v-flex xs4 mt-1>
                   <v-subheader>Vote</v-subheader>
@@ -71,10 +71,10 @@
               <v-checkbox label="Archived" class="checkbox" v-model="form.archived"></v-checkbox>
             </v-flex>
             <v-flex xs8></v-flex>
-            <v-flex sm12 md8>
+            <v-flex sm12>
               <Comments :toCommentsData="toCommentsData" ref="comments_ref"></Comments>
             </v-flex>
-            <v-flex sm12 md4>
+            <v-flex sm12>
               <Connections :toConnectionData="toConnectionData"></Connections>
             </v-flex>
           </v-layout>

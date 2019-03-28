@@ -22,10 +22,10 @@
                 </v-flex>
                 <v-flex xs12>
                   <v-layout row wrap align-center>
-                    <v-flex xs2>
+                    <v-flex xs4>
                       <v-subheader class="select-box-subheader">Severity</v-subheader>
                     </v-flex>
-                    <v-flex xs4>
+                    <v-flex xs8>
                       <v-select
                         :items="severityArray"
                         item-text="element"
@@ -34,10 +34,10 @@
                         class="pt-0"
                       ></v-select>
                     </v-flex>
-                    <v-flex xs2>
+                    <v-flex xs4>
                       <v-subheader class="select-box-subheader">Status</v-subheader>
                     </v-flex>
-                    <v-flex xs4>
+                    <v-flex xs8>
                       <v-select
                         :items="objStatuses"
                         item-text="`${data.item.name}`"
@@ -53,10 +53,10 @@
                         </template>
                       </v-select>
                     </v-flex>
-                    <v-flex xs2>
+                    <v-flex xs4>
                       <v-subheader class="select-box-subheader">Reported by:</v-subheader>
                     </v-flex>
-                    <v-flex xs4>
+                    <v-flex xs8>
                       <v-select
                         :items="users"
                         item-text="`${data.item.firstName} ${data.item.lastName}`"
@@ -77,10 +77,10 @@
                         </template>
                       </v-select>
                     </v-flex>
-                    <v-flex xs2>
+                    <v-flex xs4>
                       <v-subheader class="select-box-subheader">Assignee:</v-subheader>
                     </v-flex>
-                    <v-flex xs4>
+                    <v-flex xs8>
                       <v-select
                         :items="users"
                         item-text="`${data.item.firstName} ${data.item.lastName}`"
