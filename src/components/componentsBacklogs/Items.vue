@@ -4,7 +4,7 @@
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <h3>{{ this.title }}</h3>
 
-        <v-spacer class="hidden-md-and-down"></v-spacer>
+        <v-spacer></v-spacer>
         <v-btn small outline color="pink" @click="$router.go(-1)">close</v-btn>
         <v-btn small outline color="success" @click="dialogNewItem = true">New</v-btn>
       </v-toolbar>
@@ -35,7 +35,12 @@
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <!--new initiative dialog-->
+          <v-checkbox
+            label="Show archived"
+            class="checkbox ml-2"
+            v-model="showArchived"
+            @change="reload"
+          ></v-checkbox>
           <v-btn small outline color="pink" @click="$router.go(-1)">close</v-btn>
           <v-btn small outline color="success" @click="dialogNewItem = true">New</v-btn>
         </v-flex>
