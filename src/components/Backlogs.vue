@@ -498,23 +498,22 @@ export default {
       }
 
       let filterKeys = ["title", "author"];
-      for (let i = 0, len = backlogs.length; i < len; i++) {
-        this.filteredBacklogs = backlogs.filter(function(obj) {
-          return filterKeys.some(function(key) {
-            if (typeof obj[key] === "string" || typeof obj[key] === "number") {
-              return obj[key]
-                .toString()
-                .toLowerCase()
-                .includes(filterInputValue.toLowerCase());
-            }
-            if (typeof obj[key] === "object") {
-              return obj[key]["horizon"]
-                .toLowerCase()
-                .includes(filterInputValue.toLowerCase());
-            }
-          });
+      this.filteredBacklogs = backlogs.filter(function(obj) {
+        return filterKeys.some(function(key) {
+          if (typeof obj[key] === "string" || typeof obj[key] === "number") {
+            return obj[key]
+              .toString()
+              .toLowerCase()
+              .includes(filterInputValue.toLowerCase());
+          }
+          if (typeof obj[key] === "object") {
+            return obj[key]["horizon"]
+              .toLowerCase()
+              .includes(filterInputValue.toLowerCase());
+          }
         });
-      }
+      });
+
       this.totalPages = Math.ceil(this.filteredBacklogs.length / this.perPage);
       this.initialFilteredBacklogs = this.filteredBacklogs.slice();
     },

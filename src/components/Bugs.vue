@@ -663,23 +663,22 @@ export default {
         "assignedTo",
         "createdAt"
       ];
-      for (let i = 0, len = bugs.length; i < len; i++) {
-        this.filteredBugs = bugs.filter(function(obj) {
-          return filterKeys.some(function(key) {
-            if (typeof obj[key] === "string" || typeof obj[key] === "number") {
-              return obj[key]
-                .toString()
-                .toLowerCase()
-                .includes(filterInputValue.toLowerCase());
-            }
-            if (typeof obj[key] === "object") {
-              return obj[key]["name"]
-                .toLowerCase()
-                .includes(filterInputValue.toLowerCase());
-            }
-          });
+      this.filteredBugs = bugs.filter(function(obj) {
+        return filterKeys.some(function(key) {
+          if (typeof obj[key] === "string" || typeof obj[key] === "number") {
+            return obj[key]
+              .toString()
+              .toLowerCase()
+              .includes(filterInputValue.toLowerCase());
+          }
+          if (typeof obj[key] === "object") {
+            return obj[key]["name"]
+              .toLowerCase()
+              .includes(filterInputValue.toLowerCase());
+          }
         });
-      }
+      });
+
       this.totalPages = Math.ceil(this.filteredBugs.length / this.perPage);
       this.initialFilteredBugs = this.filteredBugs.slice();
     },

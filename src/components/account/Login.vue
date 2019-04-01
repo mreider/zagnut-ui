@@ -4,15 +4,17 @@
     <h1 class="center">PM415</h1>
 
     <b-form-group>
-      <b-form-input type="email" v-model="form.email" required placeholder="Email address">
-      </b-form-input>
+      <b-form-input type="email" v-model="form.email" required placeholder="Email address"></b-form-input>
     </b-form-group>
 
     <b-form-group>
-      <b-form-input type="password" v-model="form.password" required placeholder="Password">
-      </b-form-input>
+      <b-form-input type="password" v-model="form.password" required placeholder="Password"></b-form-input>
       <template slot="description">
-        <a href="#" class="small float-right" @click="onChangeForm && onChangeForm('forgot')">Forgot password?</a>
+        <a
+          href="#"
+          class="small float-right"
+          @click="onChangeForm && onChangeForm('forgot')"
+        >Forgot password?</a>
       </template>
     </b-form-group>
 
@@ -24,11 +26,11 @@
 </template>
 
 <script>
-import _get from 'lodash/get';
-import { doLogin } from '@/utils';
+import _get from "lodash/get";
+import { doLogin } from "@/utils";
 
 export default {
-  name: 'Login',
+  name: "Login",
   data() {
     return {
       form: {
@@ -43,9 +45,9 @@ export default {
       event.preventDefault();
 
       try {
-        let response = await this.axios.post('/api/account/login', this.form);
-        const token = _get(response, 'data.token');
-        const user = _get(response, 'data.user');
+        let response = await this.axios.post("/api/account/login", this.form);
+        const token = _get(response, "data.token");
+        const user = _get(response, "data.user");
 
         doLogin(this, token, user);
       } catch (error) {
@@ -63,11 +65,11 @@ export default {
 </script>
 
 <style lang="scss">
-  .login {
-    margin: auto;
-    // width: 300px;
-    h1 {
-      margin-bottom: 30px;
-    }
+.login {
+  margin: auto;
+  // width: 300px;
+  h1 {
+    margin-bottom: 30px;
   }
+}
 </style>
