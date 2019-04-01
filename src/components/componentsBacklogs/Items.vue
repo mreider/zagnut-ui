@@ -76,7 +76,7 @@
       </v-layout>
     </v-layout>
     <!--cards section-->
-    <v-layout row wrap v-for="element in filteredSelected" :key="element.id">
+    <v-layout row wrap v-for="element in filteredSelected.slice().reverse()" :key="element.id">
       <v-flex xs12>
         <h5 class="backlogs-cards-header">{{ element.name }}</h5>
       </v-flex>
@@ -343,8 +343,8 @@ export default {
         });
         if (firstLoad) {
           this.selected = this.objStatuses;
-          this.initialSelected = this.objStatusesj;
-          this.filteredSelected = this.objStatusesj;
+          // this.initialSelected = this.objStatusesj;
+          // this.filteredSelected = this.objStatusesj;
         }
         if (!firstLoad) {
           this.selected.forEach(element => {
@@ -355,6 +355,7 @@ export default {
             element.currentPage = 1;
           });
           this.filteredSelected = this.selected;
+          console.log(this.filteredSelected);
           this.initialSelected = this.selected;
         }
         this.selected.sort(function(a, b) {
