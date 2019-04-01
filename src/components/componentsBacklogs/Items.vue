@@ -250,7 +250,7 @@ export default {
       selected: [],
       initialSelected: [],
       initialFilteredSelected: null,
-      filteredSelected: null,
+      filteredSelected: [],
       options: [],
       users: [],
       newItem: {
