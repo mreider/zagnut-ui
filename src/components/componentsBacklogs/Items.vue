@@ -75,7 +75,7 @@
       <v-flex xs12>
         <h5 class="backlogs-cards-header">{{ element.name }}</h5>
       </v-flex>
-      <v-flex xs6 sm4 md2 lg2 pl-1 pr-1 pt-3 v-for="item in element.filteredItems" :key="item.id">
+      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in element.filteredItems" :key="item.id">
         <v-card>
           <v-card-title primary-title>
             <h5 class="mb-0">
