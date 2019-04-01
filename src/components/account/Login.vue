@@ -45,7 +45,11 @@ export default {
       event.preventDefault();
 
       try {
-        let response = await this.axios.post("/api/account/login", this.form);
+        let response = await this.axios.post(
+          "https://cors-anywhere.herokuapp.com/" +
+            "https://6sprints.com/api/account/login",
+          this.form
+        );
         const token = _get(response, "data.token");
         const user = _get(response, "data.user");
 
