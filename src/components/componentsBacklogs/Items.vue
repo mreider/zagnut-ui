@@ -75,53 +75,72 @@
         </v-flex>
       </v-layout>
     </v-layout>
+
     <!--cards section-->
+
     <v-layout row wrap v-for="element in filteredSelected.slice().reverse()" :key="element.id">
       <v-flex xs12>
         <h5 class="backlogs-cards-header">{{ element.name }}</h5>
       </v-flex>
-      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in element.filteredItems" :key="item.id">
-        <v-card>
-          <v-card-title primary-title>
-            <h5 class="mb-0">
-              Title:
-              <router-link
+      <draggable
+        v-model="element.filteredItems"
+        @start="drag=true"
+        @end="drag=false"
+        class="layout row wrap"
+      >
+        <v-flex
+          xs12
+          sm6
+          md4
+          lg3
+          pl-1
+          pr-1
+          pt-3
+          v-for="item in element.filteredItems"
+          :key="item.id"
+        >
+          <v-card>
+            <v-card-title primary-title>
+              <h5 class="mb-0">
+                Title:
+                <router-link
+                  :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ item.id"
+                >{{ item.title }}</router-link>
+              </h5>
+            </v-card-title>
+            <div class="card-body pt-0 pb-0">
+              <p class="mb-2">
+                Author:
+                <a href="#" @click="filterItems(item.author)">{{item.author }}</a>
+              </p>
+            </div>
+            <v-card-actions class="pl-3 pb-2">
+              <v-btn
+                class="edit-button extra-small-button"
+                outline
+                fab
+                dark
+                small
+                color="primary"
                 :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ item.id"
-              >{{ item.title }}</router-link>
-            </h5>
-          </v-card-title>
-          <div class="card-body pt-0 pb-0">
-            <p class="mb-2">
-              Author:
-              <a href="#" @click="filterItems(item.author)">{{item.author }}</a>
-            </p>
-          </div>
-          <v-card-actions class="pl-3 pb-2">
-            <v-btn
-              class="edit-button extra-small-button"
-              outline
-              fab
-              dark
-              small
-              color="primary"
-              :to="'item/?orgId='+$store.state.organization.id +'&itemId='+ item.id"
-            >
-              <i class="material-icons">edit</i>
-            </v-btn>
-            <v-btn
-              class="delete-button extra-small-button"
-              outline
-              fab
-              dark
-              small
-              color="primary"
-              @click="setCurrentItem(item), dialogDeleteItem = true"
-            >
-              <i class="material-icons">delete</i>
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
+              >
+                <i class="material-icons">edit</i>
+              </v-btn>
+              <v-btn
+                class="delete-button extra-small-button"
+                outline
+                fab
+                dark
+                small
+                color="primary"
+                @click="setCurrentItem(item), dialogDeleteItem = true"
+              >
+                <i class="material-icons">delete</i>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
+      </draggable>
     </v-layout>
 
     <v-dialog v-model="dialogNewItem" max-width="850px">
@@ -234,6 +253,8 @@ import _get from "lodash/get";
 import _ from "lodash";
 import Item from "../componentsBacklogs/item.vue";
 import { username } from "@/utils";
+import draggable from "vuedraggable";
+
 export default {
   name: "Items",
   data() {
@@ -548,7 +569,8 @@ export default {
     }
   },
   components: {
-    item: Item
+    item: Item,
+    draggable
   }
 };
 </script>
