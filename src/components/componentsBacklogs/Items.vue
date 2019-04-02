@@ -377,7 +377,6 @@ export default {
             element.currentPage = 1;
           });
           this.filteredSelected = this.selected;
-          console.log(this.filteredSelected);
           this.initialSelected = this.selected;
         }
         this.selected.sort(function(a, b) {
@@ -566,6 +565,16 @@ export default {
     onMove({ relatedContext, draggedContext }) {
       console.log(draggedContext);
       console.log(relatedContext);
+
+      const orgId = this.$route.query.orgId;
+      let data = draggedContext.element;
+      const id = draggedContext.element.id;
+      data.order_index = draggedContext.futureIndex;
+      console.log(orgId);
+      const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
+
+      const success = _get(response, "data.success");
+      if (!success) throw new Error(`Unable to update item.`);
     }
   },
   watch: {

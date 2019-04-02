@@ -165,6 +165,7 @@ export default {
         assignee: { firstName: "", lastName: "", email: "", id: "" },
         forecastedRelease: "",
         actualRelease: "",
+        order_index: "3",
         statusId: 0,
         id: "",
         Author: { firstName: "", lastName: "", email: "" },
