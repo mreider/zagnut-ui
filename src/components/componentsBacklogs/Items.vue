@@ -85,7 +85,7 @@
       <draggable
         v-model="element.filteredItems"
         @start="drag=true"
-        @end="drag=false"
+        @end="onEnd($event)"
         :move="onMove"
         class="layout row wrap"
       >
@@ -562,19 +562,17 @@ export default {
     clearItemsFilter() {
       this.filterItems("");
     },
-    onMove({ relatedContext, draggedContext }) {
-      console.log(draggedContext);
-      console.log(relatedContext);
+    onMove({ relatedContext, draggedContext }) {},
+    onEnd(event) {
+      console.log(event);
+      // const orgId = this.$route.query.orgId;
+      // let data = draggedContext.element;
+      // const id = draggedContext.element.id;
+      // data.order_index = draggedContext.futureIndex;
+      // const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
 
-      const orgId = this.$route.query.orgId;
-      let data = draggedContext.element;
-      const id = draggedContext.element.id;
-      data.order_index = draggedContext.futureIndex;
-      console.log(orgId);
-      const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
-
-      const success = _get(response, "data.success");
-      if (!success) throw new Error(`Unable to update item.`);
+      // const success = _get(response, "data.success");
+      // if (!success) throw new Error(`Unable to update item.`);
     }
   },
   watch: {
