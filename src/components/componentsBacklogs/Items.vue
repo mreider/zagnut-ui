@@ -4,7 +4,7 @@
       <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
         <h3>{{ this.title }}</h3>
 
-        <v-spacer class="hidden-md-and-down"></v-spacer>
+        <v-spacer></v-spacer>
         <v-btn small outline color="pink" @click="$router.go(-1)">close</v-btn>
         <v-btn small outline color="success" @click="dialogNewItem = true">New</v-btn>
       </v-toolbar>
@@ -35,7 +35,12 @@
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <!--new initiative dialog-->
+          <v-checkbox
+            label="Show archived"
+            class="checkbox ml-2"
+            v-model="showArchived"
+            @change="reload"
+          ></v-checkbox>
           <v-btn small outline color="pink" @click="$router.go(-1)">close</v-btn>
           <v-btn small outline color="success" @click="dialogNewItem = true">New</v-btn>
         </v-flex>
@@ -71,11 +76,11 @@
       </v-layout>
     </v-layout>
     <!--cards section-->
-    <v-layout row wrap v-for="element in filteredSelected" :key="element.id">
+    <v-layout row wrap v-for="element in filteredSelected.slice().reverse()" :key="element.id">
       <v-flex xs12>
         <h5 class="backlogs-cards-header">{{ element.name }}</h5>
       </v-flex>
-      <v-flex xs6 sm4 md2 lg2 pl-1 pr-1 pt-3 v-for="item in element.filteredItems" :key="item.id">
+      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in element.filteredItems" :key="item.id">
         <v-card>
           <v-card-title primary-title>
             <h5 class="mb-0">
@@ -245,7 +250,7 @@ export default {
       selected: [],
       initialSelected: [],
       initialFilteredSelected: null,
-      filteredSelected: null,
+      filteredSelected: [],
       options: [],
       users: [],
       newItem: {
@@ -338,8 +343,8 @@ export default {
         });
         if (firstLoad) {
           this.selected = this.objStatuses;
-          this.initialSelected = this.objStatusesj;
-          this.filteredSelected = this.objStatusesj;
+          // this.initialSelected = this.objStatusesj;
+          // this.filteredSelected = this.objStatusesj;
         }
         if (!firstLoad) {
           this.selected.forEach(element => {
@@ -350,6 +355,7 @@ export default {
             element.currentPage = 1;
           });
           this.filteredSelected = this.selected;
+          console.log(this.filteredSelected);
           this.initialSelected = this.selected;
         }
         this.selected.sort(function(a, b) {

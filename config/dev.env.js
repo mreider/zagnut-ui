@@ -3,7 +3,7 @@ var prodEnv = require('./prod.env');
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  BACKEND_URL: '"http://6sprints.com"'
+  BACKEND_URL: '"https://6sprints.com"'
   // BACKEND_URL: '"http://pm415.com"'
   // BACKEND_URL: '"http://localhost:3000"'
 });
