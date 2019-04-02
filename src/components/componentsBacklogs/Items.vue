@@ -86,6 +86,7 @@
         v-model="element.filteredItems"
         @start="drag=true"
         @end="drag=false"
+        :move="onMove"
         class="layout row wrap"
       >
         <v-flex
@@ -561,6 +562,10 @@ export default {
     },
     clearItemsFilter() {
       this.filterItems("");
+    },
+    onMove({ relatedContext, draggedContext }) {
+      console.log(draggedContext);
+      console.log(relatedContext);
     }
   },
   watch: {
