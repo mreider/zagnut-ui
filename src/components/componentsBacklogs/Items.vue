@@ -290,7 +290,8 @@ export default {
       filter: null,
       perPage: 5,
       title: "backlog title",
-      showArchived: false
+      showArchived: false,
+      draggedContext: []
     };
   },
   async mounted() {
@@ -562,17 +563,42 @@ export default {
     clearItemsFilter() {
       this.filterItems("");
     },
-    onMove({ relatedContext, draggedContext }) {},
+    onMove({ relatedContext, draggedContext }) {
+      this.draggedContext = draggedContext;
+    },
     onEnd(event) {
-      console.log(event);
-      // const orgId = this.$route.query.orgId;
-      // let data = draggedContext.element;
-      // const id = draggedContext.element.id;
-      // data.order_index = draggedContext.futureIndex;
-      // const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
+      const orgId = this.$route.query.orgId;
 
-      // const success = _get(response, "data.success");
-      // if (!success) throw new Error(`Unable to update item.`);
+      const {
+        archived,
+        assignee,
+        description,
+        points,
+        statusId,
+        title
+      } = this.draggedContext.element;
+
+      let archivedBoolean;
+      if (archived === 0) {
+        archivedBoolean = false;
+      } else {
+        archivedBoolean = true;
+      }
+      let data = {};
+      data.archived = archivedBoolean;
+      data.assignee = assignee;
+      data.description = description;
+      data.pints = points;
+      data.statusId = statusId.toString();
+      data.title = title;
+      data.order_index = this.draggedContext.futureIndex.toString();
+
+      const id = this.draggedContext.element.id;
+
+      const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
+
+      const success = _get(response, "data.success");
+      if (!success) throw new Error(`Unable to update item.`);
     }
   },
   watch: {
