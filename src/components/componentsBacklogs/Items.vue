@@ -568,34 +568,12 @@ export default {
     },
     onEnd(event) {
       const orgId = this.$route.query.orgId;
-
-      const {
-        archived,
-        assignee,
-        description,
-        points,
-        statusId,
-        title
-      } = this.draggedContext.element;
-
-      let archivedBoolean;
-      if (archived === 0) {
-        archivedBoolean = false;
-      } else {
-        archivedBoolean = true;
-      }
       let data = {};
-      data.archived = archivedBoolean;
-      data.assignee = assignee;
-      data.description = description;
-      data.pints = points;
-      data.statusId = statusId.toString();
-      data.title = title;
       data.order_index = this.draggedContext.futureIndex.toString();
-
       const id = this.draggedContext.element.id;
-
-      const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
+      const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, {
+        order_index: "3"
+      });
 
       const success = _get(response, "data.success");
       if (!success) throw new Error(`Unable to update item.`);
