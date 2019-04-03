@@ -574,20 +574,17 @@ export default {
       console.log(draggedContext);
     },
     onEnd(event) {
-      this.raging = false;
+      this.loading = false;
       let foundArrIndex = this.filteredSelected.findIndex(
         x => x.id === this.draggedContext.element.statusId
       );
-      let index = this.draggedContext.futureIndex;
-      // eslint-disable-next-line
-      this.filteredSelected[foundArrIndex].filteredItems[
-        index
-      ].order_index = this.draggedContext.futureIndex;
-      console.log(this.filteredSelected[foundArrIndex]);
-
-      const arr = JSON.parse(JSON.stringify(this.filteredSelected));
-      this.filteredSelected = [];
-      this.filteredSelected = arr;
+      let arrayToUpdate = this.filteredSelected[foundArrIndex].filteredItems;
+      for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
+        arrayToUpdate[i].order_index = i.toString();
+      }
+      const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
+      this.filteredSelected = updatedArr;
+      console.log(this.filteredSelected);
 
       // this.filteredSelected[foundArrIndex].filteredItems.sort((a, b) => {
       //   if (a.order_index > b.order_index) {
