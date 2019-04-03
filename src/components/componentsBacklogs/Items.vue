@@ -83,8 +83,8 @@
         <h5 class="backlogs-cards-header">{{ element.name }}</h5>
       </v-flex>
       <draggable
-        v-model="element.filteredItems"
-        @start="drag=true"
+        :list="element.filteredItems"
+        @start="draging=true"
         @end="onEnd($event)"
         :move="onMove"
         class="layout row wrap"
@@ -291,7 +291,9 @@ export default {
       perPage: 5,
       title: "backlog title",
       showArchived: false,
-      draggedContext: []
+      dragging: false,
+      draggedContext: {},
+      relatedContext: {}
     };
   },
   async mounted() {
@@ -306,6 +308,7 @@ export default {
 
   computed: {
     selectedCards: function() {
+      console.log(this.filteredSelected);
       return this.filteredSelected !== null
         ? this.filteredSelected
         : this.selected;
@@ -378,6 +381,7 @@ export default {
             element.currentPage = 1;
           });
           this.filteredSelected = this.selected;
+          console.log(this.filteredSelected);
           this.initialSelected = this.selected;
         }
         this.selected.sort(function(a, b) {
@@ -565,16 +569,46 @@ export default {
     },
     onMove({ relatedContext, draggedContext }) {
       this.draggedContext = draggedContext;
+      this.relatedContext = relatedContext;
+      console.log(relatedContext);
+      console.log(draggedContext);
     },
     onEnd(event) {
-      const orgId = this.$route.query.orgId;
-      let data = {};
-      data.order_index = this.draggedContext.futureIndex.toString();
-      const id = this.draggedContext.element.id;
-      const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
+      this.raging = false;
+      let foundArrIndex = this.filteredSelected.findIndex(
+        x => x.id === this.draggedContext.element.statusId
+      );
+      let index = this.draggedContext.futureIndex;
+      // eslint-disable-next-line
+      this.filteredSelected[foundArrIndex].filteredItems[
+        index
+      ].order_index = this.draggedContext.futureIndex;
+      console.log(this.filteredSelected[foundArrIndex]);
 
-      const success = _get(response, "data.success");
-      if (!success) throw new Error(`Unable to update item.`);
+      const arr = JSON.parse(JSON.stringify(this.filteredSelected));
+      this.filteredSelected = [];
+      this.filteredSelected = arr;
+
+      // this.filteredSelected[foundArrIndex].filteredItems.sort((a, b) => {
+      //   if (a.order_index > b.order_index) {
+      //     return 1;
+      //   }
+      //   if (a.order_index < b.order_index) {
+      //     return -1;
+      //   }
+      //   return 0;
+      // });
+      // console.log(this.filteredSelected[foundArrIndex]);
+
+      // const orgId = this.$route.query.orgId;
+      // let data = {};
+      // data.order_index = this.draggedContext.futureIndex.toString();
+      // const id = this.draggedContext.element.id;
+
+      // const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
+
+      // const success = _get(response, "data.success");
+      // if (!success) throw new Error(`Unable to update item.`);
     }
   },
   watch: {
