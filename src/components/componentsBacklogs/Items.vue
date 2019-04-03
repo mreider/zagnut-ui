@@ -571,9 +571,7 @@ export default {
       let data = {};
       data.order_index = this.draggedContext.futureIndex.toString();
       const id = this.draggedContext.element.id;
-      const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, {
-        order_index: "3"
-      });
+      const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
 
       const success = _get(response, "data.success");
       if (!success) throw new Error(`Unable to update item.`);
