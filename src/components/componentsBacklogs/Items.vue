@@ -87,7 +87,7 @@
         @start="draging=true"
         @end="onEnd($event)"
         :move="onMove"
-        class="layout row wrap"
+        class="layout wrap"
       >
         <v-flex
           xs12
@@ -308,7 +308,6 @@ export default {
 
   computed: {
     selectedCards: function() {
-      console.log(this.filteredSelected);
       return this.filteredSelected !== null
         ? this.filteredSelected
         : this.selected;
@@ -381,6 +380,23 @@ export default {
             element.currentPage = 1;
           });
           this.filteredSelected = this.selected;
+          console.log(this.filteredSelected);
+          for (let item of this.filteredSelected) {
+            console.log(item);
+            if (item.filteredItems) {
+              console.log("hello");
+              console.log(item.filteredItems);
+              item.filteredItems.sort((a, b) => {
+                if (a.order_index > b.order_index) {
+                  return 1;
+                }
+                if (a.order_index < b.order_index) {
+                  return -1;
+                }
+                return 0;
+              });
+            }
+          }
           console.log(this.filteredSelected);
           this.initialSelected = this.selected;
         }
