@@ -574,17 +574,29 @@ export default {
       console.log(draggedContext);
     },
     onEnd(event) {
-      this.loading = false;
+      this.dragging = false;
+      const orgId = this.$route.query.orgId;
       let foundArrIndex = this.filteredSelected.findIndex(
         x => x.id === this.draggedContext.element.statusId
       );
       let arrayToUpdate = this.filteredSelected[foundArrIndex].filteredItems;
+      let data;
       for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
         arrayToUpdate[i].order_index = i.toString();
+        data = {
+          order_index: arrayToUpdate[i].order_index
+        };
+        this.axios
+          .put(`/api/items/edit/${orgId}/${arrayToUpdate[i].id}`, data)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(err => {
+            console.log(err);
+          });
       }
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
       this.filteredSelected = updatedArr;
-      console.log(this.filteredSelected);
 
       // this.filteredSelected[foundArrIndex].filteredItems.sort((a, b) => {
       //   if (a.order_index > b.order_index) {
