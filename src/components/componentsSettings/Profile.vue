@@ -22,8 +22,6 @@
             :rules="[rules.passwordMatch]"
           ></v-text-field>
         </v-flex>
-      </v-layout>
-      <div class="button-box">
         <v-btn
           outline
           color="primary"
@@ -31,7 +29,22 @@
           @click="handleProfileSubmit"
           class="ml-0"
         >Save</v-btn>
-      </div>
+      </v-layout>
+      <v-layout wrap>
+        <v-flex xs12 md3 pr-4>
+          <v-text-field readonly label="Api key" v-model="profile.apiKey" disabled></v-text-field>
+        </v-flex>
+        <v-flex xs12 md4 pr-4>
+          <v-btn
+            color="warning"
+            outline
+            dark
+            v-b-modal="modalId(1, 'regenerate-api-key')"
+            class="ml-0 mb-0 mt-2"
+          >Regenerate</v-btn>
+          <v-btn color="success" outline dark v-b-modal.modal-invite class="mb-0 mt-2">Invite link</v-btn>
+        </v-flex>
+      </v-layout>
     </v-form>
 
     <div class="profile">
@@ -77,16 +90,16 @@
         </div>-->
 
         <div class="api-key-invite form-inline float-right">
-          <label>API key</label>
-          <b-form-input readonly v-model="profile.apiKey"></b-form-input>
+          <!-- <label>API key</label> -->
+          <!-- <b-form-input readonly v-model="profile.apiKey"></b-form-input> -->
 
-          <v-btn
+          <!-- <v-btn
             color="warning"
             outline
             small
             dark
             v-b-modal="modalId(1, 'regenerate-api-key')"
-          >Regenerate</v-btn>
+          >Regenerate</v-btn>-->
 
           <b-modal
             :id="modalId(1, 'regenerate-api-key')"
@@ -102,7 +115,7 @@
             <p>Are absolutely sure you want to create new API key?</p>
           </b-modal>
 
-          <v-btn color="success" outline small dark v-b-modal.modal-invite>Invite link</v-btn>
+          <!-- <v-btn color="success" outline small dark v-b-modal.modal-invite>Invite link</v-btn> -->
 
           <b-modal
             id="modal-invite"
