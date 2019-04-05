@@ -596,22 +596,30 @@ export default {
         x => x.id === this.draggedContext.element.statusId
       );
       let arrayToUpdate = this.filteredSelected[foundArrIndex].filteredItems;
-      let data;
+      // let data;
       for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
         arrayToUpdate[i].order_index = i.toString();
-        data = {
-          order_index: arrayToUpdate[i].order_index
-        };
-        this.axios
-          .put(`/api/items/edit/${orgId}/${arrayToUpdate[i].id}`, data)
-          .then(response => {
-            console.log(response);
-          })
-          .catch(err => {
-            console.log(err);
-          });
+        // data = {
+        //   order_index: arrayToUpdate[i].order_index
+        // };
       }
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
+      this.axios
+        .put(`/api/orderindexchange/${orgId}`, {
+          items: [
+            {
+              id: "1",
+              order_index: "2"
+            }
+          ],
+          initiatives: []
+        })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(err => {
+          console.log(err);
+        });
       this.filteredSelected = updatedArr;
 
       // this.filteredSelected[foundArrIndex].filteredItems.sort((a, b) => {
