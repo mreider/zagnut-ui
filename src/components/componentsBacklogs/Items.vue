@@ -611,6 +611,7 @@ export default {
         .put(`/api/orderindexchange/${orgId}`, data)
         .then(response => {
           console.log(response);
+          this.loadOrgStatuses();
         })
         .catch(err => {
           console.log(err);
