@@ -74,6 +74,40 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="dialogInviteLink" max-width="650">
+      <v-card>
+        <v-card-text class="subheading">
+          <v-select
+            :items="organizations"
+            item-text="name"
+            item-value="name"
+            return-object
+            @click="handleInviteOrgChange"
+          ></v-select>
+          <v-text-field label="Api key" v-model="invite.email" placeholder="E-Mail">></v-text-field>
+          <v-text-field readonly label="Api key" v-model="invite.link" disabled></v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="handleGenerateLink(false)"
+            small
+            class="ml-2 mb-2"
+          >generate link</v-btn>
+          <v-btn
+            color="error"
+            flat="flat"
+            outline
+            @click="handleGenerateLink(false)"
+            small
+            class="mb-2"
+          >send link</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <div class="profile">
       <b-form @submit="handleProfileSubmit">
         <div class="api-key-invite form-inline float-right">
@@ -147,6 +181,7 @@ export default {
     return {
       profile: {},
       dialogRegenerateApiKey: false,
+      dialogInviteLink: false,
       invite: {
         org: { name: "Organization" },
         email: null,
