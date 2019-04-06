@@ -42,7 +42,13 @@
             @click="dialogRegenerateApiKey=true"
             class="ml-0 mb-0 mt-2"
           >Regenerate</v-btn>
-          <v-btn color="success" outline dark v-b-modal.modal-invite class="mb-0 mt-2">Invite link</v-btn>
+          <v-btn
+            color="success"
+            outline
+            dark
+            @click="dialogInviteLink = true"
+            class="mb-0 mt-2"
+          >Invite link</v-btn>
         </v-flex>
       </v-layout>
     </v-form>
@@ -74,7 +80,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogInviteLink" max-width="650">
+    <v-dialog v-model="dialogInviteLink" max-width="450">
       <v-card>
         <v-card-text class="subheading">
           <v-select
@@ -84,8 +90,8 @@
             return-object
             @click="handleInviteOrgChange"
           ></v-select>
-          <v-text-field label="Api key" v-model="invite.email" placeholder="E-Mail">></v-text-field>
-          <v-text-field readonly label="Api key" v-model="invite.link" disabled></v-text-field>
+          <v-text-field label="E-Mail" v-model="invite.email"></v-text-field>
+          <v-text-field readonly label="Invitation link" v-model="invite.link" disabled></v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-btn
@@ -125,7 +131,7 @@
             <p>Are absolutely sure you want to create new API key?</p>
           </b-modal>-->
 
-          <!-- <v-btn color="success" outline small dark v-b-modal.modal-invite>Invite link</v-btn> -->
+          <v-btn color="success" outline small dark v-b-modal.modal-invite>Invite link</v-btn>
 
           <b-modal
             id="modal-invite"
