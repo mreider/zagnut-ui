@@ -380,11 +380,9 @@ export default {
             element.currentPage = 1;
           });
           this.filteredSelected = this.selected;
-          console.log(this.filteredSelected);
           for (let item of this.filteredSelected) {
-            console.log(item);
             if (item.filteredItems) {
-              console.log("hello");
+              console.log("filterd items before sorting");
               console.log(item.filteredItems);
               item.filteredItems.sort((a, b) => {
                 if (a.order_index > b.order_index) {
@@ -596,24 +594,21 @@ export default {
         x => x.id === this.draggedContext.element.statusId
       );
       let arrayToUpdate = this.filteredSelected[foundArrIndex].filteredItems;
-      // let data;
+      let data = {
+        items: [],
+        initiatives: []
+      };
       for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
-        arrayToUpdate[i].order_index = i.toString();
+        let id = arrayToUpdate[i].id;
+        data.items.push(id);
+        // arrayToUpdate[i].order_index = i.toString();
         // data = {
         //   order_index: arrayToUpdate[i].order_index
         // };
       }
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
       this.axios
-        .put(`/api/orderindexchange/${orgId}`, {
-          items: [
-            {
-              id: "1",
-              order_index: "2"
-            }
-          ],
-          initiatives: []
-        })
+        .put(`/api/orderindexchange/${orgId}`, data)
         .then(response => {
           console.log(response);
         })
