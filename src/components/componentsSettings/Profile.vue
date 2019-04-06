@@ -39,7 +39,7 @@
             color="warning"
             outline
             dark
-            v-b-modal="modalId(1, 'regenerate-api-key')"
+            @click="dialogRegenerateApiKey=true"
             class="ml-0 mb-0 mt-2"
           >Regenerate</v-btn>
           <v-btn color="success" outline dark v-b-modal.modal-invite class="mb-0 mt-2">Invite link</v-btn>
@@ -47,61 +47,37 @@
       </v-layout>
     </v-form>
 
+    <v-dialog v-model="dialogRegenerateApiKey" max-width="450">
+      <v-card>
+        <v-card-text class="subheading">
+          <p>All application that uses this API key wouldn't work until new key promoted to its instances.</p>
+          <p>Are absolutely sure you want to create new API key?</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            color="primary"
+            flat="flat"
+            outline
+            @click="dialogRegenerateApiKey = false"
+            small
+            class="ml-2 mb-2"
+          >Cancel</v-btn>
+          <v-btn
+            color="error"
+            flat="flat"
+            outline
+            @click="handleRegenerageApiKey"
+            small
+            class="mb-2"
+          >Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <div class="profile">
       <b-form @submit="handleProfileSubmit">
-        <!-- <b-row>
-          <b-col md="6" sm="12">
-            <b-form-group label="First Name">
-              <b-form-input type="text" v-model="profile.firstName"></b-form-input>
-            </b-form-group>
-          </b-col>
-
-          <b-col md="6" sm="12">
-            <b-form-group label="Last Name">
-              <b-form-input type="text" v-model="profile.lastName"></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
-
-        <b-row>
-          <b-col md="6" sm="12">
-            <b-form-group label="Email">
-              <b-form-input type="email" required v-model="profile.email"></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
-
-        <b-row>
-          <b-col md="6" sm="12">
-            <b-form-group label="Password">
-              <b-form-input type="password" v-model="profile.password"></b-form-input>
-            </b-form-group>
-          </b-col>
-
-          <b-col md="6" sm="12">
-            <b-form-group label="Confrmation">
-              <b-form-input type="password" v-model="profile.confirmation"></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
-
-        <div class="button-box">
-          <v-btn outline color="primary" :disabled="saving" type="submit">Save</v-btn>
-        </div>-->
-
         <div class="api-key-invite form-inline float-right">
-          <!-- <label>API key</label> -->
-          <!-- <b-form-input readonly v-model="profile.apiKey"></b-form-input> -->
-
-          <!-- <v-btn
-            color="warning"
-            outline
-            small
-            dark
-            v-b-modal="modalId(1, 'regenerate-api-key')"
-          >Regenerate</v-btn>-->
-
-          <b-modal
+          <!-- <b-modal
             :id="modalId(1, 'regenerate-api-key')"
             button-size="sm"
             title="Generate new API key?"
@@ -113,7 +89,7 @@
           >
             <p>All application that uses this API key wouldn't work until new key promoted to its instances.</p>
             <p>Are absolutely sure you want to create new API key?</p>
-          </b-modal>
+          </b-modal>-->
 
           <!-- <v-btn color="success" outline small dark v-b-modal.modal-invite>Invite link</v-btn> -->
 
@@ -170,6 +146,7 @@ export default {
   data() {
     return {
       profile: {},
+      dialogRegenerateApiKey: false,
       invite: {
         org: { name: "Organization" },
         email: null,
