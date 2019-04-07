@@ -40,14 +40,14 @@
             outline
             dark
             @click="dialogRegenerateApiKey=true"
-            class="ml-0 mb-0 mt-2"
+            class="ml-0 mb-0 mt-3"
           >Regenerate</v-btn>
           <v-btn
             color="success"
             outline
             dark
             @click="dialogInviteLink = true"
-            class="mb-0 mt-2"
+            class="mb-0 mt-3"
           >Invite link</v-btn>
         </v-flex>
       </v-layout>
