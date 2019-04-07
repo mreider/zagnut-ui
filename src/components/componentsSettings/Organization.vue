@@ -1,71 +1,81 @@
 <template>
   <div>
-    <div class="button-box right">
-      <div>
-        <v-btn outline color="success" v-b-modal.modalnew>Add organization</v-btn>
-        <b-modal
-          id="modalnew"
-          button-size="sm"
-          title="New orgranization name"
-          @ok="handleOrganizationNew(newOrgName)"
-          size="sm"
-          centered
-        >
-          <b-form-input v-model="newOrgName" placeholder="Enter organization name">></b-form-input>
-        </b-modal>
-      </div>
-    </div>
-
-    <b-table hover :items="organizations" :fields="organizationsFields">
-      <template slot="actions" slot-scope="data">
-        <v-btn
-          class="extra-small-button"
-          v-b-modal.edit
-          v-if="data.item.role === 'Admin'"
-          @click="setCurrentOrg(data.item)"
-          outline
-          small
-          fab
-        >
-          <i class="material-icons">edit</i>
-        </v-btn>
-        <v-btn
-          class="delete-button extra-small-button"
-          outline
-          fab
-          small
-          v-b-modal.delete
-          v-if="data.item.role === 'Admin'"
-          @click="setCurrentOrg(data.item)"
-        >
-          <i class="material-icons">delete</i>
-        </v-btn>
+    <v-toolbar flat color="transparent">
+      <v-spacer></v-spacer>
+      <v-btn outline color="success" @click="dialogNew = true">Add organization</v-btn>
+    </v-toolbar>
+    <v-data-table :headers="organizationsTableHeaders" :items="organizations" class="elevation-1">
+      <template v-slot:items="props">
+        <td class="text-xs-right">{{ props.item.orgId }}</td>
+        <td class="text-xs-right">{{ props.item.name }}</td>
+        <td class="text-xs-right">{{ props.item.role }}</td>
+        <td class="justify-center layout px-0">
+          <v-icon small class="mr-2" @click="setCurrentOrg(props.item), dialogEdit  = true">edit</v-icon>
+          <v-icon small @click="setCurrentOrg(props.item),  dialogDelete= true">delete</v-icon>
+        </td>
       </template>
-    </b-table>
-    <b-modal
-      id="delete"
-      :title="'Wait. Are you sure you want to delete this permanently?'"
-      button-size="sm"
-      size="sm"
-      centered
-      body-class="zero-size"
-      ok-variant="danger"
-      @ok="handleOrganizationDelete(currentOrganization)"
-      ok-title="delete"
-    ></b-modal>
+    </v-data-table>
 
-    <b-modal
-      id="edit"
-      title="Edit"
-      button-size="sm"
-      size="sm"
-      centered
-      ok-variant="submit"
-      @ok="handleOrganizationEdit(currentOrganization, newOrgName)"
-      ok-title="submit"
-    >
-      <b-form-input v-model="newOrgName" :placeholder="currentOrganization.name"></b-form-input>
-    </b-modal>
+    <v-dialog v-model="dialogDelete" max-width="250">
+      <v-card>
+        <v-card-text
+          class="text-xs-center subheading"
+        >Wait. Are you sure you want to delete this permanently?</v-card-text>
+        <v-card-actions>
+          <v-btn color="primary" flat="flat" outline @click="dialogDelete = false" small>Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            flat="flat"
+            outline
+            @click="handleOrganizationDelete(currentOrganization)"
+            small
+          >Yes</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialogEdit" max-width="450">
+      <v-card>
+        <v-layout row container wrap align-center>
+          <v-flex xs12 align-center>
+            <v-text-field v-model="newOrgName" :placeholder="currentOrganization.name"></v-text-field>
+          </v-flex>
+        </v-layout>
+        <v-card-actions>
+          <v-btn flat="flat" outline @click="dialogEdit = false" small class="ml-3 mb-2">Cancel</v-btn>
+          <v-btn
+            color="success"
+            flat="flat"
+            outline
+            @click="handleOrganizationEdit(currentOrganization, newOrgName)"
+            small
+            class="mb-2"
+          >Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialogNew" max-width="450">
+      <v-card>
+        <v-layout row container wrap align-center>
+          <v-flex xs12 align-center>
+            <v-text-field v-model="newOrgName" placeholder="Enter organization name">></v-text-field>
+          </v-flex>
+        </v-layout>
+        <v-card-actions>
+          <v-btn flat="flat" outline @click="dialogNew = false" small class="ml-3 mb-2">Cancel</v-btn>
+          <v-btn
+            color="success"
+            flat="flat"
+            outline
+            @click="handleOrganizationNew(newOrgName)"
+            small
+            class="mb-2"
+          >Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -79,8 +89,17 @@ export default {
   data() {
     return {
       organizationsFields: ["orgId", "name", "role", "actions"],
+      organizationsTableHeaders: [
+        { text: "Org Id", value: "orgId", sortable: false },
+        { text: "Name", value: "name", sortable: false },
+        { text: "role", value: "role", sortable: false },
+        { text: "Actions", value: "name", sortable: false }
+      ],
       newOrgName: "",
-      currentOrganization: ""
+      currentOrganization: "",
+      dialogDelete: false,
+      dialogEdit: false,
+      dialogNew: false
     };
   },
 
@@ -103,6 +122,7 @@ export default {
       try {
         const response = await this.axios.post("/api/org", { name: data });
         const success = _get(response, "data.success");
+        this.dialogNew = false;
         if (!success) throw new Error(`Unable to create new organization.`);
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -120,6 +140,7 @@ export default {
       try {
         const response = await this.axios.delete(`/api/org/${org.orgId}`);
         const success = _get(response, "data.success");
+        this.dialogDelete = false;
         if (!success) throw new Error(`Unable to create new organization.`);
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -150,6 +171,7 @@ export default {
         });
 
         const success = _get(response, "data.success");
+        this.dialogEdit = false;
         if (!success) throw new Error(`Unable to update organization.`);
 
         this.$notify({
