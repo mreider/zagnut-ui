@@ -1,14 +1,14 @@
 <template>
   <div>
-    <v-toolbar flat color="transparent">
+    <v-toolbar flat color="transparent" class="no-padding-right">
       <v-spacer></v-spacer>
       <v-btn outline color="success" @click="dialogNew = true">Add organization</v-btn>
     </v-toolbar>
     <v-data-table :headers="organizationsTableHeaders" :items="organizations" class="elevation-1">
       <template v-slot:items="props">
-        <td class="text-xs-right">{{ props.item.orgId }}</td>
-        <td class="text-xs-right">{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ props.item.role }}</td>
+        <td>{{ props.item.orgId }}</td>
+        <td>{{ props.item.name }}</td>
+        <td>{{ props.item.role }}</td>
         <td class="justify-center layout px-0">
           <v-icon small class="mr-2" @click="setCurrentOrg(props.item), dialogEdit  = true">edit</v-icon>
           <v-icon small @click="setCurrentOrg(props.item),  dialogDelete= true">delete</v-icon>
@@ -204,5 +204,8 @@ export default {
   i {
     font-size: 15px;
   }
+}
+.no-padding-right .v-toolbar__content {
+  padding-right: 0;
 }
 </style>
