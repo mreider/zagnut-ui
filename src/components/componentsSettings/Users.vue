@@ -3,13 +3,7 @@
     <v-toolbar flat color="transparent" class="no-padding-right">
       <v-spacer></v-spacer>
     </v-toolbar>
-    <v-data-table
-      :headers="usersTableHeaders"
-      :items="users"
-      class="elevation-1"
-      select-all
-      @change.native="handleSelect()"
-    >
+    <v-data-table :headers="usersTableHeaders" :items="users" class="elevation-1">
       <template v-slot:headers="props">
         <tr>
           <th>
