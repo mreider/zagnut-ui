@@ -83,8 +83,10 @@
     <v-dialog v-model="dialogInviteLink" max-width="450">
       <v-card>
         <v-card-text class="subheading">
+          <span class="headline">Invite link generate</span>
           <v-select
             :items="organizations"
+            label="Organisation"
             item-text="name"
             item-value="name"
             return-object
@@ -110,6 +112,15 @@
             small
             class="mb-2"
           >send link</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            flat="flat"
+            outline
+            @click="dialogInviteLink = false"
+            small
+            class="mb-2"
+          >CLose</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -131,9 +142,9 @@
             <p>Are absolutely sure you want to create new API key?</p>
           </b-modal>-->
 
-          <v-btn color="success" outline small dark v-b-modal.modal-invite>Invite link</v-btn>
+          <!-- <v-btn color="success" outline small dark v-b-modal.modal-invite>Invite link</v-btn> -->
 
-          <b-modal
+          <!-- <b-modal
             id="modal-invite"
             class="invite-link-modal"
             title="Invite link generate"
@@ -170,7 +181,7 @@
               <b-button size="sm" variant="primary" @click="handleGenerateLink(false)">generate link</b-button>
               <b-button size="sm" variant="primary" @click="handleGenerateLink(true)">send link</b-button>
             </div>
-          </b-modal>
+          </b-modal>-->
         </div>
       </b-form>
     </div>
