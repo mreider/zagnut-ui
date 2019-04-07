@@ -87,6 +87,7 @@ export default {
 
   .tab-content {
     padding: 10px;
+    outline: none !important;
 
     .col-form-label {
       margin-bottom: 0;
@@ -97,6 +98,9 @@ export default {
       padding-top: 10px;
       padding-bottom: 10px;
     }
+  }
+  .tab-content > .active {
+    outline: none !important;
   }
 }
 </style>
