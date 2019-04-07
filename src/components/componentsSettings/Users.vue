@@ -126,8 +126,6 @@ export default {
 
   methods: {
     handleSelect(user) {
-      console.log("hello");
-      console.log(user);
       if (!user) {
         this.selectAllUsers = !this.selectAllUsers;
         this.users.forEach(u => {
