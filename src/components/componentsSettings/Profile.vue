@@ -31,10 +31,10 @@
         >Save</v-btn>
       </v-layout>
       <v-layout wrap>
-        <v-flex xs12 md3 pr-4>
+        <v-flex sm12 md12 lg3 pr-4>
           <v-text-field readonly label="Api key" v-model="profile.apiKey" disabled></v-text-field>
         </v-flex>
-        <v-flex xs12 md4 pr-4>
+        <v-flex sm12 md12 lg4 pr-4>
           <v-btn
             color="warning"
             outline
@@ -243,22 +243,6 @@ export default {
 
     async handleProfileSubmit(event) {
       event.preventDefault();
-
-      // if (this.profile.password !== this.profile.confirmation) {
-      //   return this.$notify({
-      //     group: "error",
-      //     type: "warn",
-      //     text: "Password and confirmation does'n match"
-      //   });
-      // }
-
-      // if (this.profile.hasOwnProperty("email") && !this.profile.email) {
-      //   return this.$notify({
-      //     group: "error",
-      //     type: "warn",
-      //     text: "Email cannot be empty"
-      //   });
-      // }
 
       if (!this.passwordMatch || !this.emailValidate) {
         return;
