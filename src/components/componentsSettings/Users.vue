@@ -1,6 +1,31 @@
 <template>
   <div class="users">
-    <v-toolbar flat color="transparent" class="no-padding-right">
+    <v-toolbar flat color="transparent" class="no-padding-right no-padding-left">
+      <v-select
+        :items="organizations"
+        label="Organization"
+        item-text="name"
+        item-value="name"
+        @input="handleOrgChange"
+        return-object
+        class="pt-0"
+      ></v-select>
+      <v-select
+        item-text="selectedOrg.name"
+        item-value="selectedOrg.name"
+        label="Actions"
+        class="pl-3 pt-0"
+      >
+        <template slot="selection">Grant admin</template>
+        <template slot="item" id="granAdmin" @click="handleGrantAdmin()">
+          <v-list-tile-content>
+            <v-list-tile-title html="Grant admin">ewrwrw</v-list-tile-title>
+          </v-list-tile-content>
+        </template>
+      </v-select>
+      <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
       <v-spacer></v-spacer>
     </v-toolbar>
     <v-data-table :headers="usersTableHeaders" :items="users" class="elevation-1">
@@ -338,5 +363,8 @@ export default {
       }
     }
   }
+}
+.no-padding-left .v-toolbar__content {
+  padding-left: 0 !important;
 }
 </style>

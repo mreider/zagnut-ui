@@ -208,4 +208,7 @@ export default {
 .no-padding-right .v-toolbar__content {
   padding-right: 0;
 }
+.no-padding-left .v-toolbar__content {
+  padding-left: 0;
+}
 </style>
