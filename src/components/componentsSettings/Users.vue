@@ -364,7 +364,4 @@ export default {
     }
   }
 }
-.no-padding-left .v-toolbar__content {
-  padding-left: 0 !important;
-}
 </style>

@@ -102,8 +102,5 @@ export default {
   .tab-content > .active {
     outline: none !important;
   }
-  .no-padding-left {
-    padding-left: 0;
-  }
 }
 </style>
