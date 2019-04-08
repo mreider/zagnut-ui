@@ -9,8 +9,12 @@
         <td>{{ props.item.orgId }}</td>
         <td>{{ props.item.name }}</td>
         <td>{{ props.item.role }}</td>
-        <td class="justify-center layout px-0">
-          <v-icon small class="mr-2" @click="setCurrentOrg(props.item), dialogEdit  = true">edit</v-icon>
+        <td class="justify-start layout px-0">
+          <v-icon
+            small
+            class="pl-4 text-center"
+            @click="setCurrentOrg(props.item), dialogEdit  = true"
+          >edit</v-icon>
           <v-icon small @click="setCurrentOrg(props.item),  dialogDelete= true">delete</v-icon>
         </td>
       </template>
