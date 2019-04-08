@@ -11,18 +11,14 @@
         class="pt-0"
       ></v-select>
       <v-select
-        item-text="selectedOrg.name"
-        item-value="selectedOrg.name"
-        label="Actions"
-        class="pl-3 pt-0"
-      >
-        <template slot="selection">Grant admin</template>
-        <template slot="item" id="granAdmin" @click="handleGrantAdmin()">
-          <v-list-tile-content>
-            <v-list-tile-title html="Grant admin">ewrwrw</v-list-tile-title>
-          </v-list-tile-content>
-        </template>
-      </v-select>
+        :items="actionSelectOptions"
+        label="Action"
+        item-text="name"
+        item-value="name"
+        return-object
+        @change="handleActionSelect"
+        class="pt-0 pl-3"
+      ></v-select>
       <v-spacer></v-spacer>
       <v-spacer></v-spacer>
       <v-spacer></v-spacer>
@@ -33,12 +29,11 @@
         <tr>
           <th>
             <v-checkbox
-              @click.stop="toggleAll"
+              @click.stop="handleSelect()"
               :input-value="props.all"
               primary
               hide-details
               v-model="selectAllUsers"
-              @click="handleSelect()"
             ></v-checkbox>
           </th>
           <th
@@ -66,54 +61,6 @@
         <td>{{ props.item.isActive }}</td>
       </template>
     </v-data-table>
-
-    <b-dropdown :text="selectedOrg.name" size="sm">
-      <b-dropdown-item
-        v-for="org in organizations"
-        v-bind:key="org.orgId"
-        @click="handleOrgChange(org)"
-      >{{ org.name }}</b-dropdown-item>
-    </b-dropdown>
-
-    <b-dropdown id="Actions" text="Action" size="sm" class="m-2">
-      <b-dropdown-item id="granAdmin" @click="handleGrantAdmin()">Grant admin</b-dropdown-item>
-      <b-dropdown-item id="revokeAdmin" @click="handleRevokeAdmin()">Revoke admin</b-dropdown-item>
-      <b-dropdown-item id="Authorise" @click="handleRevokeAdmin()">Authorize user</b-dropdown-item>
-      <b-dropdown-item id="ReasetPassword" @click="handleResetPassword()">Reset password</b-dropdown-item>
-      <b-dropdown-item
-        id="removeFromOrganization"
-        @click="handleRemoveFromOrganization()"
-      >Remove from org</b-dropdown-item>
-    </b-dropdown>
-    <template>
-      <table class="table table-striped table-hover">
-        <thead>
-          <tr>
-            <th>
-              <label class="form-checkbox">
-                <input type="checkbox" v-model="selectAllUsers" @click="handleSelect()">
-                <i class="form-icon"></i>
-              </label>
-            </th>
-            <th v-for="uf in usersFields" v-bind:key="uf">{{ uf }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="u in users" v-bind:key="u.userId">
-            <td>
-              <label class="form-checkbox">
-                <input type="checkbox" @click="handleSelect(u)" :checked="u.selected">
-                <i class="form-icon"></i>
-              </label>
-            </td>
-            <td v-for="uf in usersFields" v-bind:key="uf">
-              <tr>{{ u[uf] }}</tr>
-            </td>
-          </tr>
-          <tr></tr>
-        </tbody>
-      </table>
-    </template>
   </div>
 </template>
 
@@ -144,7 +91,25 @@ export default {
       ],
       selectedOrg: { name: "Organization" },
       selectAllUsers: false,
-      selectSingle: false
+      selectSingle: false,
+      actionSelectOptions: [
+        {
+          name: "Grant admin",
+          event: this.handleGrantAdmin
+        },
+        {
+          name: "Revoke admin",
+          event: this.handleRevokeAdmin
+        },
+        {
+          name: "Authorize user",
+          event: this.handleRevokeAdmin
+        },
+        {
+          name: "Reset password",
+          event: this.handleResetPassword
+        }
+      ]
     };
   },
   computed: {},
@@ -327,9 +292,8 @@ export default {
         this.$loading(false);
       }
     },
-    toggleAll() {
-      // if (this.users.length) this.users = [];
-      // else this.users = this.users.slice();
+    handleActionSelect(selectedItem) {
+      selectedItem.event();
     }
   },
 
