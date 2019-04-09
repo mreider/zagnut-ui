@@ -30,6 +30,7 @@
                         :items="objStatuses"
                         item-text="name"
                         item-value="name"
+                        v-model="currentStatus"
                         return-object
                         @input="handleItemSetField($event, 'status')"
                       ></v-select>
@@ -43,6 +44,7 @@
                         item-text="`${data.item.firstName} ${data.item.lastName}`"
                         item-value="`${data.item.firstName} ${data.item.lastName}`"
                         @input="handleItemSetField($event, 'assignee')"
+                        v-model="assignee.userId"
                         class="pt-0"
                       >
                         <template
@@ -64,6 +66,7 @@
                     <v-flex xs8>
                       <v-select
                         :items="pointsVar"
+                        v-model="points"
                         :item-text="String(points)"
                         :item-value="String(points)"
                         @input="handleItemSetField($event, 'points')"
@@ -153,6 +156,11 @@ export default {
       },
       objStatuses: [],
       currentStatus: "",
+      assignee: {
+        firstName: "",
+        lastName: "",
+        userId: 5
+      },
       users: [],
       pointsVar: ["0", "1", "2", "3", "5", "8", "13", "21"],
       points: "",
@@ -215,6 +223,8 @@ export default {
         );
 
         let success = _get(response, "data.success");
+        this.assignee = response.data.item.assignee;
+        console.log(this.assignee);
         if (!success) {
           this.$errorMessage.show("Unable to load current user profile");
         }
@@ -271,7 +281,7 @@ export default {
         delete data["ownerTable"];
 
         data.points = String(data.points);
-
+        data.order_index = String(data.order_index);
         const response = await this.axios.put(
           `/api/items/edit/${orgId}/${id}`,
           data
