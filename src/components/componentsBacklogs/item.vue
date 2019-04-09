@@ -41,10 +41,9 @@
                     <v-flex xs8>
                       <v-select
                         :items="users"
-                        item-text="`${data.item.firstName} ${data.item.lastName}`"
-                        item-value="`${data.item.firstName} ${data.item.lastName}`"
-                        @input="handleItemSetField($event, 'assignee')"
+                        item-value="userId"
                         v-model="assignee.userId"
+                        @input="handleItemSetField($event, 'assignee')"
                         class="pt-0"
                       >
                         <template
@@ -157,9 +156,7 @@ export default {
       objStatuses: [],
       currentStatus: "",
       assignee: {
-        firstName: "",
-        lastName: "",
-        userId: 5
+        userId: "5"
       },
       users: [],
       pointsVar: ["0", "1", "2", "3", "5", "8", "13", "21"],
@@ -224,7 +221,7 @@ export default {
 
         let success = _get(response, "data.success");
         this.assignee = response.data.item.assignee;
-        console.log(this.assignee);
+        // console.log(this.assignee);
         if (!success) {
           this.$errorMessage.show("Unable to load current user profile");
         }
