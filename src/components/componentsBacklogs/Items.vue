@@ -385,10 +385,10 @@ export default {
               console.log("filterd items before sorting");
               console.log(item.filteredItems);
               item.filteredItems.sort((a, b) => {
-                if (a.order_index > b.order_index) {
+                if (b.order_index > a.order_index) {
                   return 1;
                 }
-                if (a.order_index < b.order_index) {
+                if (b.order_index < a.order_index) {
                   return -1;
                 }
                 return 0;
