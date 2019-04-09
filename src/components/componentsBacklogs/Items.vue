@@ -166,6 +166,7 @@
                       :items="objStatuses"
                       item-text="name"
                       item-value="name"
+                      v-model="objSelecBox"
                       return-object
                       @input="handleItemNewItemSetField($event, 'status')"
                     ></v-select>
@@ -293,7 +294,8 @@ export default {
       showArchived: false,
       dragging: false,
       draggedContext: {},
-      relatedContext: {}
+      relatedContext: {},
+      objSelecBox: ""
     };
   },
   async mounted() {
@@ -382,8 +384,6 @@ export default {
           this.filteredSelected = this.selected;
           for (let item of this.filteredSelected) {
             if (item.filteredItems) {
-              console.log("filterd items before sorting");
-              console.log(item.filteredItems);
               item.filteredItems.sort((a, b) => {
                 if (b.order_index > a.order_index) {
                   return 1;
@@ -395,7 +395,6 @@ export default {
               });
             }
           }
-          console.log(this.filteredSelected);
           this.initialSelected = this.selected;
         }
         this.selected.sort(function(a, b) {
@@ -512,6 +511,7 @@ export default {
       }
     },
     async handleNewItem() {
+      this.objSelecBox = "";
       try {
         let data = {};
         data.assignee = String(this.newItem.assignee.userId);
@@ -584,8 +584,6 @@ export default {
     onMove({ relatedContext, draggedContext }) {
       this.draggedContext = draggedContext;
       this.relatedContext = relatedContext;
-      console.log(relatedContext);
-      console.log(draggedContext);
     },
     onEnd(event) {
       this.dragging = false;
@@ -610,34 +608,12 @@ export default {
       this.axios
         .put(`/api/orderindexchange/${orgId}`, data)
         .then(response => {
-          console.log(response);
           this.loadOrgStatuses();
         })
         .catch(err => {
           console.log(err);
         });
       this.filteredSelected = updatedArr;
-
-      // this.filteredSelected[foundArrIndex].filteredItems.sort((a, b) => {
-      //   if (a.order_index > b.order_index) {
-      //     return 1;
-      //   }
-      //   if (a.order_index < b.order_index) {
-      //     return -1;
-      //   }
-      //   return 0;
-      // });
-      // console.log(this.filteredSelected[foundArrIndex]);
-
-      // const orgId = this.$route.query.orgId;
-      // let data = {};
-      // data.order_index = this.draggedContext.futureIndex.toString();
-      // const id = this.draggedContext.element.id;
-
-      // const response = this.axios.put(`/api/items/edit/${orgId}/${id}`, data);
-
-      // const success = _get(response, "data.success");
-      // if (!success) throw new Error(`Unable to update item.`);
     }
   },
   watch: {
