@@ -127,67 +127,80 @@
         </v-flex>
       </v-layout>
       <!--cards section-->
-      <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in intiativeCards" :key="item.id">
-        <v-card>
-          <v-card-title primary-title>
-            <h4 class="mb-0">
-              Initiative:
-              <router-link
-                :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ item.id"
-              >{{ item.title }}</router-link>
-            </h4>
-          </v-card-title>
-          <div class="card-body pt-0 pb-0">
-            <p class="mb-2">Description: {{item.description}}</p>
-            <p class="mb-2">Popularity: {{item.popularity}}</p>
-            <p class="mb-2">
-              importance:
-              <a href="#" @click="filterInitiatives(item.importance)">{{item.importance}}</a>
-            </p>
-            <p class="mb-2">
-              Horizon:
-              <a
-                href="#"
-                @click="filterInitiatives(item.horizon.horizon)"
-              >{{item.horizon.horizon}}</a>
-            </p>
-            <p class="mb-2">
-              Author:
-              <a
-                href="#"
-                @click="filterInitiatives(item.lastName)"
-              >{{item.firstName + ' ' + item.lastName }}</a>
-            </p>
-          </div>
 
-          <v-card-actions class="pl-3 pb-2">
-            <v-btn
-              slot="activator"
-              class="edit-button extra-small-button"
-              outline
-              fab
-              dark
-              small
-              color="primary"
-              :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ item.id"
-            >
-              <i class="material-icons">edit</i>
-            </v-btn>
-            <v-btn
-              v-if="$store.state.user.id ===  item.createdBy || admin"
-              class="delete-button extra-small-button"
-              outline
-              fab
-              dark
-              small
-              color="primary"
-              @click="setCurrentInitiative(item), dialogDeleteInitiative = true"
-            >
-              <i class="material-icons">delete</i>
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
+      <draggable
+        :list="intiativeCards"
+        @start="draging=true"
+        @end="onEnd($event)"
+        @change="onListChange"
+        :move="onMove"
+        class="layout wrap"
+      >
+        <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in intiativeCards" :key="item.id">
+          <v-card>
+            <v-card-title primary-title>
+              <h4 class="mb-0">
+                Initiative:
+                <router-link
+                  :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ item.id"
+                >{{ item.title }}</router-link>
+              </h4>
+            </v-card-title>
+            <div class="card-body pt-0 pb-0">
+              <p class="mb-2">Description: {{item.description}}</p>
+              <p class="mb-2">Popularity: {{item.popularity}}</p>
+              <p class="mb-2">
+                importance:
+                <a
+                  href="#"
+                  @click="filterInitiatives(item.importance)"
+                >{{item.importance}}</a>
+              </p>
+              <p class="mb-2">
+                Horizon:
+                <a
+                  href="#"
+                  @click="filterInitiatives(item.horizon.horizon)"
+                >{{item.horizon.horizon}}</a>
+              </p>
+              <p class="mb-2">
+                Author:
+                <a
+                  href="#"
+                  @click="filterInitiatives(item.lastName)"
+                >{{item.firstName + ' ' + item.lastName }}</a>
+              </p>
+            </div>
+
+            <v-card-actions class="pl-3 pb-2">
+              <v-btn
+                slot="activator"
+                class="edit-button extra-small-button"
+                outline
+                fab
+                dark
+                small
+                color="primary"
+                :to="'initiative/?orgId='+$store.state.organization.id +'&initiativeid='+ item.id"
+              >
+                <i class="material-icons">edit</i>
+              </v-btn>
+              <v-btn
+                v-if="$store.state.user.id ===  item.createdBy || admin"
+                class="delete-button extra-small-button"
+                outline
+                fab
+                dark
+                small
+                color="primary"
+                @click="setCurrentInitiative(item), dialogDeleteInitiative = true"
+              >
+                <i class="material-icons">delete</i>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
+      </draggable>
     </v-layout>
     <v-layout row wrap justify-center>
       <div class="text-xs-center pt-3">
@@ -322,6 +335,7 @@
 import _get from "lodash/get";
 import _ from "lodash";
 import { username } from "@/utils";
+import draggable from "vuedraggable";
 export default {
   name: "Initiatives",
   data() {
@@ -356,7 +370,10 @@ export default {
       dialogNewInitiative: false,
       dialogDeleteInitiative: false,
       loading: false,
-      paramForNewCard: null
+      paramForNewCard: null,
+      dragging: false,
+      draggedContext: {},
+      relatedContext: {}
     };
   },
 
@@ -451,6 +468,15 @@ export default {
             date: element.horizon,
             horizon: this.getHorizonName(new Date(element.horizon))
           };
+        });
+        initiatives.sort((a, b) => {
+          if (b.order_index > a.order_index) {
+            return 1;
+          }
+          if (b.order_index < a.order_index) {
+            return -1;
+          }
+          return 0;
         });
         this.totalPages = Math.ceil(initiatives.length / this.perPage);
 
@@ -765,9 +791,52 @@ export default {
         }
       }
       this.initiatives = paginatedArray;
+    },
+    onMove({ relatedContext, draggedContext }) {
+      this.draggedContext = draggedContext;
+      this.relatedContext = relatedContext;
+    },
+    onListChange(event) {
+      console.log(event);
+    },
+    onEnd(event) {
+      console.log(event);
+      console.log("this.draggedContext");
+      console.log(this.draggedContext);
+      console.log("this.relatedContext");
+      console.log(this.relatedContext);
+
+      this.dragging = false;
+      const orgId = this.$store.state.organization.id;
+      const updatedArr = JSON.parse(JSON.stringify(this.intiativeCards));
+
+      const orderChanger = () => {
+        let arrayToUpdate = this.relatedContext.list;
+        let data = {
+          items: [],
+          initiatives: []
+        };
+        for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
+          let id = arrayToUpdate[i].id;
+          data.initiatives.push(id);
+        }
+        this.axios
+          .put(`/api/orderindexchange/${orgId}`, data)
+          .then(response => {
+            console.log("hello");
+            this.loadOrgInitiatives();
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      };
+      orderChanger();
+      this.initiatives = updatedArr;
     }
   },
-  components: {}
+  components: {
+    draggable
+  }
 };
 </script>
 

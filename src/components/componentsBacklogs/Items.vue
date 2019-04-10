@@ -605,12 +605,6 @@ export default {
       console.log(event);
     },
     onEnd(event) {
-      console.log(event);
-      console.log("this.draggedContext");
-      console.log(this.draggedContext);
-      console.log("this.relatedContext");
-      console.log(this.relatedContext);
-
       this.dragging = false;
       const orgId = this.$route.query.orgId;
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
