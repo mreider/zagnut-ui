@@ -86,6 +86,7 @@
         :list="element.filteredItems"
         @start="draging=true"
         @end="onEnd($event)"
+        group="items"
         :move="onMove"
         class="layout wrap"
       >
@@ -599,10 +600,6 @@ export default {
       for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
         let id = arrayToUpdate[i].id;
         data.items.push(id);
-        // arrayToUpdate[i].order_index = i.toString();
-        // data = {
-        //   order_index: arrayToUpdate[i].order_index
-        // };
       }
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
       this.axios
@@ -613,6 +610,16 @@ export default {
         .catch(err => {
           console.log(err);
         });
+      // this.axios
+      //   .put(`/api/items/edit/${orgId}/6`, {
+      //     statusId: "4"
+      //   })
+      //   .then(response => {
+      //     this.loadOrgStatuses();
+      //   })
+      //   .catch(err => {
+      //     console.log(err);
+      //   });
       this.filteredSelected = updatedArr;
     }
   },
