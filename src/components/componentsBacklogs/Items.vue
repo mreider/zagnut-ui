@@ -615,23 +615,11 @@ export default {
       const orgId = this.$route.query.orgId;
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
 
-      if (event.to.parentNode.id !== event.from.parentNode.id) {
-        const elementId = this.draggedContext.element.id;
-        this.axios
-          .put(`/api/items/edit/${orgId}/${elementId}`, {
-            statusId: String(event.to.parentNode.id)
-          })
-          .then(response => {
-            this.loadOrgStatuses();
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      } else {
-        let foundArrIndex = this.filteredSelected.findIndex(
-          x => x.id === this.draggedContext.element.statusId
-        );
-        let arrayToUpdate = this.filteredSelected[foundArrIndex].filteredItems;
+      const orderChanger = () => {
+        // let foundArrIndex = this.filteredSelected.findIndex(
+        //   x => x.id === this.draggedContext.element.statusId
+        // );
+        let arrayToUpdate = this.relatedContext.list;
         let data = {
           items: [],
           initiatives: []
@@ -648,6 +636,22 @@ export default {
           .catch(err => {
             console.log(err);
           });
+      };
+
+      if (event.to.parentNode.id !== event.from.parentNode.id) {
+        const elementId = this.draggedContext.element.id;
+        this.axios
+          .put(`/api/items/edit/${orgId}/${elementId}`, {
+            statusId: String(event.to.parentNode.id)
+          })
+          .then(response => {
+            orderChanger();
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      } else {
+        orderChanger();
       }
 
       this.filteredSelected = updatedArr;
