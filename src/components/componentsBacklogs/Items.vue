@@ -84,9 +84,16 @@
       v-for="element in filteredSelected.slice().reverse()"
       :key="element.id"
       :id="String(element.id)"
+      class="items-row"
     >
       <v-flex xs12>
         <h5 class="backlogs-cards-header">{{ element.name }}</h5>
+      </v-flex>
+
+      <v-flex xs12 v-if="!element.filteredItems.length">
+        <h3
+          class="text-center font-weight-thin"
+        >No items, please add new or drag from another category</h3>
       </v-flex>
       <draggable
         :list="element.filteredItems"
@@ -390,6 +397,7 @@ export default {
             element.currentPage = 1;
           });
           this.filteredSelected = this.selected;
+          console.log(this.filteredSelected);
           for (let item of this.filteredSelected) {
             if (item.filteredItems) {
               item.filteredItems.sort((a, b) => {
@@ -695,6 +703,13 @@ export default {
   }
   i {
     font-size: 15px;
+  }
+}
+
+.items-row {
+  .layout {
+    width: 100%;
+    min-height: 100px;
   }
 }
 </style>
