@@ -78,7 +78,13 @@
 
     <!--cards section-->
 
-    <v-layout row wrap v-for="element in filteredSelected.slice().reverse()" :key="element.id">
+    <v-layout
+      row
+      wrap
+      v-for="element in filteredSelected.slice().reverse()"
+      :key="element.id"
+      :id="String(element.id)"
+    >
       <v-flex xs12>
         <h5 class="backlogs-cards-header">{{ element.name }}</h5>
       </v-flex>
@@ -86,6 +92,7 @@
         :list="element.filteredItems"
         @start="draging=true"
         @end="onEnd($event)"
+        @change="onListChange"
         group="items"
         :move="onMove"
         class="layout wrap"
@@ -586,40 +593,55 @@ export default {
       this.draggedContext = draggedContext;
       this.relatedContext = relatedContext;
     },
+    onListChange(event) {
+      console.log(event);
+    },
     onEnd(event) {
+      console.log(event);
+      console.log("this.draggedContext");
+      console.log(this.draggedContext);
+      console.log("this.relatedContext");
+      console.log(this.relatedContext);
+
       this.dragging = false;
       const orgId = this.$route.query.orgId;
-      let foundArrIndex = this.filteredSelected.findIndex(
-        x => x.id === this.draggedContext.element.statusId
-      );
-      let arrayToUpdate = this.filteredSelected[foundArrIndex].filteredItems;
-      let data = {
-        items: [],
-        initiatives: []
-      };
-      for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
-        let id = arrayToUpdate[i].id;
-        data.items.push(id);
-      }
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
-      this.axios
-        .put(`/api/orderindexchange/${orgId}`, data)
-        .then(response => {
-          this.loadOrgStatuses();
-        })
-        .catch(err => {
-          console.log(err);
-        });
-      // this.axios
-      //   .put(`/api/items/edit/${orgId}/6`, {
-      //     statusId: "4"
-      //   })
-      //   .then(response => {
-      //     this.loadOrgStatuses();
-      //   })
-      //   .catch(err => {
-      //     console.log(err);
-      //   });
+
+      if (event.to.parentNode.id !== event.from.parentNode.id) {
+        const elementId = this.draggedContext.element.id;
+        this.axios
+          .put(`/api/items/edit/${orgId}/${elementId}`, {
+            statusId: String(event.to.parentNode.id)
+          })
+          .then(response => {
+            this.loadOrgStatuses();
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      } else {
+        let foundArrIndex = this.filteredSelected.findIndex(
+          x => x.id === this.draggedContext.element.statusId
+        );
+        let arrayToUpdate = this.filteredSelected[foundArrIndex].filteredItems;
+        let data = {
+          items: [],
+          initiatives: []
+        };
+        for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
+          let id = arrayToUpdate[i].id;
+          data.items.push(id);
+        }
+        this.axios
+          .put(`/api/orderindexchange/${orgId}`, data)
+          .then(response => {
+            this.loadOrgStatuses();
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+
       this.filteredSelected = updatedArr;
     }
   },
