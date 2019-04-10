@@ -616,9 +616,6 @@ export default {
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
 
       const orderChanger = () => {
-        // let foundArrIndex = this.filteredSelected.findIndex(
-        //   x => x.id === this.draggedContext.element.statusId
-        // );
         let arrayToUpdate = this.relatedContext.list;
         let data = {
           items: [],
