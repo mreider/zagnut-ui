@@ -804,7 +804,6 @@ export default {
       this.loading = true;
       this.dragging = false;
       const orgId = this.$store.state.organization.id;
-      const updatedArr = JSON.parse(JSON.stringify(this.intiativeCards));
       const orderChanger = () => {
         this.initialInitiativesForSorting.splice(
           this.sliceFrom,
@@ -833,7 +832,6 @@ export default {
           });
       };
       orderChanger();
-      this.initiatives = updatedArr;
     }
   },
   components: {
