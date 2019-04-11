@@ -764,26 +764,18 @@ export default {
       this.sliceFrom = (event - 1) * this.perPage;
       this.page = event;
       let paginatedArray;
-      if (this.activatedButton === "") {
-        if (this.filteredInitiatives !== null) {
-          paginatedArray = this.initialFilteredInitiatives.slice(
-            this.sliceFrom,
-            this.sliceFrom + this.perPage
-          );
-          this.filteredInitiatives = paginatedArray.slice();
-        } else {
+      if (this.filteredInitiatives !== null) {
+        paginatedArray = this.initialFilteredInitiatives.slice(
+          this.sliceFrom,
+          this.sliceFrom + this.perPage
+        );
+        this.filteredInitiatives = paginatedArray.slice();
+      } else {
+        if (this.activatedButton === "") {
           paginatedArray = this.initialInitiatives.slice(
             this.sliceFrom,
             this.sliceFrom + this.perPage
           );
-        }
-      } else {
-        if (this.filteredInitiatives !== null) {
-          paginatedArray = this.initialFilteredInitiatives.slice(
-            this.sliceFrom,
-            this.sliceFrom + this.perPage
-          );
-          this.filteredInitiatives = paginatedArray.slice();
         } else {
           paginatedArray = this.initialInitiativesForSorting.slice(
             this.sliceFrom,
