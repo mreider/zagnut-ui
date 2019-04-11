@@ -352,6 +352,7 @@ export default {
       currentPage: 0,
       totalPages: 4,
       perPage: 8,
+      sliceFrom: 0,
       newInitiative: {
         title: "",
         description: "",
@@ -760,33 +761,33 @@ export default {
       );
     },
     paginationFunction(event) {
-      let sliceFrom = (event - 1) * this.perPage;
+      this.sliceFrom = (event - 1) * this.perPage;
       this.page = event;
       let paginatedArray;
       if (this.activatedButton === "") {
         if (this.filteredInitiatives !== null) {
           paginatedArray = this.initialFilteredInitiatives.slice(
-            sliceFrom,
-            sliceFrom + this.perPage
+            this.sliceFrom,
+            this.sliceFrom + this.perPage
           );
           this.filteredInitiatives = paginatedArray.slice();
         } else {
           paginatedArray = this.initialInitiatives.slice(
-            sliceFrom,
-            sliceFrom + this.perPage
+            this.sliceFrom,
+            this.sliceFrom + this.perPage
           );
         }
       } else {
         if (this.filteredInitiatives !== null) {
           paginatedArray = this.initialFilteredInitiatives.slice(
-            sliceFrom,
-            sliceFrom + this.perPage
+            this.sliceFrom,
+            this.sliceFrom + this.perPage
           );
           this.filteredInitiatives = paginatedArray.slice();
         } else {
           paginatedArray = this.initialInitiativesForSorting.slice(
-            sliceFrom,
-            sliceFrom + this.perPage
+            this.sliceFrom,
+            this.sliceFrom + this.perPage
           );
         }
       }
@@ -809,21 +810,29 @@ export default {
       this.dragging = false;
       const orgId = this.$store.state.organization.id;
       const updatedArr = JSON.parse(JSON.stringify(this.intiativeCards));
-
+      console.log(this.initialInitiativesForSorting);
+      console.log(this.sliceFrom, this.sliceFrom);
       const orderChanger = () => {
-        let arrayToUpdate = this.relatedContext.list;
+        this.initialInitiativesForSorting.splice(
+          this.sliceFrom,
+          this.sliceFrom + this.perPage,
+          ...this.relatedContext.list
+        );
         let data = {
           items: [],
           initiatives: []
         };
-        for (let i = 0, len = arrayToUpdate.length; i < len; i++) {
-          let id = arrayToUpdate[i].id;
+        for (
+          let i = 0, len = this.initialInitiativesForSorting.length;
+          i < len;
+          i++
+        ) {
+          let id = this.initialInitiativesForSorting[i].id;
           data.initiatives.push(id);
         }
         this.axios
           .put(`/api/orderindexchange/${orgId}`, data)
           .then(response => {
-            console.log("hello");
             this.loadOrgInitiatives();
           })
           .catch(err => {
