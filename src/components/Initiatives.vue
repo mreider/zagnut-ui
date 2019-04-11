@@ -793,25 +793,18 @@ export default {
       }
       this.initiatives = paginatedArray;
     },
+
     onMove({ relatedContext, draggedContext }) {
+      this.dragging = true;
       this.draggedContext = draggedContext;
       this.relatedContext = relatedContext;
     },
-    onListChange(event) {
-      console.log(event);
-    },
+    onListChange(event) {},
     onEnd(event) {
-      console.log(event);
-      console.log("this.draggedContext");
-      console.log(this.draggedContext);
-      console.log("this.relatedContext");
-      console.log(this.relatedContext);
-
+      this.loading = true;
       this.dragging = false;
       const orgId = this.$store.state.organization.id;
       const updatedArr = JSON.parse(JSON.stringify(this.intiativeCards));
-      console.log(this.initialInitiativesForSorting);
-      console.log(this.sliceFrom, this.sliceFrom);
       const orderChanger = () => {
         this.initialInitiativesForSorting.splice(
           this.sliceFrom,

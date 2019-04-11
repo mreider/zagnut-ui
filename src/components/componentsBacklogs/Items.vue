@@ -605,6 +605,7 @@ export default {
       console.log(event);
     },
     onEnd(event) {
+      this.$loading(true);
       this.dragging = false;
       const orgId = this.$route.query.orgId;
       const updatedArr = JSON.parse(JSON.stringify(this.filteredSelected));
