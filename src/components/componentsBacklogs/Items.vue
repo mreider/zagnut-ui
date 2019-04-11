@@ -397,7 +397,6 @@ export default {
             element.currentPage = 1;
           });
           this.filteredSelected = this.selected;
-          console.log(this.filteredSelected);
           for (let item of this.filteredSelected) {
             if (item.filteredItems) {
               item.filteredItems.sort((a, b) => {
