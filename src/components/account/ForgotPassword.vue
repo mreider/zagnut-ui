@@ -1,8 +1,6 @@
 <template>
   <b-form @submit="submit" class="forgot col-lg-4 col-md-8 col-sm-12 col-xs-12">
-    <h2 class="center">Restore password<br/>for</h2>
-    <h1 class="center">PM415</h1>
-
+    <h2 class="center">Password reset<br/>for</h2>
     <b-form-group>
       <b-form-input type="email" v-model="form.email" required placeholder="Email address">
       </b-form-input>
@@ -12,7 +10,7 @@
     </b-form-group>
 
     <div class="button-box center">
-      <b-button type="submit" variant="primary">Restore</b-button>
+      <b-button type="submit" variant="primary">Send reset link</b-button>
     </div>
   </b-form>
 </template>

@@ -1,7 +1,6 @@
 <template>
   <b-form @submit="submit" class="reset-password">
-    <h2 class="center">Set new password<br/>for</h2>
-    <h1 class="center">PM415</h1>
+    <h2 class="center">Reset password<br/>for</h2>
     <b-form-group>
       <b-form-input type="password" v-model="form.password" required placeholder="Password">
       </b-form-input>
@@ -13,7 +12,7 @@
     </b-form-group>
 
     <div class="button-box center">
-      <b-button type="submit" variant="primary">Set password</b-button>
+      <b-button type="submit" variant="primary">Save</b-button>
     </div>
   </b-form>
 </template>

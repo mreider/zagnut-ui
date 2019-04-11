@@ -44,7 +44,7 @@
 
             <b-col md="6" sm="12">
               <b-form-group>
-                <b-form-input type="password" v-model="register.confirmation" placeholder="Confrmation"></b-form-input>
+                <b-form-input type="password" v-model="register.confirmation" placeholder="confirmation"></b-form-input>
               </b-form-group>
             </b-col>
           </b-row>
