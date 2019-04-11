@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
-    <v-layout row wrap>
-      <v-flex xs12>
+    <v-layout row wrap justify-center>
+      <v-flex xs12 sm10>
         <v-card>
           <v-card-title>
             <span class="headline">{{form.title}}</span>
