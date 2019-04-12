@@ -341,6 +341,7 @@ export default {
         data.statusId = String(data.status.id);
         delete data.status;
         data.organizationId = String(data.organizationId);
+        data.order_index = String(data.order_index);
         const response = await this.axios.put(
           `/api/initiatives/edit/${orgId}/${initiativeId}`,
           data
