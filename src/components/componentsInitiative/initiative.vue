@@ -48,6 +48,7 @@
                     :items="horizonList"
                     item-text="horizon"
                     item-value="horizon"
+                    v-model="form.horizon"
                     return-object
                     @input="handleInitiativeSetField"
                   ></v-select>
@@ -60,6 +61,7 @@
                     :items="objStatuses"
                     item-text="name"
                     item-value="name"
+                    v-model="form.status"
                     return-object
                     @change="handleInitiativeSetField"
                   ></v-select>
@@ -162,7 +164,8 @@ export default {
         archived: false
       },
       admin: false,
-      dialogDeleteInitiative: false
+      dialogDeleteInitiative: false,
+      currentStatus: ""
     };
   },
   async mounted() {
@@ -315,6 +318,7 @@ export default {
           initiative.archived = true;
         }
         this.form = initiative;
+        this.currentStatus = initiative.statusId;
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {

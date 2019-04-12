@@ -20,7 +20,7 @@
             outline
             @click="sortBacklogsCards('autor')"
             :class="{'v-btn--active': this.activatedButton === 'autor' }"
-          >Autor</v-btn>
+          >Author</v-btn>
         </div>
         <v-spacer class="hidden-md-and-down"></v-spacer>
         <v-btn small outline color="success" @click="dialogNewBackLog = true">New</v-btn>
@@ -67,7 +67,7 @@
             outline
             @click="sortBacklogsCards('autor')"
             :class="{'v-btn--active': this.activatedButton === 'autor'}"
-          >Autor</v-btn>
+          >Author</v-btn>
         </v-flex>
 
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
