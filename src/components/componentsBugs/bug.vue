@@ -260,8 +260,6 @@ export default {
       }
     },
     handleBugSetField(element, name) {
-      console.log(element);
-      console.log(name);
       this.form[name] = element;
     },
     async handleSaveBug() {
@@ -269,15 +267,16 @@ export default {
         const orgId = this.$route.query.orgId;
         const bugId = this.$route.query.bugId;
         let data = {};
-        if (this.form.assignee) {
-          data.assignee = String(this.form.assignee.userId);
+        if (this.assignee.userId) {
+          data.createdBy = String(this.assignee.userId);
         }
         data.description = this.form.description;
         data.title = this.form.title;
         data.archived = this.form.archived;
         data.severity = this.form.severity;
-        if (this.form.reportedBy) {
-          data.createdBy = String(this.form.reportedBy.userId);
+
+        if (this.reportedBy.userId) {
+          data.createdBy = String(this.reportedBy.userId);
         }
 
         if (this.form.status.id !== 0) {
