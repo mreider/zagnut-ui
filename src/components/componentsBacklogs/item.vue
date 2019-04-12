@@ -43,6 +43,7 @@
                         :items="users"
                         item-value="userId"
                         v-model="assignee.userId"
+                        return-object
                         @input="handleItemSetField($event, 'assignee')"
                         class="pt-0"
                       >
