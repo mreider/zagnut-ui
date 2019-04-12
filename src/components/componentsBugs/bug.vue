@@ -63,6 +63,7 @@
                         :items="users"
                         item-value="userId"
                         v-model="reportedBy.userId"
+                        return-object
                         @input="handleBugSetField($event, 'reportedBy')"
                         class="pt-0"
                       >
@@ -87,6 +88,7 @@
                         :items="users"
                         item-value="userId"
                         v-model="assignee.userId"
+                        return-object
                         @input="handleBugSetField($event, 'assignee')"
                         class="pt-0"
                       >
@@ -260,6 +262,8 @@ export default {
       }
     },
     handleBugSetField(element, name) {
+      console.log(element);
+      console.log(name);
       this.form[name] = element;
     },
     async handleSaveBug() {
@@ -267,16 +271,18 @@ export default {
         const orgId = this.$route.query.orgId;
         const bugId = this.$route.query.bugId;
         let data = {};
-        if (this.assignee.userId) {
-          data.createdBy = String(this.assignee.userId);
+
+        if (this.form.assignee) {
+          data.assignee = String(this.form.assignee.userId);
         }
+
         data.description = this.form.description;
         data.title = this.form.title;
         data.archived = this.form.archived;
         data.severity = this.form.severity;
 
-        if (this.reportedBy.userId) {
-          data.createdBy = String(this.reportedBy.userId);
+        if (this.form.reportedBy) {
+          data.createdBy = String(this.form.reportedBy.userId);
         }
 
         if (this.form.status.id !== 0) {
