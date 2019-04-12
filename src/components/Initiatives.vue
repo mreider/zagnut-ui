@@ -648,12 +648,12 @@ export default {
     },
     sortInitiaiveCards(initiativeName) {
       let param = initiativeName.toLowerCase();
+      console.log();
 
       function sortFunction(a, b) {
         if (param === "initiative") {
           param = "title";
         }
-
         let aParam;
         let bParam;
         if (param === "horizon") {
@@ -675,12 +675,22 @@ export default {
             typeof b[param] === "string"
               ? b[param].replace(/\s/g, "X").toLowerCase()
               : b[param];
-          if (aParam < bParam) {
-            return -1;
+          if (param === "popularity") {
+            if (aParam > bParam) {
+              return -1;
+            }
+            if (aParam === bParam) {
+              return 1;
+            }
+          } else {
+            if (aParam < bParam) {
+              return -1;
+            }
+            if (aParam === bParam) {
+              return 1;
+            }
           }
-          if (aParam === bParam) {
-            return 1;
-          }
+
           return 0;
         }
       }
