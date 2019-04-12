@@ -30,6 +30,7 @@
                         :items="severityArray"
                         item-text="element"
                         item-value="element"
+                        v-model="form.severity"
                         @input="handleBugSetField($event, 'severity')"
                         class="pt-0"
                       ></v-select>
@@ -40,8 +41,8 @@
                     <v-flex xs8>
                       <v-select
                         :items="objStatuses"
-                        item-text="`${data.item.name}`"
-                        item-value="`${data.item.name}`"
+                        item-value="status_id"
+                        v-model="status.id"
                         @input="handleBugSetField($event, 'status')"
                         class="pt-0"
                       >
@@ -59,8 +60,8 @@
                     <v-flex xs8>
                       <v-select
                         :items="users"
-                        item-text="`${data.item.firstName} ${data.item.lastName}`"
-                        item-value="`${data.item.firstName} ${data.item.lastName}`"
+                        item-value="userId"
+                        v-model="reportedBy.userId"
                         @input="handleBugSetField($event, 'reportedBy')"
                         class="pt-0"
                       >
@@ -83,8 +84,8 @@
                     <v-flex xs8>
                       <v-select
                         :items="users"
-                        item-text="`${data.item.firstName} ${data.item.lastName}`"
-                        item-value="`${data.item.firstName} ${data.item.lastName}`"
+                        item-value="userId"
+                        v-model="assignee.userId"
                         @input="handleBugSetField($event, 'assignee')"
                         class="pt-0"
                       >
@@ -180,10 +181,13 @@ export default {
       objStatuses: [],
       severityArray: ["P0", "P1", "P2", "P3"],
       users: [],
+      reportedBy: { userId: "" },
+      assignee: { userId: "" },
+      status: { name: "None", id: 0 },
       form: {
         title: "",
         description: "",
-        severity: "P2",
+        severity: "",
         status: { name: "None", id: 0 },
         reportedBy: {},
         assignee: {}
@@ -240,6 +244,10 @@ export default {
         } else {
           bug.status = { name: "None", id: 0 };
         }
+        this.reportedBy.userId = bug.reportedBy.id;
+        this.assignee.userId = bug.assignee.id;
+        this.status = bug.status;
+        console.log(this.reportedBy);
         bug.assignee.userId = bug.assignee.id;
         bug.reportedBy.userId = bug.reportedBy.id;
         bug.createdAt = new Date(bug.createdAt).toLocaleString();
