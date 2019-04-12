@@ -279,6 +279,8 @@ export default {
 
         if (this.form.status.id !== 0) {
           data.statusId = String(this.form.status.id);
+        } else {
+          data.statusId = String(this.status.id);
         }
 
         delete data.status;
