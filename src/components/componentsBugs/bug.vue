@@ -41,8 +41,9 @@
                     <v-flex xs8>
                       <v-select
                         :items="objStatuses"
-                        item-value="status_id"
+                        item-value="id"
                         v-model="status.id"
+                        return-object
                         @input="handleBugSetField($event, 'status')"
                         class="pt-0"
                       >
@@ -259,6 +260,8 @@ export default {
       }
     },
     handleBugSetField(element, name) {
+      console.log(element);
+      console.log(name);
       this.form[name] = element;
     },
     async handleSaveBug() {

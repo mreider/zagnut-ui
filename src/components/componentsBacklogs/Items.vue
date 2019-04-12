@@ -91,9 +91,7 @@
       </v-flex>
 
       <v-flex xs12 v-if="!element.filteredItems.length">
-        <h3
-          class="text-center font-weight-thin"
-        >No items, please add new or drag from another category</h3>
+        <h3 class="text-center font-weight-thin">Nothing here yet</h3>
       </v-flex>
       <draggable
         :list="element.filteredItems"
