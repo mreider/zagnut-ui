@@ -535,22 +535,23 @@ export default {
         data.title = this.newItem.title;
         data.ownerTable = "backlogs";
         data.ownerId = this.$route.query.backlogid;
-        const response = await this.axios.post(
-          `/api/items/new/${this.$store.state.organization.id}`,
-          data
-        );
-        const success = _get(response, "data.success");
-        const newItem = _get(response, "data.item");
-        if (go === true) {
-          console.log(go);
-          this.$router.push({
-            name: "item",
-            query: {
-              orgId: this.$store.state.organization.id,
-              itemId: newItem.id
+        const response = await this.axios
+          .post(`/api/items/new/${this.$store.state.organization.id}`, data)
+          .then(response => {
+            const newItem = _get(response, "data.item");
+            if (go === true) {
+              console.log(go);
+              this.$router.push({
+                name: "item",
+                query: {
+                  orgId: this.$store.state.organization.id,
+                  itemId: newItem.id
+                }
+              });
             }
           });
-        }
+        const success = _get(response, "data.success");
+
         this.dialogNewItem = false;
         if (!success) throw new Error(`Unable to create new item.`);
       } catch (error) {
