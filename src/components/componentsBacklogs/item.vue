@@ -215,6 +215,7 @@ export default {
       this.$loading(true);
       const orgId = this.$route.query.orgId;
       const itemId = this.$route.query.itemId;
+      console.log(orgId, itemId);
       try {
         const response = await this.axios.get(
           "/api/items/" + orgId + "/" + itemId

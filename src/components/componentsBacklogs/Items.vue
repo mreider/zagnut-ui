@@ -235,6 +235,7 @@
                 medium
                 @click="handleNewItem()"
               >Save and close</v-btn>
+              <v-btn color="blue darken-1" flat medium @click="handleNewItem(true)">Save and open</v-btn>
               <v-btn color="blue darken-1" flat medium @click="dialogNewItem=false">Cancel</v-btn>
             </v-flex>
           </v-layout>
@@ -523,7 +524,7 @@ export default {
         this.currentItem = "";
       }
     },
-    async handleNewItem() {
+    async handleNewItem(go) {
       this.objSelecBox = "";
       try {
         let data = {};
@@ -539,6 +540,17 @@ export default {
           data
         );
         const success = _get(response, "data.success");
+        const newItem = _get(response, "data.item");
+        if (go === true) {
+          console.log(go);
+          this.$router.push({
+            name: "item",
+            query: {
+              orgId: this.$store.state.organization.id,
+              itemId: newItem.id
+            }
+          });
+        }
         this.dialogNewItem = false;
         if (!success) throw new Error(`Unable to create new item.`);
       } catch (error) {
