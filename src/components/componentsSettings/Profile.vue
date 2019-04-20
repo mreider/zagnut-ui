@@ -90,7 +90,7 @@
             item-text="name"
             item-value="name"
             return-object
-            @click="handleInviteOrgChange"
+            @change="handleInviteOrgChange"
           ></v-select>
           <v-text-field label="E-Mail" v-model="invite.email"></v-text-field>
           <v-text-field readonly label="Invitation link" v-model="invite.link" disabled></v-text-field>
