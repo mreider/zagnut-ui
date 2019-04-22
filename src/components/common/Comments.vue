@@ -237,7 +237,9 @@ export default {
     async handleNewComment(newComment) {
       const orgId = this.$route.query.orgId;
       const id = this.toCommentsData.id;
-
+      const usersId = this.asignedUsers;
+      console.log(usersId);
+      // request to tagging users will be here
       try {
         this.$loading(true);
         this.findEmailAndReturnMailers(newComment);
@@ -304,6 +306,7 @@ export default {
     removeAssignedUser(item) {
       const index = this.asignedUsers.indexOf(item.userId);
       if (index >= 0) this.asignedUsers.splice(index, 1);
+      // rewuest ro delete assigned item will be here
     }
   },
   components: {
