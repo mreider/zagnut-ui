@@ -45,6 +45,39 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12 sm9 mt-4>
+        <!--autocomplete-->
+        <v-form>
+          <v-flex xs12>
+            <v-autocomplete
+              :items="users"
+              v-model="asignedUsers"
+              chips
+              label="Assign users to comment"
+              item-value="userId"
+              multiple
+            >
+              <template v-slot:selection="data">
+                <v-chip
+                  :selected="data.selected"
+                  close
+                  class="chip--select-multi"
+                  @input="removeAssignedUser(data.item)"
+                >{{ data.item.firstName + " " + data.item.lastName}}</v-chip>
+              </template>
+              <template v-slot:item="data">
+                <template v-if="typeof data.item !== 'object'">
+                  <v-list-tile-content v-text="data.item"></v-list-tile-content>
+                </template>
+                <template v-else>
+                  <v-list-tile-content>
+                    <v-list-tile-title v-html="`${data.item.firstName} ${data.item.lastName}`"></v-list-tile-title>
+                  </v-list-tile-content>
+                </template>
+              </template>
+            </v-autocomplete>
+          </v-flex>
+        </v-form>
+
         <v-textarea
           id="newComment"
           v-model="newComment"
@@ -83,6 +116,7 @@ export default {
   data() {
     return {
       comments: [{ comment: "", readOnly: true }],
+      asignedUsers: [],
       showComments: true,
       addComment: true,
       newComment: "",
@@ -266,6 +300,10 @@ export default {
         });
         this.mailers = _.union(this.mailers);
       }
+    },
+    removeAssignedUser(item) {
+      const index = this.asignedUsers.indexOf(item.userId);
+      if (index >= 0) this.asignedUsers.splice(index, 1);
     }
   },
   components: {
