@@ -260,27 +260,26 @@ export default {
             this.$loading(false);
             this.loadComments();
             this.newComment = "";
+
+            this.axios
+              .post(`/api/subscribers/new/${pathName}/${ownerId}`, {
+                subowner: "comments",
+                subownerId: response.comment.id,
+                usersId: usersIds
+              })
+              .then(response => {
+                console.log(response);
+              })
+              .catch(err => {
+                console.log(err);
+              });
           })
           .catch(err => {
             this.$loading(false);
             return this.$errorMessage.show(err);
           });
       };
-
       postComment();
-
-      this.axios
-        .post(`/api/subscribers/new/${pathName}/${ownerId}`, {
-          subowner: "comments",
-          subownerId: "",
-          usersId: usersIds
-        })
-        .then(response => {
-          console.log(response);
-        })
-        .catch(err => {
-          console.log(err);
-        });
 
       // try {
       //   this.$loading(true);
