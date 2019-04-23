@@ -244,6 +244,31 @@ export default {
       console.log("new comment has created");
       // request to tagging users will be here
 
+      const postComment = () => {
+        this.axios
+          .post(
+            "/api/comments/new/" +
+              this.toCommentsData.name +
+              "/" +
+              orgId +
+              "/" +
+              id,
+            { comment: newComment, mailers: this.mailers }
+          )
+          .then(response => {
+            this.mailers = [];
+            this.$loading(false);
+            this.loadComments();
+            this.newComment = "";
+          })
+          .catch(err => {
+            this.$loading(false);
+            return this.$errorMessage.show(err);
+          });
+      };
+
+      postComment();
+
       this.axios
         .post(`/api/subscribers/new/${pathName}/${ownerId}`, {
           subowner: "comments",
@@ -257,33 +282,33 @@ export default {
           console.log(err);
         });
 
-      try {
-        this.$loading(true);
-        this.findEmailAndReturnMailers(newComment);
+      // try {
+      //   this.$loading(true);
+      //   this.findEmailAndReturnMailers(newComment);
 
-        const response = await this.axios.post(
-          "/api/comments/new/" +
-            this.toCommentsData.name +
-            "/" +
-            orgId +
-            "/" +
-            id,
-          { comment: newComment, mailers: this.mailers }
-        );
-        this.mailers = [];
+      //   const response = await this.axios.post(
+      //     "/api/comments/new/" +
+      //       this.toCommentsData.name +
+      //       "/" +
+      //       orgId +
+      //       "/" +
+      //       id,
+      //     { comment: newComment, mailers: this.mailers }
+      //   );
+      //   this.mailers = [];
 
-        const success = _get(response, "data.success");
-        if (!success) throw new Error(`Unable to create comment.`);
+      //   const success = _get(response, "data.success");
+      //   if (!success) throw new Error(`Unable to create comment.`);
 
-        // this.$notify({group: 'app', type: 'success', text: 'Comment created'});
-      } catch (error) {
-        return this.$errorMessage.show(error);
-      } finally {
-        this.$loading(false);
-        await this.loadComments();
-        this.newComment = "";
-        // this.addComment = false;
-      }
+      //   // this.$notify({group: 'app', type: 'success', text: 'Comment created'});
+      // } catch (error) {
+      //   return this.$errorMessage.show(error);
+      // } finally {
+      //   this.$loading(false);
+      //   await this.loadComments();
+      //   this.newComment = "";
+      //   // this.addComment = false;
+      // }
     },
     async handleDeleteComment(element) {
       const orgId = this.$route.query.orgId;
