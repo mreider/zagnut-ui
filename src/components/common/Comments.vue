@@ -36,8 +36,8 @@
           flat
           icon
           color="pink"
-          v-if="toCommentsData.admin"
           @click="handleDeleteComment(element)"
+          v-if="toCommentsData.admin"
         >
           <v-icon>delete</v-icon>
         </v-btn>
@@ -52,7 +52,7 @@
               :items="users"
               v-model="asignedUsers"
               chips
-              label="Assign users to comment"
+              label="Subscribe users to the bug"
               item-value="userId"
               multiple
             >
@@ -94,8 +94,8 @@
           flat
           icon
           color="primary"
-          v-if="toCommentsData.admin"
           @click="handleNewComment(newComment)"
+          v-if="toCommentsData.admin"
           class="add-comment-button"
         >
           <v-icon>add</v-icon>
@@ -158,8 +158,8 @@ export default {
         const response = await this.axios.get(`/api/org/${orgId}/users`);
 
         const success = _get(response, "data.success");
+        this.loadSubscribers();
         if (!success) throw new Error(`Unable to load user's organizations.`);
-
         const users = _get(response, "data.users");
         this.users = users;
         this.options.values.length = 0;
@@ -175,6 +175,23 @@ export default {
       } finally {
         this.$loading(false);
       }
+    },
+    loadSubscribers() {
+      const ownerId = this.$route.query.bugId;
+      const ownerTable = this.$route.name + "s";
+      this.axios
+        .get(`/api/subscribers/${ownerTable}/${ownerId}`)
+        .then(response => {
+          console.log(response);
+          for (let item of response.data.subscribers) {
+            this.asignedUsers.push(item.id);
+          }
+          console.log(this.asignedUsers);
+          this.$loading(false);
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     handleReadOnly(element) {
       this.comments.forEach(el => {
@@ -239,11 +256,8 @@ export default {
       const id = this.toCommentsData.id;
       const usersIds = this.asignedUsers;
       const ownerId = this.$route.query.bugId;
-      const pathName = this.$route.name + "s";
-      console.log(usersIds);
-      console.log("new comment has created");
+      const ownerTable = this.$route.name + "s";
       // request to tagging users will be here
-
       const postComment = () => {
         this.axios
           .post(
@@ -256,23 +270,23 @@ export default {
             { comment: newComment, mailers: this.mailers }
           )
           .then(response => {
-            this.mailers = [];
-            this.$loading(false);
-            this.loadComments();
-            this.newComment = "";
-
+            console.log(response);
             this.axios
-              .post(`/api/subscribers/new/${pathName}/${ownerId}`, {
+              .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
                 subowner: "comments",
-                subownerId: response.comment.id,
+                subownerId: response.data.comment.comment.id,
                 usersId: usersIds
               })
               .then(response => {
                 console.log(response);
+                this.$loading(false);
+                this.loadComments();
               })
               .catch(err => {
                 console.log(err);
               });
+            this.mailers = [];
+            this.newComment = "";
           })
           .catch(err => {
             this.$loading(false);
