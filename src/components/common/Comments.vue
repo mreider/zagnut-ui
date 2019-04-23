@@ -237,9 +237,26 @@ export default {
     async handleNewComment(newComment) {
       const orgId = this.$route.query.orgId;
       const id = this.toCommentsData.id;
-      const usersId = this.asignedUsers;
-      console.log(usersId);
+      const usersIds = this.asignedUsers;
+      const ownerId = this.$route.query.bugId;
+      const pathName = this.$route.name + "s";
+      console.log(usersIds);
+      console.log("new comment has created");
       // request to tagging users will be here
+
+      this.axios
+        .post(`/api/subscribers/new/${pathName}/${ownerId}`, {
+          subowner: "comments",
+          subownerId: "",
+          usersId: usersIds
+        })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+
       try {
         this.$loading(true);
         this.findEmailAndReturnMailers(newComment);
