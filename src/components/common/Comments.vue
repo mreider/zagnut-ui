@@ -51,8 +51,9 @@
             <v-autocomplete
               :items="users"
               v-model="asignedUsers"
+              @change="autocompleteChanged"
               chips
-              label="Subscribe users to the bug"
+              :label="`Assign user to ${$route.name}`"
               item-value="userId"
               multiple
             >
@@ -122,6 +123,7 @@ export default {
       newComment: "",
       mailers: [],
       users: [],
+      ownerId: "",
       options: {
         selectTemplate: function(item) {
           // mailers.push(item.original.value);
@@ -158,7 +160,17 @@ export default {
         const response = await this.axios.get(`/api/org/${orgId}/users`);
 
         const success = _get(response, "data.success");
+
+        if (this.$route.query.hasOwnProperty("bugId")) {
+          this.ownerId = this.$route.query.bugId;
+        } else if (this.$route.query.hasOwnProperty("initiativeid")) {
+          this.ownerId = this.$route.query.initiativeid;
+        } else if (this.$route.query.hasOwnProperty("itemId")) {
+          this.ownerId = this.$route.query.itemId;
+        }
+
         this.loadSubscribers();
+
         if (!success) throw new Error(`Unable to load user's organizations.`);
         const users = _get(response, "data.users");
         this.users = users;
@@ -177,8 +189,9 @@ export default {
       }
     },
     loadSubscribers() {
-      const ownerId = this.$route.query.bugId;
-      const ownerTable = this.$route.name + "s";
+      const ownerTable = this.$route.name.toLowerCase() + "s";
+      const ownerId = this.ownerId;
+      console.log(this.$route);
       this.axios
         .get(`/api/subscribers/${ownerTable}/${ownerId}`)
         .then(response => {
@@ -255,9 +268,8 @@ export default {
       const orgId = this.$route.query.orgId;
       const id = this.toCommentsData.id;
       const usersIds = this.asignedUsers;
-      const ownerId = this.$route.query.bugId;
-      const ownerTable = this.$route.name + "s";
-      // request to tagging users will be here
+      const ownerId = this.ownerId;
+      const ownerTable = this.$route.name.toLowerCase() + "s";
       const postComment = () => {
         this.axios
           .post(
@@ -284,6 +296,7 @@ export default {
               })
               .catch(err => {
                 console.log(err);
+                this.$loading(false);
               });
             this.mailers = [];
             this.newComment = "";
@@ -294,34 +307,6 @@ export default {
           });
       };
       postComment();
-
-      // try {
-      //   this.$loading(true);
-      //   this.findEmailAndReturnMailers(newComment);
-
-      //   const response = await this.axios.post(
-      //     "/api/comments/new/" +
-      //       this.toCommentsData.name +
-      //       "/" +
-      //       orgId +
-      //       "/" +
-      //       id,
-      //     { comment: newComment, mailers: this.mailers }
-      //   );
-      //   this.mailers = [];
-
-      //   const success = _get(response, "data.success");
-      //   if (!success) throw new Error(`Unable to create comment.`);
-
-      //   // this.$notify({group: 'app', type: 'success', text: 'Comment created'});
-      // } catch (error) {
-      //   return this.$errorMessage.show(error);
-      // } finally {
-      //   this.$loading(false);
-      //   await this.loadComments();
-      //   this.newComment = "";
-      //   // this.addComment = false;
-      // }
     },
     async handleDeleteComment(element) {
       const orgId = this.$route.query.orgId;
@@ -358,10 +343,33 @@ export default {
         this.mailers = _.union(this.mailers);
       }
     },
+    autocompleteChanged() {
+      console.log(this.asignedUsers);
+    },
     removeAssignedUser(item) {
       const index = this.asignedUsers.indexOf(item.userId);
-      if (index >= 0) this.asignedUsers.splice(index, 1);
-      // rewuest ro delete assigned item will be here
+      if (index >= 0) {
+        this.asignedUsers.splice(index, 1);
+        let usersIds = [];
+        usersIds.push(item.userId);
+        const ownerTable = this.$route.name.toLowerCase() + "s";
+        const ownerId = this.ownerId;
+
+        this.$loading(true);
+        this.axios
+          .post(`/api/subscribers/delete/${ownerTable}/${ownerId}`, {
+            usersId: usersIds
+          })
+          .then(response => {
+            console.log(response);
+            this.$loading(false);
+            this.loadComments();
+          })
+          .catch(err => {
+            console.log(err);
+            this.$loading(false);
+          });
+      }
     }
   },
   components: {
