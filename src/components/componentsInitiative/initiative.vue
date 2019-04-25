@@ -350,7 +350,7 @@ export default {
         if (!success) throw new Error(`Unable to update initiative.`);
         // this.$notify({group: 'app', type: 'success', text: 'Item updated'});
         const newComment = this.$refs["comments_ref"].newComment;
-        if (newComment) {
+        if (newComment.length > 0) {
           this.$refs["comments_ref"].handleNewComment(
             this.$refs["comments_ref"].newComment
           );

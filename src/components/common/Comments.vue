@@ -276,11 +276,13 @@ export default {
       }
     },
     async handleNewComment(newComment) {
+      console.log("new comment handled");
       const orgId = this.$route.query.orgId;
       const id = this.toCommentsData.id;
       const usersIds = this.asignedUsers;
       const ownerId = this.ownerId;
       const ownerTable = this.$route.name.toLowerCase() + "s";
+      console.log('subscribers added');
       const postComment = () => {
         this.axios
           .post(
