@@ -45,7 +45,6 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12 sm9 mt-4>
-        <!--autocomplete-->
         <v-form>
           <v-flex xs12>
             <v-autocomplete
@@ -56,7 +55,9 @@
               :label="`Assign user to ${$route.name}`"
               item-value="userId"
               multiple
-              v-if="newComment.length > 0"
+              @click:append="showByIcon = !showByIcon"
+              v-if="showAutocomplete || asignedUsers.length"
+              expandet
             >
               <template v-slot:selection="data">
                 <v-chip
@@ -131,15 +132,27 @@ export default {
           return "@" + item.original.key + ".";
         },
         values: []
-      }
+      },
+      showPrependIcon: false,
+      dialog: false,
+      showByIcon: false,
+      showUsersDialog: false
     };
   },
   async mounted() {
     await this.loadOrgUsers();
     await this.loadComments();
   },
-  computed: {},
-
+  computed: {
+    showAutocomplete: function() {
+      const commentArray = this.newComment.trim().split(" ");
+      for (let item of commentArray) {
+        if (item.startsWith("@")) {
+          return true;
+        }
+      }
+    }
+  },
   methods: {
     tributeReplaced(element) {
       // init change for vue-tribute
@@ -192,15 +205,12 @@ export default {
     loadSubscribers() {
       const ownerTable = this.$route.name.toLowerCase() + "s";
       const ownerId = this.ownerId;
-      console.log(this.$route);
       this.axios
         .get(`/api/subscribers/${ownerTable}/${ownerId}`)
         .then(response => {
-          console.log(response);
           for (let item of response.data.subscribers) {
             this.asignedUsers.push(item.id);
           }
-          console.log(this.asignedUsers);
           this.$loading(false);
         })
         .catch(err => {
@@ -283,7 +293,6 @@ export default {
             { comment: newComment, mailers: this.mailers }
           )
           .then(response => {
-            console.log(response);
             this.axios
               .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
                 subowner: "comments",
@@ -291,8 +300,6 @@ export default {
                 usersId: usersIds
               })
               .then(response => {
-                console.log(response);
-                console.log('subsribers addded');
                 this.$loading(false);
                 this.loadComments();
               })
@@ -346,7 +353,6 @@ export default {
       }
     },
     autocompleteChanged() {
-      console.log(this.asignedUsers);
     },
     removeAssignedUser(item) {
       const index = this.asignedUsers.indexOf(item.userId);
@@ -363,7 +369,6 @@ export default {
             usersId: usersIds
           })
           .then(response => {
-            console.log(response);
             this.$loading(false);
             this.loadComments();
           })
