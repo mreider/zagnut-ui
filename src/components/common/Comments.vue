@@ -56,6 +56,7 @@
               :label="`Assign user to ${$route.name}`"
               item-value="userId"
               multiple
+              v-if="newComment.length > 0"
             >
               <template v-slot:selection="data">
                 <v-chip
@@ -291,6 +292,7 @@ export default {
               })
               .then(response => {
                 console.log(response);
+                console.log('subsribers addded');
                 this.$loading(false);
                 this.loadComments();
               })
