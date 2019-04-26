@@ -45,6 +45,28 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12 sm9 mt-4>
+        <v-item-group multiple v-if="chipsUsers.length">
+          <v-subheader>Subscribed users</v-subheader>
+          <v-item
+                  v-for="(item, i) in chipsUsers"
+                  :key="i"
+          >
+            <v-chip close @input="removeAssignedUser(item)">
+              {{ item.firstName }}  {{ item.lastName }}
+            </v-chip>
+          </v-item>
+        </v-item-group>
+        <v-dialog
+                v-model="dialogUserList"
+                :overlay="false"
+                max-width="350px"
+        >
+          <v-list>
+            <v-list-tile v-for="(item) in users" :key="item.userId" :id="item.userId" @click="selectChip($event)">
+              <v-list-tile-title>{{ item.firstName }} {{ item.lastName }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-dialog>
         <v-form>
           <v-flex xs12>
             <v-autocomplete
@@ -56,7 +78,7 @@
               item-value="userId"
               multiple
               @click:append="showByIcon = !showByIcon"
-              v-if="showAutocomplete || asignedUsers.length"
+              v-if="showAutocomplete"
               expandet
             >
               <template v-slot:selection="data">
@@ -86,6 +108,7 @@
           v-model="newComment"
           label="New comment: "
           placeholder="Enter comment text"
+          @keyup="checkComment"
           :rows="2"
           class="text-left"
           :ref="newComment"
@@ -136,7 +159,9 @@ export default {
       showPrependIcon: false,
       dialog: false,
       showByIcon: false,
-      showUsersDialog: false
+      dialogUserList: false,
+      chipsUsers: [],
+      wordIndex: null
     };
   },
   async mounted() {
@@ -145,12 +170,14 @@ export default {
   },
   computed: {
     showAutocomplete: function() {
-      const commentArray = this.newComment.trim().split(" ");
-      for (let item of commentArray) {
-        if (item.startsWith("@")) {
-          return true;
-        }
-      }
+      return false;
+      // const commentArray = this.newComment.trim().split(" ");
+      // for (let item of commentArray) {
+      //   if (item.startsWith("@")) {
+      //     console.log(true);
+      //     return true;
+      //   }
+      // }
     }
   },
   methods: {
@@ -209,7 +236,9 @@ export default {
         .get(`/api/subscribers/${ownerTable}/${ownerId}`)
         .then(response => {
           for (let item of response.data.subscribers) {
-            this.asignedUsers.push(item.id);
+            // this.asignedUsers.push(item.id);
+            item.userId = item.id;
+            this.chipsUsers.push(item);
           }
           this.$loading(false);
         })
@@ -279,7 +308,11 @@ export default {
       console.log("new comment handled");
       const orgId = this.$route.query.orgId;
       const id = this.toCommentsData.id;
-      const usersIds = this.asignedUsers;
+      // const usersIds = this.asignedUsers.userId;
+      let usersIds = [];
+      for (let item of this.chipsUsers) {
+        usersIds.push(item.userId);
+      }
       const ownerId = this.ownerId;
       const ownerTable = this.$route.name.toLowerCase() + "s";
       console.log('subscribers added');
@@ -298,7 +331,7 @@ export default {
             this.axios
               .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
                 subowner: "comments",
-                subownerId: response.data.comment.comment.id,
+                subownerId: String(response.data.comment.id),
                 usersId: usersIds
               })
               .then(response => {
@@ -357,9 +390,14 @@ export default {
     autocompleteChanged() {
     },
     removeAssignedUser(item) {
-      const index = this.asignedUsers.indexOf(item.userId);
-      if (index >= 0) {
-        this.asignedUsers.splice(index, 1);
+      // const index = this.asignedUsers.indexOf(item.userId);
+      console.log(item);
+      let itemIndex;
+      for (let [index, value] of this.chipsUsers.entries()) {
+        if (value.userId === Number(item.userId)) itemIndex = index;
+      }
+      if (itemIndex >= 0) {
+        this.chipsUsers.splice(itemIndex, 1);
         let usersIds = [];
         usersIds.push(item.userId);
         const ownerTable = this.$route.name.toLowerCase() + "s";
@@ -378,6 +416,27 @@ export default {
             console.log(err);
             this.$loading(false);
           });
+      }
+    },
+    checkComment(e) {
+      if (e.key === "@") this.dialogUserList = true;
+    },
+    selectChip(e) {
+      this.dialogUserList = false;
+      const userId = Number(e.target.parentNode.id);
+      console.log(userId);
+      const commentArray = this.newComment.trim().split(" ");
+      const foundUser = this.users.find((item) => item.userId === userId);
+      if (foundUser) {
+        for (let [index, word] of commentArray.entries()) {
+          if (word === "@") {
+            commentArray[index] = `@${foundUser.firstName + foundUser.lastName}`;
+          }
+        }
+        this.newComment = commentArray.join(" ");
+        if (!this.chipsUsers.find((item) => item.userId === userId)) {
+          this.chipsUsers.push(foundUser);
+        }
       }
     }
   },
