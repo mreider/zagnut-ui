@@ -1,6 +1,17 @@
 <template>
   <div>
     <v-layout row wrap v-for="element in comments" :key="element.id">
+      <v-item-group multiple >
+        <v-subheader>Subscribed users</v-subheader>
+        <v-item
+                v-for="(item, i) in element.subscribers"
+                :key="i"
+        >
+          <v-chip close @input="removeAssignedUser(item)">
+            {{ item.firstName }}  {{ item.lastName }}
+          </v-chip>
+        </v-item>
+      </v-item-group>
       <v-flex xs12 sm9>
         <v-textarea
           :ref="'comment' + element.id"
@@ -8,6 +19,7 @@
           :disabled="element.readOnly"
           box
           v-model="element.comment"
+          @keyup="checkComment($event, false, element.id)"
           name="input-7-4"
           label="Comment: "
         ></v-textarea>
@@ -45,10 +57,10 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12 sm9 mt-4>
-        <v-item-group multiple v-if="chipsUsers.length">
+        <v-item-group multiple v-if="newCommentChipsUsers.length">
           <v-subheader>Subscribed users</v-subheader>
           <v-item
-                  v-for="(item, i) in chipsUsers"
+                  v-for="(item, i) in newCommentChipsUsers"
                   :key="i"
           >
             <v-chip close @input="removeAssignedUser(item)">
@@ -67,48 +79,13 @@
             </v-list-tile>
           </v-list>
         </v-dialog>
-        <v-form>
-          <v-flex xs12>
-            <v-autocomplete
-              :items="users"
-              v-model="asignedUsers"
-              @change="autocompleteChanged"
-              chips
-              :label="`Assign user to ${$route.name}`"
-              item-value="userId"
-              multiple
-              @click:append="showByIcon = !showByIcon"
-              v-if="showAutocomplete"
-              expandet
-            >
-              <template v-slot:selection="data">
-                <v-chip
-                  :selected="data.selected"
-                  close
-                  class="chip--select-multi"
-                  @input="removeAssignedUser(data.item)"
-                >{{ data.item.firstName + " " + data.item.lastName}}</v-chip>
-              </template>
-              <template v-slot:item="data">
-                <template v-if="typeof data.item !== 'object'">
-                  <v-list-tile-content v-text="data.item"></v-list-tile-content>
-                </template>
-                <template v-else>
-                  <v-list-tile-content>
-                    <v-list-tile-title v-html="`${data.item.firstName} ${data.item.lastName}`"></v-list-tile-title>
-                  </v-list-tile-content>
-                </template>
-              </template>
-            </v-autocomplete>
-          </v-flex>
-        </v-form>
 
         <v-textarea
           id="newComment"
           v-model="newComment"
           label="New comment: "
           placeholder="Enter comment text"
-          @keyup="checkComment"
+          @keyup="checkComment($event, true)"
           :rows="2"
           class="text-left"
           :ref="newComment"
@@ -160,25 +137,16 @@ export default {
       dialog: false,
       showByIcon: false,
       dialogUserList: false,
-      chipsUsers: [],
-      wordIndex: null
+      commentChipsUsers: [],
+      newCommentChipsUsers: [],
+      wordIndex: null,
+      commentStatus: false,
+      editingCommentId: null
     };
   },
   async mounted() {
     await this.loadOrgUsers();
     await this.loadComments();
-  },
-  computed: {
-    showAutocomplete: function() {
-      return false;
-      // const commentArray = this.newComment.trim().split(" ");
-      // for (let item of commentArray) {
-      //   if (item.startsWith("@")) {
-      //     console.log(true);
-      //     return true;
-      //   }
-      // }
-    }
   },
   methods: {
     tributeReplaced(element) {
@@ -209,9 +177,6 @@ export default {
         } else if (this.$route.query.hasOwnProperty("itemId")) {
           this.ownerId = this.$route.query.itemId;
         }
-
-        this.loadSubscribers();
-
         if (!success) throw new Error(`Unable to load user's organizations.`);
         const users = _get(response, "data.users");
         this.users = users;
@@ -229,17 +194,14 @@ export default {
         this.$loading(false);
       }
     },
-    loadSubscribers() {
+    loadCommentSubscribers(subownerId) {
       const ownerTable = this.$route.name.toLowerCase() + "s";
       const ownerId = this.ownerId;
       this.axios
-        .get(`/api/subscribers/${ownerTable}/${ownerId}`)
+        .get(`/api/subscribers/${ownerTable}/${ownerId}/${subownerId}`)
         .then(response => {
-          for (let item of response.data.subscribers) {
-            // this.asignedUsers.push(item.id);
-            item.userId = item.id;
-            this.chipsUsers.push(item);
-          }
+          const index = this.comments.findIndex((item) => item.id === subownerId);
+          this.comments[index].subscribers = response.data.subscribers;
           this.$loading(false);
         })
         .catch(err => {
@@ -270,6 +232,9 @@ export default {
           let success = _get(response, "data.success");
           if (!success) this.$errorMessage.show("Unable to load comments");
           let comments = _get(response, "data.comments");
+          for (let comment of comments) {
+            this.loadCommentSubscribers(comment.id);
+          }
           comments.forEach(element => {
             element.readOnly = true;
           });
@@ -296,6 +261,26 @@ export default {
         const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to update comment.`);
 
+        const ownerId = this.ownerId;
+        const ownerTable = this.$route.name.toLowerCase() + "s";
+        let usersIds = [];
+        for (let item of this.element.subscribers) {
+          usersIds.push(item.userId);
+        }
+        this.axios
+          .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
+            subowner: "comments",
+            subownerId: String(element.id),
+            usersId: usersIds
+          })
+          .then(response => {
+            this.$loading(false);
+            this.loadComments();
+          })
+          .catch(err => {
+            console.log(err);
+            this.$loading(false);
+          });
         // this.$notify({group: 'app', type: 'success', text: 'Comment updated'});
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -310,7 +295,7 @@ export default {
       const id = this.toCommentsData.id;
       // const usersIds = this.asignedUsers.userId;
       let usersIds = [];
-      for (let item of this.chipsUsers) {
+      for (let item of this.newCommentChipsUsers) {
         usersIds.push(item.userId);
       }
       const ownerId = this.ownerId;
@@ -387,17 +372,17 @@ export default {
         this.mailers = _.union(this.mailers);
       }
     },
-    autocompleteChanged() {
-    },
     removeAssignedUser(item) {
       // const index = this.asignedUsers.indexOf(item.userId);
-      console.log(item);
       let itemIndex;
-      for (let [index, value] of this.chipsUsers.entries()) {
+      let chipsUsersArray;
+      // TODO: add ownerId prop to item if item not from new comment
+      item.ownerId ? chipsUsersArray = this.commentChipsUsers : this.newCommentChipsUsers;
+      for (let [index, value] of chipsUsersArray.entries()) {
         if (value.userId === Number(item.userId)) itemIndex = index;
       }
       if (itemIndex >= 0) {
-        this.chipsUsers.splice(itemIndex, 1);
+        this.commentChipsUsers.splice(itemIndex, 1);
         let usersIds = [];
         usersIds.push(item.userId);
         const ownerTable = this.$route.name.toLowerCase() + "s";
@@ -418,14 +403,21 @@ export default {
           });
       }
     },
-    checkComment(e) {
+    checkComment(e, isNewComment, commentId) {
+      this.commentStatus = isNewComment;
+      this.editingCommentId = commentId;
       if (e.key === "@") this.dialogUserList = true;
     },
     selectChip(e) {
       this.dialogUserList = false;
       const userId = Number(e.target.parentNode.id);
-      console.log(userId);
-      const commentArray = this.newComment.trim().split(" ");
+      let commentArray;
+      if (this.commentStatus === true) {
+        commentArray = this.newComment.trim().split(" ");
+      } else {
+        let commentItem = this.comments.find((item) => item.id === this.editingCommentId);
+        commentArray = commentItem.comment.trim().split(" ");
+      }
       const foundUser = this.users.find((item) => item.userId === userId);
       if (foundUser) {
         for (let [index, word] of commentArray.entries()) {
@@ -433,9 +425,20 @@ export default {
             commentArray[index] = `@${foundUser.firstName + foundUser.lastName}`;
           }
         }
-        this.newComment = commentArray.join(" ");
-        if (!this.chipsUsers.find((item) => item.userId === userId)) {
-          this.chipsUsers.push(foundUser);
+        if (this.commentStatus === true) {
+          this.newComment = commentArray.join(" ");
+          if (!this.newCommentChipsUsers.find((item) => item.userId === userId)) {
+            this.newCommentChipsUsers.push(foundUser);
+          }
+        } else {
+          let foundComment;
+          for (let [index, value] of this.comments.entries()) {
+            if (value.id === Number(this.editingCommentId)) foundComment = index;
+          }
+          this.comments[foundComment].comment = commentArray.join(" ");
+          if (!this.commentChipsUsers.find((item) => item.userId === userId)) {
+            this.commentChipsUsers.push(foundUser);
+          }
         }
       }
     }
