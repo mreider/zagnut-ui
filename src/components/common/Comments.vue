@@ -1,8 +1,9 @@
 <template>
   <div>
     <v-layout row wrap v-for="element in comments" :key="element.id">
+    <v-flex xs12>
       <v-item-group multiple >
-        <v-subheader>Subscribed users</v-subheader>
+        <v-subheader>Subscribed users: </v-subheader>
         <v-item
                 v-for="(item, i) in element.subscribers"
                 :key="i"
@@ -12,6 +13,7 @@
           </v-chip>
         </v-item>
       </v-item-group>
+    </v-flex>
       <v-flex xs12 sm9>
         <v-textarea
           :ref="'comment' + element.id"
@@ -56,30 +58,31 @@
       </v-flex>
     </v-layout>
     <v-layout row wrap>
-      <v-flex xs12 sm9 mt-4>
-        <v-item-group multiple v-if="newCommentChipsUsers.length">
-          <v-subheader>Subscribed users</v-subheader>
-          <v-item
-                  v-for="(item, i) in newCommentChipsUsers"
-                  :key="i"
-          >
-            <v-chip close @input="removeAssignedUser(item)">
-              {{ item.firstName }}  {{ item.lastName }}
-            </v-chip>
-          </v-item>
-        </v-item-group>
-        <v-dialog
-                v-model="dialogUserList"
-                :overlay="false"
-                max-width="350px"
+    <v-flex xs12>
+     <v-item-group multiple v-if="newCommentChipsUsers.length">
+        <v-subheader>Subscribed users:</v-subheader>
+        <v-item
+                v-for="(item, i) in newCommentChipsUsers"
+                :key="i"
         >
-          <v-list>
-            <v-list-tile v-for="(item) in users" :key="item.userId" :id="item.userId" @click="selectChip($event)">
-              <v-list-tile-title>{{ item.firstName }} {{ item.lastName }}</v-list-tile-title>
-            </v-list-tile>
-          </v-list>
-        </v-dialog>
-
+          <v-chip close @input="removeAssignedUser(item)">
+            {{ item.firstName }}  {{ item.lastName }}
+          </v-chip>
+        </v-item>
+      </v-item-group>
+      <v-dialog
+              v-model="dialogUserList"
+              :overlay="false"
+              max-width="350px"
+      >
+        <v-list>
+          <v-list-tile v-for="(item) in users" :key="item.userId" :id="item.userId" @click="selectChip($event)">
+            <v-list-tile-title>{{ item.firstName }} {{ item.lastName }}</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-dialog>
+    </v-flex>
+      <v-flex xs12 sm9 mt-0>
         <v-textarea
           id="newComment"
           v-model="newComment"
@@ -198,10 +201,14 @@ export default {
       const ownerTable = this.$route.name.toLowerCase() + "s";
       const ownerId = this.ownerId;
       this.axios
-        .get(`/api/subscribers/${ownerTable}/${ownerId}/${subownerId}`)
+        .get(`/api/subscribers/${ownerTable}/${ownerId}/comments/${subownerId}`)
         .then(response => {
           const index = this.comments.findIndex((item) => item.id === subownerId);
+          for (let item of response.data.subscribers) {
+            item.subownerId = subownerId;
+          }
           this.comments[index].subscribers = response.data.subscribers;
+          console.log(this.comments);
           this.$loading(false);
         })
         .catch(err => {
@@ -233,6 +240,7 @@ export default {
           if (!success) this.$errorMessage.show("Unable to load comments");
           let comments = _get(response, "data.comments");
           for (let comment of comments) {
+            comment.subscribers = [];
             this.loadCommentSubscribers(comment.id);
           }
           comments.forEach(element => {
@@ -373,34 +381,40 @@ export default {
       }
     },
     removeAssignedUser(item) {
-      // const index = this.asignedUsers.indexOf(item.userId);
-      let itemIndex;
-      let chipsUsersArray;
-      // TODO: add ownerId prop to item if item not from new comment
-      item.ownerId ? chipsUsersArray = this.commentChipsUsers : this.newCommentChipsUsers;
-      for (let [index, value] of chipsUsersArray.entries()) {
-        if (value.userId === Number(item.userId)) itemIndex = index;
+      let chipsUsersArray = [];
+      let commentIndex;
+      if (item.subownerId) {
+        const commentObject = this.comments.find(commentObj => commentObj.id === item.subownerId);
+        commentIndex = this.comments.findIndex(commentObj => commentObj.id === item.subownerId);
+        chipsUsersArray.push(commentObject);
+      } else {
+        chipsUsersArray = this.newCommentChipsUsers;
       }
+      const itemIndex = chipsUsersArray.findIndex(chipUser => chipUser.userId === item.userId);
       if (itemIndex >= 0) {
-        this.commentChipsUsers.splice(itemIndex, 1);
-        let usersIds = [];
-        usersIds.push(item.userId);
-        const ownerTable = this.$route.name.toLowerCase() + "s";
-        const ownerId = this.ownerId;
+        if (!item.subownerId) {
+          this.newCommentChipsUsers.splice(itemIndex, 1);
+        } else {
+          this.comments[commentIndex].subscribers.splice(itemIndex, 1);
+          let usersIds = [];
+          usersIds.push(String(item.id));
+          const ownerTable = this.$route.name.toLowerCase() + "s";
+          const ownerId = this.ownerId;
 
-        this.$loading(true);
-        this.axios
-          .post(`/api/subscribers/delete/${ownerTable}/${ownerId}`, {
-            usersId: usersIds
-          })
-          .then(response => {
-            this.$loading(false);
-            this.loadComments();
-          })
-          .catch(err => {
-            console.log(err);
-            this.$loading(false);
-          });
+          this.$loading(true);
+          this.axios
+            .post(`/api/subscribers/delete/${ownerTable}/${ownerId}/comments/${item.subownerId}`, {
+              usersId: usersIds
+            })
+            .then(response => {
+              this.$loading(false);
+              this.loadComments();
+            })
+            .catch(err => {
+              console.log(err);
+              this.$loading(false);
+            });
+        }
       }
     },
     checkComment(e, isNewComment, commentId) {
