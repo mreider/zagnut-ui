@@ -4,9 +4,22 @@
       <v-card-text>
         <v-container grid-list-md>
           <v-layout row wrap>
-            <v-flex xs12>
               <v-text-field v-model="form.title" placeholder="Enter initiative"></v-text-field>
-              <v-textarea v-model="form.description" placeholder="Enter hightlights"></v-textarea>
+              <v-flex xs12>
+                <v-item-group multiple >
+                    <v-subheader class="pl-2">Subscribed users: </v-subheader>
+                    <v-item
+                            v-for="(item, i) in subscribedUsers"
+                            :key="i"
+                    >
+                      <v-chip close @input="removeSubscribedUser(item)">
+                        {{ item.firstName }}  {{ item.lastName }}
+                      </v-chip>
+                    </v-item>
+                </v-item-group>
+              </v-flex>
+            <v-flex xs12>
+              <v-textarea v-model="form.description" @keyup="checkText($event)" placeholder="Enter hightlights"></v-textarea>
             </v-flex>
             <v-flex xs12>
               <v-layout row wrap align-center>
@@ -128,6 +141,17 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="dialogUserList"
+      :overlay="false"
+      max-width="350px"
+          >
+      <v-list>
+        <v-list-tile v-for="(item) in users" :key="item.userId" :id="item.userId" @click="selectChip($event)">
+          <v-list-tile-title>{{ item.firstName }} {{ item.lastName }}</v-list-tile-title>
+        </v-list-tile>
+      </v-list>
+    </v-dialog>
   </div>
 </template>
 
@@ -165,7 +189,10 @@ export default {
       },
       admin: false,
       dialogDeleteInitiative: false,
-      currentStatus: ""
+      currentStatus: "",
+      users: [],
+      dialogUserList: false,
+      subscribedUsers: []
     };
   },
   async mounted() {
@@ -173,6 +200,7 @@ export default {
     await this.loadOrgInitiative();
     this.horizonLoadList();
     await this.loadVotes();
+    await this.loadOrgUsers();
     // this.btnfalse = '';
   },
   computed: {},
@@ -319,6 +347,7 @@ export default {
         }
         this.form = initiative;
         this.currentStatus = initiative.statusId;
+        this.loadSubscribers(initiativeId);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -349,6 +378,7 @@ export default {
         const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to update initiative.`);
         // this.$notify({group: 'app', type: 'success', text: 'Item updated'});
+        this.subscribeUsers();
         const newComment = this.$refs["comments_ref"].newComment;
         if (newComment.length > 0) {
           this.$refs["comments_ref"].handleNewComment(
@@ -401,7 +431,76 @@ export default {
       } finally {
         // this.$loading(false);
       }
-    }
+    },
+    async loadOrgUsers() {
+      const orgId = this.$route.query.orgId;
+      try {
+        this.$loading(true);
+        const response = await this.axios.get(`/api/org/${orgId}/users`);
+
+        const success = _get(response, "data.success");
+        if (!success) throw new Error(`Unable to load user's organizations.`);
+        const users = _get(response, "data.users");
+        this.users = users;
+        console.log(this.users);
+      } catch (error) {
+        return this.$errorMessage.show(error);
+      } finally {
+        this.$loading(false);
+      }
+    },
+    loadSubscribers(ownerId) {
+      console.log('load subscribers');
+      const ownerTable = this.$route.name.toLowerCase() + "s";
+      this.axios
+        .get(`/api/subscribers/${ownerTable}/${ownerId}`)
+        .then(response => {
+          this.subscribedUsers = response.data.subscribers;
+          console.log(this.subscribers);
+          this.$loading(false);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    checkText(e) {
+      if (e.key === "@") this.dialogUserList = true;
+    },
+    selectChip($event) {
+      this.dialogUserList = false;
+      const userId = Number($event.target.parentNode.id);
+      console.log(userId);
+      let textArray;
+      textArray = this.form.description.trim().split(" ");
+      const foundUser = this.users.find((item) => item.userId === userId);
+      if (foundUser) {
+        for (let [index, word] of textArray.entries()) {
+          if (word === "@") {
+            textArray[index] = `@${foundUser.firstName + foundUser.lastName}`;
+          }
+        }
+        this.form.description = textArray.join(" ");
+        console.log(this.subscribedUsers);
+        if (!this.subscribedUsers.find((item) => item.id === userId)) {
+          this.subscribedUsers.push(foundUser);
+        }
+      }
+    },
+    subscribeUsers() {
+      // this.axios
+      //   .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
+      //     usersId: usersIds
+      //   })
+      //   .then(response => {
+      //     this.$loading(false);
+      //     this.loadComments();
+      //   })
+      //   .catch(err => {
+      //     console.log(err);
+      //     this.$loading(false);
+      //   });
+    },
+    removeSubscribedUser(item) {}
   },
   components: {
     Connections,
