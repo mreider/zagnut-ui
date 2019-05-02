@@ -395,6 +395,7 @@ export default {
         if (!item.subownerId) {
           this.newCommentChipsUsers.splice(itemIndex, 1);
         } else {
+          console.log('loh');
           this.comments[commentIndex].subscribers.splice(itemIndex, 1);
           let usersIds = [];
           usersIds.push(String(item.id));

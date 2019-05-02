@@ -505,7 +505,30 @@ export default {
           this.$loading(false);
         });
     },
-    removeSubscribedUser(item) {}
+    removeSubscribedUser(item) {
+      const itemIndex = this.subscribedUsers.findIndex(chipUser => chipUser.id === item.id);
+      console.log(this.subscribedUsers);
+      console.log(item);
+      if (itemIndex >= 0) {
+        const ownerTable = this.$route.name.toLowerCase() + "s";
+        const ownerId = this.$route.query.initiativeid;
+        let usersIds = [];
+        usersIds.push(String(item.id));
+        this.$loading(true);
+        this.axios
+          .post(`/api/subscribers/delete/${ownerTable}/${ownerId}`, {
+            usersId: usersIds
+          })
+          .then(response => {
+            this.$loading(false);
+            this.subscribedUsers.splice(itemIndex, 1);
+          })
+          .catch(err => {
+            console.log(err);
+            this.$loading(false);
+          });
+      }
+    }
   },
   components: {
     Connections,
