@@ -487,18 +487,23 @@ export default {
       }
     },
     subscribeUsers() {
-      // this.axios
-      //   .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
-      //     usersId: usersIds
-      //   })
-      //   .then(response => {
-      //     this.$loading(false);
-      //     this.loadComments();
-      //   })
-      //   .catch(err => {
-      //     console.log(err);
-      //     this.$loading(false);
-      //   });
+      const ownerTable = this.$route.name.toLowerCase() + "s";
+      const ownerId = this.$route.query.initiativeid;
+      let usersIds = [];
+      for (let item of this.subscribedUsers) {
+        usersIds.push(item.userId || item.id);
+      }
+      this.axios
+        .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
+          usersId: usersIds
+        })
+        .then(response => {
+          this.$loading(false);
+        })
+        .catch(err => {
+          console.log(err);
+          this.$loading(false);
+        });
     },
     removeSubscribedUser(item) {}
   },
