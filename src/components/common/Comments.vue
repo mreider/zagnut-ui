@@ -326,6 +326,7 @@ export default {
               })
               .then(response => {
                 this.$loading(false);
+                this.newCommentChipsUsers = [];
                 this.loadComments();
               })
               .catch(err => {
