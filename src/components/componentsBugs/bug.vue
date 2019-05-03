@@ -288,8 +288,6 @@ export default {
       }
     },
     handleBugSetField(element, name) {
-      console.log(element);
-      console.log(name);
       this.form[name] = element;
     },
     async handleSaveBug() {
@@ -376,7 +374,6 @@ export default {
         .get(`/api/subscribers/${ownerTable}/${ownerId}`)
         .then(response => {
           this.subscribedUsers = response.data.subscribers;
-          console.log(this.subscribedUsers);
           this.$loading(false);
         })
         .catch(err => {
@@ -426,8 +423,6 @@ export default {
     },
     removeSubscribedUser(item) {
       const itemIndex = this.subscribedUsers.findIndex(chipUser => chipUser.id === item.id);
-      console.log(this.subscribedUsers);
-      console.log(item);
       if (itemIndex >= 0) {
         const ownerTable = this.$route.name.toLowerCase() + "s";
         const ownerId = this.$route.query.bugId;

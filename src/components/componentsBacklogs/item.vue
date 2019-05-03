@@ -240,7 +240,6 @@ export default {
       this.$loading(true);
       const orgId = this.$route.query.orgId;
       const itemId = this.$route.query.itemId;
-      console.log(orgId, itemId);
       try {
         const response = await this.axios.get(
           "/api/items/" + orgId + "/" + itemId
@@ -248,7 +247,6 @@ export default {
 
         let success = _get(response, "data.success");
         this.assignee = response.data.item.assignee;
-        // console.log(this.assignee);
         if (!success) {
           this.$errorMessage.show("Unable to load current user profile");
         }
@@ -378,7 +376,6 @@ export default {
         .get(`/api/subscribers/${ownerTable}/${ownerId}`)
         .then(response => {
           this.subscribedUsers = response.data.subscribers;
-          console.log(this.subscribedUsers);
           this.$loading(false);
         })
         .catch(err => {
