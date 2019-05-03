@@ -208,7 +208,6 @@ export default {
             item.subownerId = subownerId;
           }
           this.comments[index].subscribers = response.data.subscribers;
-          console.log(this.comments);
           this.$loading(false);
         })
         .catch(err => {
@@ -272,8 +271,8 @@ export default {
         const ownerId = this.ownerId;
         const ownerTable = this.$route.name.toLowerCase() + "s";
         let usersIds = [];
-        for (let item of this.element.subscribers) {
-          usersIds.push(item.userId);
+        for (let item of element.subscribers) {
+          usersIds.push(item.id);
         }
         this.axios
           .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
@@ -298,7 +297,6 @@ export default {
       }
     },
     async handleNewComment(newComment) {
-      console.log("new comment handled");
       const orgId = this.$route.query.orgId;
       const id = this.toCommentsData.id;
       // const usersIds = this.asignedUsers.userId;
@@ -308,7 +306,6 @@ export default {
       }
       const ownerId = this.ownerId;
       const ownerTable = this.$route.name.toLowerCase() + "s";
-      console.log('subscribers added');
       const postComment = () => {
         this.axios
           .post(
@@ -395,7 +392,6 @@ export default {
         if (!item.subownerId) {
           this.newCommentChipsUsers.splice(itemIndex, 1);
         } else {
-          console.log('loh');
           this.comments[commentIndex].subscribers.splice(itemIndex, 1);
           let usersIds = [];
           usersIds.push(String(item.id));
@@ -404,8 +400,10 @@ export default {
 
           this.$loading(true);
           this.axios
-            .post(`/api/subscribers/delete/${ownerTable}/${ownerId}/comments/${item.subownerId}`, {
-              usersId: usersIds
+            .post(`/api/subscribers/delete/${ownerTable}/${ownerId}`, {
+              subowner: "comments",
+              usersId: usersIds,
+              subownerId: `${item.subownerId}`
             })
             .then(response => {
               this.$loading(false);
@@ -451,8 +449,9 @@ export default {
             if (value.id === Number(this.editingCommentId)) foundComment = index;
           }
           this.comments[foundComment].comment = commentArray.join(" ");
-          if (!this.commentChipsUsers.find((item) => item.userId === userId)) {
-            this.commentChipsUsers.push(foundUser);
+          if (!this.comments[foundComment].subscribers.find((item) => item.id === userId)) {
+            foundUser.id = userId;
+            this.comments[foundComment].subscribers.push(foundUser);
           }
         }
       }
