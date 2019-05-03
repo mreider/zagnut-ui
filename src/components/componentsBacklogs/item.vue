@@ -14,10 +14,22 @@
                   <label
                     class="text-left"
                   >Created by {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
+                  <v-item-group multiple >
+                      <v-subheader class="pl-2">Subscribed users: </v-subheader>
+                      <v-item
+                              v-for="(item, i) in subscribedUsers"
+                              :key="i"
+                      >
+                        <v-chip close @input="removeSubscribedUser(item)">
+                          {{ item.firstName }}  {{ item.lastName }}
+                        </v-chip>
+                      </v-item>
+                  </v-item-group>
                   <v-textarea
                     v-model="form.description"
                     placeholder="Title description"
                     class="mt-3"
+                    @keyup="checkText($event)"
                   ></v-textarea>
                 </v-flex>
                 <v-flex xs12>
@@ -130,6 +142,17 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="dialogUserList"
+      :overlay="false"
+      max-width="350px"
+          >
+      <v-list>
+        <v-list-tile v-for="(item) in users" :key="item.userId" :id="item.userId" @click="selectChip($event)">
+          <v-list-tile-title>{{ item.firstName }} {{ item.lastName }}</v-list-tile-title>
+        </v-list-tile>
+      </v-list>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -176,7 +199,9 @@ export default {
         id: "",
         Author: { firstName: "", lastName: "", email: "" },
         archived: false
-      }
+      },
+      dialogUserList: false,
+      subscribedUsers: []
     };
   },
   async mounted() {
@@ -245,6 +270,7 @@ export default {
         this.points = String(this.form.points);
         this.admin = _get(response, "data.admin");
         this.toCommentsData.admin = _get(response, "data.admin");
+        this.loadSubscribers(itemId);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -288,7 +314,7 @@ export default {
 
         const success = _get(response, "data.success");
         if (!success) throw new Error(`Unable to update item.`);
-
+        this.subscribeUsers();
         // this.$notify({group: 'app', type: 'success', text: 'Item updated'});
         const newComment = this.$refs["comments_ref"].newComment;
         if (newComment) {
@@ -344,6 +370,82 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.$loading(false);
+      }
+    },
+    loadSubscribers(ownerId) {
+      const ownerTable = this.$route.name.toLowerCase() + "s";
+      this.axios
+        .get(`/api/subscribers/${ownerTable}/${ownerId}`)
+        .then(response => {
+          this.subscribedUsers = response.data.subscribers;
+          console.log(this.subscribedUsers);
+          this.$loading(false);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    checkText(e) {
+      if (e.key === "@") this.dialogUserList = true;
+    },
+    selectChip($event) {
+      this.dialogUserList = false;
+      const userId = Number($event.target.parentNode.id);
+      let textArray;
+      textArray = this.form.description.trim().split(" ");
+      const foundUser = this.users.find((item) => item.userId === userId);
+      if (foundUser) {
+        for (let [index, word] of textArray.entries()) {
+          if (word === "@") {
+            textArray[index] = `@${foundUser.firstName + foundUser.lastName}`;
+          }
+        }
+        this.form.description = textArray.join(" ");
+        if (!this.subscribedUsers.find((item) => item.id === userId)) {
+          foundUser.id = userId;
+          this.subscribedUsers.push(foundUser);
+        }
+      }
+    },
+    subscribeUsers() {
+      const ownerTable = this.$route.name.toLowerCase() + "s";
+      const ownerId = this.$route.query.itemId;
+      let usersIds = [];
+      for (let item of this.subscribedUsers) {
+        usersIds.push(item.userId || item.id);
+      }
+      this.axios
+        .post(`/api/subscribers/new/${ownerTable}/${ownerId}`, {
+          usersId: usersIds
+        })
+        .then(response => {
+          this.$loading(false);
+        })
+        .catch(err => {
+          console.log(err);
+          this.$loading(false);
+        });
+    },
+    removeSubscribedUser(item) {
+      const itemIndex = this.subscribedUsers.findIndex(chipUser => chipUser.id === item.id);
+      if (itemIndex >= 0) {
+        const ownerTable = this.$route.name.toLowerCase() + "s";
+        const ownerId = this.$route.query.itemId;
+        let usersIds = [];
+        usersIds.push(String(item.id));
+        this.$loading(true);
+        this.axios
+          .post(`/api/subscribers/delete/${ownerTable}/${ownerId}`, {
+            usersId: usersIds
+          })
+          .then(response => {
+            this.$loading(false);
+            this.subscribedUsers.splice(itemIndex, 1);
+          })
+          .catch(err => {
+            console.log(err);
+            this.$loading(false);
+          });
       }
     }
   },

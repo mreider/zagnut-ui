@@ -442,7 +442,6 @@ export default {
         if (!success) throw new Error(`Unable to load user's organizations.`);
         const users = _get(response, "data.users");
         this.users = users;
-        console.log(this.users);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -450,13 +449,12 @@ export default {
       }
     },
     loadSubscribers(ownerId) {
-      console.log('load subscribers');
       const ownerTable = this.$route.name.toLowerCase() + "s";
       this.axios
         .get(`/api/subscribers/${ownerTable}/${ownerId}`)
         .then(response => {
           this.subscribedUsers = response.data.subscribers;
-          console.log(this.subscribers);
+          console.log(this.subscribedUsers);
           this.$loading(false);
         })
         .catch(err => {
@@ -469,7 +467,6 @@ export default {
     selectChip($event) {
       this.dialogUserList = false;
       const userId = Number($event.target.parentNode.id);
-      console.log(userId);
       let textArray;
       textArray = this.form.description.trim().split(" ");
       const foundUser = this.users.find((item) => item.userId === userId);
@@ -480,8 +477,8 @@ export default {
           }
         }
         this.form.description = textArray.join(" ");
-        console.log(this.subscribedUsers);
         if (!this.subscribedUsers.find((item) => item.id === userId)) {
+          foundUser.id = userId;
           this.subscribedUsers.push(foundUser);
         }
       }
