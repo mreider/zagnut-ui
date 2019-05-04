@@ -594,8 +594,6 @@ export default {
       this.paramForNewCard = newParam;
     },
     handleNewInitiativeSetField(element, name) {
-      console.log(element);
-      console.log(name);
       if (element.hasOwnProperty("horizon")) {
         name = "horizon";
       }
@@ -650,8 +648,6 @@ export default {
     },
     sortInitiaiveCards(initiativeName) {
       let param = initiativeName.toLowerCase();
-      console.log();
-
       function sortFunction(a, b) {
         if (param === "initiative") {
           param = "title";

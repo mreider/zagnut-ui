@@ -249,7 +249,6 @@ export default {
     },
     async handleInitiativeSetField(element, name) {
       this.form[name] = element;
-      console.log(this.form.horizon);
       if (name === "vote") {
         this.vote = element;
         if (element === true) {
@@ -341,7 +340,6 @@ export default {
           horizon: this.getHorizonName(new Date(initiative.horizon))
         };
         initiative.horizon.date.setMonth(initiative.horizon.date.getMonth());
-        console.log(initiative.horizon);
         this.toCommentsData.admin = _get(response, "data.admin");
         if (initiative.archived === 0) {
           initiative.archived = false;
@@ -370,7 +368,6 @@ export default {
         delete data["id"];
         delete data.vote;
         data.horizon = this.formatDate(new Date(data.horizon.date));
-        console.log(data.horizon);
         data.statusId = String(data.status.id);
         delete data.status;
         data.organizationId = String(data.organizationId);
