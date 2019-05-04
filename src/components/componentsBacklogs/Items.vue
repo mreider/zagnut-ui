@@ -535,12 +535,12 @@ export default {
         data.title = this.newItem.title;
         data.ownerTable = "backlogs";
         data.ownerId = this.$route.query.backlogid;
+        if (data.assignee === String(this.$store.state.user.id)) delete data.assignee;
         await this.axios
           .post(`/api/items/new/${this.$store.state.organization.id}`, data)
           .then(response => {
             const newItem = _get(response, "data.item");
             if (go === true) {
-              console.log(go);
               this.$router.push({
                 name: "item",
                 query: {

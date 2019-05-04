@@ -63,7 +63,7 @@
                     item-value="horizon"
                     v-model="form.horizon"
                     return-object
-                    @input="handleInitiativeSetField"
+                    @input="handleInitiativeSetField($event, 'horizon')"
                   ></v-select>
                 </v-flex>
                 <v-flex xs4>
@@ -76,7 +76,7 @@
                     item-value="name"
                     v-model="form.status"
                     return-object
-                    @change="handleInitiativeSetField"
+                    @input="handleInitiativeSetField($event, 'status')"
                   ></v-select>
                 </v-flex>
               </v-layout>
@@ -249,6 +249,7 @@ export default {
     },
     async handleInitiativeSetField(element, name) {
       this.form[name] = element;
+      console.log(this.form.horizon);
       if (name === "vote") {
         this.vote = element;
         if (element === true) {
@@ -316,7 +317,7 @@ export default {
       return "Q" + quarter + year;
     },
     formatDate(d) {
-      const month = d.getMonth();
+      const month = d.getMonth() + 1;
       const year = d.getFullYear();
       const day = d.getDate();
       return year + "-" + month + "-" + day;
@@ -339,6 +340,8 @@ export default {
           date: new Date(initiative.horizon),
           horizon: this.getHorizonName(new Date(initiative.horizon))
         };
+        initiative.horizon.date.setMonth(initiative.horizon.date.getMonth());
+        console.log(initiative.horizon);
         this.toCommentsData.admin = _get(response, "data.admin");
         if (initiative.archived === 0) {
           initiative.archived = false;
@@ -367,6 +370,7 @@ export default {
         delete data["id"];
         delete data.vote;
         data.horizon = this.formatDate(new Date(data.horizon.date));
+        console.log(data.horizon);
         data.statusId = String(data.status.id);
         delete data.status;
         data.organizationId = String(data.organizationId);

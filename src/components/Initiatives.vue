@@ -260,7 +260,7 @@
                       item-text="horizon"
                       item-value="horizon"
                       return-object
-                      @input="handleNewInitiativeSetField"
+                      @input="handleNewInitiativeSetField($event, 'horizon')"
                     ></v-select>
                   </v-flex>
                   <v-flex xs4>
@@ -272,7 +272,7 @@
                       item-text="name"
                       item-value="name"
                       return-object
-                      @change="handleNewInitiativeSetField"
+                      @change="handleNewInitiativeSetField($event, 'status')"
                     ></v-select>
                   </v-flex>
                 </v-layout>
@@ -594,6 +594,8 @@ export default {
       this.paramForNewCard = newParam;
     },
     handleNewInitiativeSetField(element, name) {
+      console.log(element);
+      console.log(name);
       if (element.hasOwnProperty("horizon")) {
         name = "horizon";
       }
