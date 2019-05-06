@@ -396,6 +396,7 @@ export default {
         if (this.commentStatus === true) {
           this.newComment = commentArray.join(" ");
           if (!this.newCommentChipsUsers.find((item) => item.userId === userId)) {
+            foundUser.id = userId; // because subscribers have id and not userId as other tables
             this.newCommentChipsUsers.push(foundUser);
           }
         } else {
