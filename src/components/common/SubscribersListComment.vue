@@ -30,10 +30,7 @@
         } else {
           subscribedUsers = this.newCommentSubscribers;
         }
-        console.log(subscribedUsers);
-        console.log(item);
         const itemIndex = subscribedUsers.findIndex(chipUser => chipUser.id === item.id);
-        console.log(itemIndex);
         if (itemIndex >= 0) {
           if (!item.subownerId) {
             this.newCommentSubscribers.splice(itemIndex, 1);
