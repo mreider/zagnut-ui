@@ -14,7 +14,7 @@
                   <label
                     class="text-left"
                   >Created by {{handleUsername(form.reportedBy)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
-                  <SubscribedUsersList :subscribedUsers="subscribedUsers"/>
+                  <SubscribersList :subscribedUsers="subscribedUsers"/>
                   <v-textarea
                     v-model="form.description"
                     placeholder="Title description"
@@ -180,7 +180,7 @@ import _ from "lodash";
 import Connections from "../common/connections.vue";
 import Comments from "../common/comments.vue";
 import { username } from "@/utils";
-import SubscribedUsersList from "../common/SubscribedUsersList.vue";
+import SubscribersList from "../common/SubscribersList";
 export default {
   name: "bug",
   data() {
@@ -438,7 +438,7 @@ export default {
   components: {
     Comments: Comments,
     Connections: Connections,
-    SubscribedUsersList: SubscribedUsersList
+    SubscribersList
   }
 };
 </script>

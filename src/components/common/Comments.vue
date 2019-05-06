@@ -2,7 +2,7 @@
   <div>
     <v-layout row wrap v-for="element in comments" :key="element.id">
     <v-flex xs12>
-      <SubscribedUsersToCommentList
+      <SubscribersListComment
           v-if = "element.subscribers && element.subscribers.length"
           :subscribers = "element.subscribers"
           :comments = "comments"
@@ -55,7 +55,7 @@
     </v-layout>
     <v-layout row wrap>
     <v-flex xs12>
-      <SubscribedUsersToCommentList
+      <SubscribersListComment
               v-if = "newCommentChipsUsers && newCommentChipsUsers.length"
               :subscribers = "newCommentChipsUsers"
               :comments = "comments"
@@ -108,7 +108,7 @@ import _get from "lodash/get";
 import _ from "lodash";
 import { username } from "@/utils";
 import VueTribute from "vue-tribute";
-import SubscribedUsersToCommentList from "./SubscribedUsersToCommentList";
+import SubscribersListComment from "./SubscribersListComment";
 export default {
   name: "comments",
   props: ["toCommentsData"],
@@ -399,14 +399,12 @@ export default {
             this.newCommentChipsUsers.push(foundUser);
           }
         } else {
-          let foundComment;
-          for (let [index, value] of this.comments.entries()) {
-            if (value.id === Number(this.editingCommentId)) foundComment = index;
-          }
-          this.comments[foundComment].comment = commentArray.join(" ");
-          if (!this.comments[foundComment].subscribers.find((item) => item.id === userId)) {
-            foundUser.id = userId;
-            this.comments[foundComment].subscribers.push(foundUser);
+          let index = this.comments.findIndex((comment) => comment.id === Number(this.editingCommentId));
+          this.comments[index].comment = commentArray.join(" ");
+          if (!this.comments[index].subscribers.find((item) => item.id === userId)) {
+            foundUser.id = userId; // because subscribers have id and not userId as other tables
+            foundUser.subownerId = this.comments[index].id;
+            this.comments[index].subscribers.push(foundUser);
           }
         }
       }
@@ -414,7 +412,7 @@ export default {
   },
   components: {
     VueTribute,
-    SubscribedUsersToCommentList: SubscribedUsersToCommentList
+    SubscribersListComment
   },
   watch: {}
 };

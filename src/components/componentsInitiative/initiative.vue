@@ -6,7 +6,7 @@
           <v-layout row wrap>
               <v-text-field v-model="form.title" placeholder="Enter initiative"></v-text-field>
               <v-flex xs12>
-                <SubscribedUsersList :subscribedUsers="subscribedUsers"/>
+                <SubscribersList :subscribedUsers="subscribedUsers"/>
               </v-flex>
             <v-flex xs12>
               <v-textarea v-model="form.description" @keyup="checkText($event)" placeholder="Enter hightlights"></v-textarea>
@@ -150,7 +150,7 @@ import _get from "lodash/get";
 import _ from "lodash";
 import Connections from "../common/connections.vue";
 import Comments from "../common/comments.vue";
-import SubscribedUsersList from "../common/SubscribedUsersList.vue";
+import SubscribersList from "../common/SubscribersList";
 export default {
   name: "Initiative",
   data() {
@@ -497,7 +497,7 @@ export default {
   components: {
     Connections,
     Comments,
-    SubscribedUsersList
+    SubscribersList
   }
 };
 </script>

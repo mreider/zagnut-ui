@@ -14,7 +14,7 @@
                   <label
                     class="text-left"
                   >Created by {{handleUsername(form.author)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
-                  <SubscribedUsersList :subscribedUsers="subscribedUsers"/>
+                  <SubscribersList :subscribedUsers="subscribedUsers"/>
                   <v-textarea
                     v-model="form.description"
                     placeholder="Title description"
@@ -152,7 +152,7 @@ import _ from "lodash";
 import { username } from "@/utils";
 import Connections from "../common/connections.vue";
 import Comments from "../common/comments.vue";
-import SubscribedUsersList from "../common/SubscribedUsersList.vue";
+import SubscribersList from "../common/SubscribersList.vue";
 
 export default {
   name: "Item",
@@ -418,7 +418,7 @@ export default {
   components: {
     Connections,
     Comments,
-    SubscribedUsersList
+    SubscribersList
   }
 };
 </script>
