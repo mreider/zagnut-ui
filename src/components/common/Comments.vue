@@ -3,6 +3,7 @@
     <v-layout row wrap v-for="element in comments" :key="element.id">
     <v-flex xs12>
       <SubscribedUsersToCommentList
+          v-if = "element.subscribers && element.subscribers.length"
           :subscribers = "element.subscribers"
           :comments = "comments"
           :newCommentSubscribers = "newCommentChipsUsers"
@@ -55,6 +56,7 @@
     <v-layout row wrap>
     <v-flex xs12>
       <SubscribedUsersToCommentList
+              v-if = "newCommentChipsUsers && newCommentChipsUsers.length"
               :subscribers = "newCommentChipsUsers"
               :comments = "comments"
               :newCommentSubscribers = "newCommentChipsUsers"
