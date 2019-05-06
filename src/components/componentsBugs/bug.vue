@@ -14,17 +14,7 @@
                   <label
                     class="text-left"
                   >Created by {{handleUsername(form.reportedBy)}} on {{new Date(form.createdAt).toLocaleString()}}</label>
-                  <v-item-group multiple >
-                      <v-subheader class="pl-2">Subscribed users: </v-subheader>
-                      <v-item
-                              v-for="(item, i) in subscribedUsers"
-                              :key="i"
-                      >
-                        <v-chip close @input="removeSubscribedUser(item)">
-                          {{ item.firstName }}  {{ item.lastName }}
-                        </v-chip>
-                      </v-item>
-                  </v-item-group>
+                  <SubscribedUsersList :subscribedUsers="subscribedUsers"/>
                   <v-textarea
                     v-model="form.description"
                     placeholder="Title description"
@@ -190,6 +180,7 @@ import _ from "lodash";
 import Connections from "../common/connections.vue";
 import Comments from "../common/comments.vue";
 import { username } from "@/utils";
+import SubscribedUsersList from "../common/SubscribedUsersList.vue";
 export default {
   name: "bug",
   data() {
@@ -446,7 +437,8 @@ export default {
   },
   components: {
     Comments: Comments,
-    Connections: Connections
+    Connections: Connections,
+    SubscribedUsersList: SubscribedUsersList
   }
 };
 </script>

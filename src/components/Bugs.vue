@@ -470,7 +470,7 @@ export default {
         if (this.newBug.status.id !== 0) {
           data.statusId = String(this.newBug.status.id);
         }
-        if (data.assignee === String(this.$store.state.user.id)) delete data.assignee;
+        // if (data.assignee === String(this.$store.state.user.id)) delete data.assignee;
 
         const response = await this.axios.post(`/api/bugs/new/${orgId}`, data);
         const success = _get(response, "data.success");

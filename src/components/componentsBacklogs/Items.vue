@@ -535,7 +535,7 @@ export default {
         data.title = this.newItem.title;
         data.ownerTable = "backlogs";
         data.ownerId = this.$route.query.backlogid;
-        if (data.assignee === String(this.$store.state.user.id)) delete data.assignee;
+        // if (data.assignee === String(this.$store.state.user.id)) delete data.assignee;
         await this.axios
           .post(`/api/items/new/${this.$store.state.organization.id}`, data)
           .then(response => {

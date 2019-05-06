@@ -6,17 +6,7 @@
           <v-layout row wrap>
               <v-text-field v-model="form.title" placeholder="Enter initiative"></v-text-field>
               <v-flex xs12>
-                <v-item-group multiple >
-                    <v-subheader class="pl-2">Subscribed users: </v-subheader>
-                    <v-item
-                            v-for="(item, i) in subscribedUsers"
-                            :key="i"
-                    >
-                      <v-chip close @input="removeSubscribedUser(item)">
-                        {{ item.firstName }}  {{ item.lastName }}
-                      </v-chip>
-                    </v-item>
-                </v-item-group>
+                <SubscribedUsersList :subscribedUsers="subscribedUsers"/>
               </v-flex>
             <v-flex xs12>
               <v-textarea v-model="form.description" @keyup="checkText($event)" placeholder="Enter hightlights"></v-textarea>
@@ -160,6 +150,7 @@ import _get from "lodash/get";
 import _ from "lodash";
 import Connections from "../common/connections.vue";
 import Comments from "../common/comments.vue";
+import SubscribedUsersList from "../common/SubscribedUsersList.vue";
 export default {
   name: "Initiative",
   data() {
@@ -501,33 +492,12 @@ export default {
           console.log(err);
           this.$loading(false);
         });
-    },
-    removeSubscribedUser(item) {
-      const itemIndex = this.subscribedUsers.findIndex(chipUser => chipUser.id === item.id);
-      if (itemIndex >= 0) {
-        const ownerTable = this.$route.name.toLowerCase() + "s";
-        const ownerId = this.$route.query.initiativeid;
-        let usersIds = [];
-        usersIds.push(String(item.id));
-        this.$loading(true);
-        this.axios
-          .post(`/api/subscribers/delete/${ownerTable}/${ownerId}`, {
-            usersId: usersIds
-          })
-          .then(response => {
-            this.$loading(false);
-            this.subscribedUsers.splice(itemIndex, 1);
-          })
-          .catch(err => {
-            console.log(err);
-            this.$loading(false);
-          });
-      }
     }
   },
   components: {
     Connections,
-    Comments
+    Comments,
+    SubscribedUsersList
   }
 };
 </script>
