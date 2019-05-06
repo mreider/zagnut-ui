@@ -24,10 +24,8 @@
     methods: {
       removeSubscribedUser(item) {
         let subscribedUsers = [];
-        // let commentIndex;
         if (item.subownerId) {
           const commentObject = this.comments.find(commentObj => commentObj.id === item.subownerId);
-          // commentIndex = this.comments.findIndex(commentObj => commentObj.id === item.subownerId);
           subscribedUsers.push(commentObject);
         } else {
           subscribedUsers = this.newCommentSubscribers;
@@ -37,10 +35,7 @@
         if (itemIndex >= 0) {
           if (!item.subownerId) {
             this.newCommentSubscribers.splice(itemIndex, 1);
-            console.log('hello');
           } else {
-            console.log('hello');
-            console.log(itemIndex);
             this.subscribers.splice(itemIndex, 1);
             let usersIds = [];
             usersIds.push(String(item.id));
