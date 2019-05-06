@@ -2,17 +2,12 @@
   <div>
     <v-layout row wrap v-for="element in comments" :key="element.id">
     <v-flex xs12>
-      <v-item-group multiple >
-        <v-subheader>Subscribed users: </v-subheader>
-        <v-item
-                v-for="(item, i) in element.subscribers"
-                :key="i"
-        >
-          <v-chip close @input="removeAssignedUser(item)">
-            {{ item.firstName }}  {{ item.lastName }}
-          </v-chip>
-        </v-item>
-      </v-item-group>
+      <SubscribedUsersToCommentList
+          :subscribers = "element.subscribers"
+          :comments = "comments"
+          :newCommentSubscribers = "newCommentChipsUsers"
+          :ownerId = "ownerId"
+      />
     </v-flex>
       <v-flex xs12 sm9>
         <v-textarea
@@ -59,17 +54,12 @@
     </v-layout>
     <v-layout row wrap>
     <v-flex xs12>
-     <v-item-group multiple v-if="newCommentChipsUsers.length">
-        <v-subheader>Subscribed users:</v-subheader>
-        <v-item
-                v-for="(item, i) in newCommentChipsUsers"
-                :key="i"
-        >
-          <v-chip close @input="removeAssignedUser(item)">
-            {{ item.firstName }}  {{ item.lastName }}
-          </v-chip>
-        </v-item>
-      </v-item-group>
+      <SubscribedUsersToCommentList
+              :subscribers = "newCommentChipsUsers"
+              :comments = "comments"
+              :newCommentSubscribers = "newCommentChipsUsers"
+              :ownerId = "ownerId"
+      />
       <v-dialog
               v-model="dialogUserList"
               :overlay="false"
@@ -116,6 +106,7 @@ import _get from "lodash/get";
 import _ from "lodash";
 import { username } from "@/utils";
 import VueTribute from "vue-tribute";
+import SubscribedUsersToCommentList from "./SubscribedUsersToCommentList";
 export default {
   name: "comments",
   props: ["toCommentsData"],
@@ -378,45 +369,6 @@ export default {
         this.mailers = _.union(this.mailers);
       }
     },
-    removeAssignedUser(item) {
-      let chipsUsersArray = [];
-      let commentIndex;
-      if (item.subownerId) {
-        const commentObject = this.comments.find(commentObj => commentObj.id === item.subownerId);
-        commentIndex = this.comments.findIndex(commentObj => commentObj.id === item.subownerId);
-        chipsUsersArray.push(commentObject);
-      } else {
-        chipsUsersArray = this.newCommentChipsUsers;
-      }
-      const itemIndex = chipsUsersArray.findIndex(chipUser => chipUser.userId === item.userId);
-      if (itemIndex >= 0) {
-        if (!item.subownerId) {
-          this.newCommentChipsUsers.splice(itemIndex, 1);
-        } else {
-          this.comments[commentIndex].subscribers.splice(itemIndex, 1);
-          let usersIds = [];
-          usersIds.push(String(item.id));
-          const ownerTable = this.$route.name.toLowerCase() + "s";
-          const ownerId = this.ownerId;
-
-          this.$loading(true);
-          this.axios
-            .post(`/api/subscribers/delete/${ownerTable}/${ownerId}`, {
-              subowner: "comments",
-              usersId: usersIds,
-              subownerId: `${item.subownerId}`
-            })
-            .then(response => {
-              this.$loading(false);
-              this.loadComments();
-            })
-            .catch(err => {
-              console.log(err);
-              this.$loading(false);
-            });
-        }
-      }
-    },
     checkComment(e, isNewComment, commentId) {
       this.commentStatus = isNewComment;
       this.editingCommentId = commentId;
@@ -459,7 +411,8 @@ export default {
     }
   },
   components: {
-    VueTribute
+    VueTribute,
+    SubscribedUsersToCommentList: SubscribedUsersToCommentList
   },
   watch: {}
 };

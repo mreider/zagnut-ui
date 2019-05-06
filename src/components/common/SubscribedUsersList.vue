@@ -24,7 +24,7 @@
         if (itemIndex >= 0) {
           const ownerTable = this.$route.name.toLowerCase() + "s";
 
-          let ownerId = this.$route.query.initiativeid;
+          let ownerId;
           if (this.$route.query.hasOwnProperty("bugId")) {
             ownerId = this.$route.query.bugId;
           } else if (this.$route.query.hasOwnProperty("initiativeid")) {
