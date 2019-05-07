@@ -41,7 +41,6 @@
             })
             .then(response => {
               this.$loading(false);
-              console.log(itemIndex);
               this.subscribedUsers.splice(itemIndex, 1);
             })
             .catch(err => {

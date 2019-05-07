@@ -113,25 +113,11 @@
         </v-card>
       </v-flex>
     </v-layout>
-
-    <v-dialog v-model="dialogDeleteItem" max-width="250">
-      <v-card>
-        <v-card-text
-          class="text-xs-center subheading"
-        >Wait. Are you sure you want to delete this permanently?</v-card-text>
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            flat="flat"
-            outline
-            @click="dialogDeleteBackLog = false"
-            small
-          >Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="error" flat="flat" outline @click="handleItemDelete()" small>Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DeleteItemDialog
+            :dialogDeleteItem="dialogDeleteItem"
+            @deleteItem="handleItemDelete"
+            @closeDialog="closeDeleteDialog"
+    />
     <SubscribersListDialog :users="users" :dialogUserList="dialogUserList" @selectUser="selectChip"/>
   </v-container>
 </template>
@@ -144,6 +130,7 @@ import Connections from "../common/connections.vue";
 import Comments from "../common/comments.vue";
 import SubscribersList from "../common/SubscribersList.vue";
 import SubscribersListDialog from "../common/SubscribersListDialog";
+import DeleteItemDialog from "../common/DeleteItemDialog";
 
 export default {
   name: "Item",
@@ -217,6 +204,9 @@ export default {
         });
         this.$router.go(-1);
       }
+    },
+    closeDeleteDialog() {
+      this.dialogDeleteItem = false;
     },
     async loadItem() {
       this.$loading(true);
@@ -410,7 +400,8 @@ export default {
     Connections,
     Comments,
     SubscribersList,
-    SubscribersListDialog
+    SubscribersListDialog,
+    DeleteItemDialog
   }
 };
 </script>

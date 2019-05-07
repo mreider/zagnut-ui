@@ -146,19 +146,11 @@
         </v-card>
       </v-flex>
     </v-layout>
-
-    <v-dialog v-model="dialogDeleteBug" max-width="250">
-      <v-card>
-        <v-card-text
-          class="text-xs-center subheading"
-        >Wait. Are you sure you want to delete this permanently?</v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" flat="flat" outline @click="dialogDeleteBug = false" small>Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="error" flat="flat" outline @click="handleBugDelete()" small>Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DeleteItemDialog
+        :dialogDeleteItem="dialogDeleteBug"
+        @deleteItem="handleBugDelete"
+        @closeDialog="closeDeleteDialog"
+    />
     <SubscribersListDialog :users="users" :dialogUserList="dialogUserList" @selectUser="selectChip"/>
   </v-container>
 </template>
@@ -171,6 +163,8 @@ import Comments from "../common/comments.vue";
 import { username } from "@/utils";
 import SubscribersList from "../common/SubscribersList";
 import SubscribersListDialog from "../common/SubscribersListDialog";
+import DeleteItemDialog from "../common/DeleteItemDialog";
+
 export default {
   name: "bug",
   data() {
@@ -230,6 +224,9 @@ export default {
         });
         this.$router.go(-1);
       }
+    },
+    closeDeleteDialog() {
+      this.dialogDeleteBug = false;
     },
     async loadOrgBug() {
       try {
@@ -429,7 +426,8 @@ export default {
     Comments: Comments,
     Connections: Connections,
     SubscribersList,
-    SubscribersListDialog
+    SubscribersListDialog,
+    DeleteItemDialog
   }
 };
 </script>

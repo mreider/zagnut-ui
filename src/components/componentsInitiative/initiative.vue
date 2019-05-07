@@ -112,25 +112,11 @@
         </v-layout>
       </v-card-actions>
     </v-card>
-
-    <v-dialog v-model="dialogDeleteInitiative" max-width="250">
-      <v-card>
-        <v-card-text
-          class="text-xs-center subheading"
-        >Wait. Are you sure you want to delete this permanently?</v-card-text>
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            flat="flat"
-            outline
-            @click="dialogDeleteInitiative = false"
-            small
-          >Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="error" flat="flat" outline @click="handleInitiativeDelete()" small>Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DeleteItemDialog
+        :dialogDeleteItem="dialogDeleteInitiative"
+        @deleteItem="handleInitiativeDelete"
+        @closeDialog="closeDeleteDialog"
+    />
     <SubscribersListDialog :users="users" :dialogUserList="dialogUserList" @selectUser="selectChip"/>
   </div>
 </template>
@@ -142,6 +128,7 @@ import Connections from "../common/connections.vue";
 import Comments from "../common/comments.vue";
 import SubscribersList from "../common/SubscribersList";
 import SubscribersListDialog from "../common/SubscribersListDialog";
+import DeleteItemDialog from "../common/DeleteItemDialog";
 export default {
   name: "Initiative",
   data() {
@@ -212,6 +199,9 @@ export default {
         });
         this.$router.go(-1);
       }
+    },
+    closeDeleteDialog() {
+      this.dialogDeleteInitiative = false;
     },
     async loadOrgStatuses() {
       try {
@@ -489,7 +479,8 @@ export default {
     Connections,
     Comments,
     SubscribersList,
-    SubscribersListDialog
+    SubscribersListDialog,
+    DeleteItemDialog
   }
 };
 </script>

@@ -547,7 +547,6 @@ export default {
     },
     async loadOrgBugs() {
       this.loading = true;
-      console.log(this.$router);
       try {
         const response = await this.axios.get(
           `/api/bugs/full/${this.showArchived}/${
