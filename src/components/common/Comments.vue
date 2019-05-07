@@ -62,17 +62,7 @@
               :newCommentSubscribers = "newCommentChipsUsers"
               :ownerId = "ownerId"
       />
-      <v-dialog
-              v-model="dialogUserList"
-              :overlay="false"
-              max-width="350px"
-      >
-        <v-list>
-          <v-list-tile v-for="(item) in users" :key="item.userId" :id="item.userId" @click="selectChip($event)">
-            <v-list-tile-title>{{ item.firstName }} {{ item.lastName }}</v-list-tile-title>
-          </v-list-tile>
-        </v-list>
-      </v-dialog>
+      <SubscribersListDialog :users="users" :dialogUserList="dialogUserList" @selectUser="selectChip"/>
     </v-flex>
       <v-flex xs12 sm9 mt-0>
         <v-textarea
@@ -109,6 +99,7 @@ import _ from "lodash";
 import { username } from "@/utils";
 import VueTribute from "vue-tribute";
 import SubscribersListComment from "./SubscribersListComment";
+import SubscribersListDialog from "./SubscribersListDialog";
 export default {
   name: "comments",
   props: ["toCommentsData"],
@@ -413,7 +404,8 @@ export default {
   },
   components: {
     VueTribute,
-    SubscribersListComment
+    SubscribersListComment,
+    SubscribersListDialog
   },
   watch: {}
 };

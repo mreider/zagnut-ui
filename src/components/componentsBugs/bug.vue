@@ -159,18 +159,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-dialog
-      v-model="dialogUserList"
-      :overlay="false"
-      max-width="350px"
-          >
-      <v-list>
-        <v-list-tile v-for="(item) in users" :key="item.userId" :id="item.userId" @click="selectChip($event)">
-          <v-list-tile-title>{{ item.firstName }} {{ item.lastName }}</v-list-tile-title>
-        </v-list-tile>
-      </v-list>
-    </v-dialog>
+    <SubscribersListDialog :users="users" :dialogUserList="dialogUserList" @selectUser="selectChip"/>
   </v-container>
 </template>
 
@@ -181,6 +170,7 @@ import Connections from "../common/connections.vue";
 import Comments from "../common/comments.vue";
 import { username } from "@/utils";
 import SubscribersList from "../common/SubscribersList";
+import SubscribersListDialog from "../common/SubscribersListDialog";
 export default {
   name: "bug",
   data() {
@@ -438,7 +428,8 @@ export default {
   components: {
     Comments: Comments,
     Connections: Connections,
-    SubscribersList
+    SubscribersList,
+    SubscribersListDialog
   }
 };
 </script>
