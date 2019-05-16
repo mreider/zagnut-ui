@@ -303,44 +303,25 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-dialog v-model="dialogDeleteInitiative" max-width="250">
-      <v-card>
-        <v-card-text
-          class="text-xs-center subheading"
-        >Wait. Are you sure you want to delete this permanently?</v-card-text>
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            flat="flat"
-            outline
-            @click="dialogDeleteInitiative = false"
-            small
-          >Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="error"
-            flat="flat"
-            outline
-            @click="handleInitiativeDelete(currentInitiative)"
-            small
-          >Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DeleteItemDialog
+        :dialogDeleteItem="dialogDeleteInitiative"
+        @deleteItem="handleInitiativeDelete(currentInitiative)"
+        @closeDialog="closeDeleteDialog"
+    />
   </v-container>
 </template>
 
 <script>
-import _get from "lodash/get";
-import _ from "lodash";
-import { username } from "@/utils";
-import draggable from "vuedraggable";
+import _get from 'lodash/get';
+import _ from 'lodash';
+import { username } from '@/utils';
+import draggable from 'vuedraggable';
+import DeleteItemDialog from '../components/common/DeleteItemDialog';
 export default {
-  name: "Initiatives",
+  name: 'Initiatives',
   data() {
     return {
-      activatedButton: "",
+      activatedButton: '',
       initialInitiatives: [],
       initiatives: [],
       initialInitiativesForSorting: [],
@@ -354,18 +335,18 @@ export default {
       perPage: 8,
       sliceFrom: 0,
       newInitiative: {
-        title: "",
-        description: "",
-        status: { id: 10, name: "Should have" },
+        title: '',
+        description: '',
+        status: { id: 10, name: 'Should have' },
         horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) },
         vote: null
       },
       horizonList: [],
-      vote: "",
-      btntrue: "",
-      btnfalse: "",
+      vote: '',
+      btntrue: '',
+      btnfalse: '',
       show: false,
-      currentInitiative: "",
+      currentInitiative: '',
       admin: false,
       showArchived: false,
       dialogNewInitiative: false,
@@ -456,10 +437,10 @@ export default {
           }`
         );
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load initiatives.`);
 
-        const initiatives = _get(response, "data.initiatives");
+        const initiatives = _get(response, 'data.initiatives');
         initiatives.forEach(element => {
           element.author = username(element);
           element.importance = _.find(this.objStatuses, {
@@ -485,7 +466,7 @@ export default {
         this.initialInitiativesForSorting = initiatives.slice();
         this.initiatives = this.initialInitiatives.slice(0, this.perPage);
 
-        this.admin = _get(response, "data.admin");
+        this.admin = _get(response, 'data.admin');
         this.paginationFunction(this.page > this.totalPages ? 1 : this.page);
       } catch (error) {
         this.loading = false;
@@ -505,7 +486,7 @@ export default {
             initiative.id
           }`
         );
-        let success = _get(response, "data.success");
+        let success = _get(response, 'data.success');
         this.loading = false;
         if (!success) throw new Error(`Unable delete initiative.`);
       } catch (error) {
@@ -513,13 +494,16 @@ export default {
       } finally {
         this.loadOrgInitiatives();
         this.$notify({
-          group: "app",
-          type: "success",
+          group: 'app',
+          type: 'success',
           text: `Item ${initiative.title} was deleted`
         });
-        this.currentInitiative = "";
+        this.currentInitiative = '';
         this.dialogDeleteInitiative = false;
       }
+    },
+    closeDeleteDialog() {
+      this.dialogDeleteInitiative = false;
     },
     async loadOrgStatuses() {
       this.loading = true;
@@ -530,10 +514,10 @@ export default {
           `/api/statuses/initiatives/${orgId}`
         );
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        this.objStatuses = _get(response, "data.statuses");
+        this.objStatuses = _get(response, 'data.statuses');
       } catch (error) {
         this.loading = false;
         return this.$errorMessage.show(error);
@@ -552,13 +536,13 @@ export default {
           `/api/initiatives/new/${this.$store.state.organization.id}`,
           data
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (success) {
-          const createdInitiative = _get(response, "data.initiative");
-          if (this.vote !== "") this.doVote(this.vote, createdInitiative.id);
+          const createdInitiative = _get(response, 'data.initiative');
+          if (this.vote !== '') this.doVote(this.vote, createdInitiative.id);
           if (go === true) {
             this.$router.push({
-              name: "Initiative",
+              name: 'Initiative',
               query: {
                 orgId: this.$store.state.organization.id,
                 initiativeid: createdInitiative.id
@@ -574,8 +558,8 @@ export default {
       } finally {
         this.loading = false;
         this.newInitiative = {
-          title: "",
-          description: "",
+          title: '',
+          description: '',
           status: { id: 12, name: "Won't have" },
           horizon: {
             date: new Date(),
@@ -583,9 +567,9 @@ export default {
           },
           vote: null
         };
-        this.vote = "";
-        this.btntrue = "";
-        this.btnfalse = "";
+        this.vote = '';
+        this.btntrue = '';
+        this.btnfalse = '';
         this.show = false;
         this.loadOrgInitiatives();
       }
@@ -594,31 +578,31 @@ export default {
       this.paramForNewCard = newParam;
     },
     handleNewInitiativeSetField(element, name) {
-      if (element.hasOwnProperty("horizon")) {
-        name = "horizon";
+      if (element.hasOwnProperty('horizon')) {
+        name = 'horizon';
       }
-      if (element.hasOwnProperty("name")) {
-        name = "status";
+      if (element.hasOwnProperty('name')) {
+        name = 'status';
       }
       this.newInitiative[name] = element;
-      if (name === "vote") {
+      if (name === 'vote') {
         this.vote = element;
         if (element === true) {
-          this.btntrue = "voteUp";
-          this.btnfalse = "";
+          this.btntrue = 'voteUp';
+          this.btnfalse = '';
         } else {
-          this.btntrue = "";
-          this.btnfalse = "voteDown";
+          this.btntrue = '';
+          this.btnfalse = 'voteDown';
         }
       }
     },
     async doVote(result, initiativeId) {
       try {
         const response = await this.axios.post(
-          `/api/votes/initiatives/` + initiativeId + "/" + String(result)
+          `/api/votes/initiatives/` + initiativeId + '/' + String(result)
         );
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to vote.`);
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -638,25 +622,25 @@ export default {
       } else if (month < 12) {
         quarter = 4;
       }
-      return "Q" + quarter + year;
+      return 'Q' + quarter + year;
     },
     formatDate(d) {
       const month = d.getMonth() + 1;
       const year = d.getFullYear();
       const day = d.getDate();
-      return year + "-" + month + "-" + day;
+      return year + '-' + month + '-' + day;
     },
     sortInitiaiveCards(initiativeName) {
       let param = initiativeName.toLowerCase();
       function sortFunction(a, b) {
-        if (param === "initiative") {
-          param = "title";
+        if (param === 'initiative') {
+          param = 'title';
         }
         let aParam;
         let bParam;
-        if (param === "horizon") {
-          aParam = a[param][param].replace(/\s/g, "X").toLowerCase();
-          bParam = b[param][param].replace(/\s/g, "X").toLowerCase();
+        if (param === 'horizon') {
+          aParam = a[param][param].replace(/\s/g, 'X').toLowerCase();
+          bParam = b[param][param].replace(/\s/g, 'X').toLowerCase();
           if (aParam > bParam) {
             return -1;
           }
@@ -666,14 +650,14 @@ export default {
           return 0;
         } else {
           aParam =
-            typeof a[param] === "string"
-              ? a[param].replace(/\s/g, "X").toLowerCase()
+            typeof a[param] === 'string'
+              ? a[param].replace(/\s/g, 'X').toLowerCase()
               : a[param];
           bParam =
-            typeof b[param] === "string"
-              ? b[param].replace(/\s/g, "X").toLowerCase()
+            typeof b[param] === 'string'
+              ? b[param].replace(/\s/g, 'X').toLowerCase()
               : b[param];
-          if (param === "popularity") {
+          if (param === 'popularity') {
             if (aParam > bParam) {
               return -1;
             }
@@ -718,40 +702,40 @@ export default {
           this.initiatives = this.initialInitiatives.slice(0, this.perPage);
         }
 
-        this.activatedButton = "";
+        this.activatedButton = '';
       }
     },
     filterInitiatives(clickParam) {
-      this.activatedButton = "";
+      this.activatedButton = '';
       this.page = 1;
       let initiatives = this.initialInitiatives;
 
       let filterInputValue;
 
-      if (typeof clickParam === "string") {
+      if (typeof clickParam === 'string') {
         filterInputValue = clickParam;
       } else {
         filterInputValue = this.filter;
       }
 
       let filterKeys = [
-        "title",
-        "Initiative",
-        "popularity",
-        "importance",
-        "horizon",
-        "author"
+        'title',
+        'Initiative',
+        'popularity',
+        'importance',
+        'horizon',
+        'author'
       ];
       this.filteredInitiatives = initiatives.filter(function(obj) {
         return filterKeys.some(function(key) {
-          if (typeof obj[key] === "string" || typeof obj[key] === "number") {
+          if (typeof obj[key] === 'string' || typeof obj[key] === 'number') {
             return obj[key]
               .toString()
               .toLowerCase()
               .includes(filterInputValue.toLowerCase());
           }
-          if (typeof obj[key] === "object") {
-            return obj[key]["horizon"]
+          if (typeof obj[key] === 'object') {
+            return obj[key]['horizon']
               .toLowerCase()
               .includes(filterInputValue.toLowerCase());
           }
@@ -779,7 +763,7 @@ export default {
         );
         this.filteredInitiatives = paginatedArray.slice();
       } else {
-        if (this.activatedButton === "") {
+        if (this.activatedButton === '') {
           paginatedArray = this.initialInitiatives.slice(
             this.sliceFrom,
             this.sliceFrom + this.perPage
@@ -835,7 +819,8 @@ export default {
     }
   },
   components: {
-    draggable
+    draggable,
+    DeleteItemDialog
   }
 };
 </script>

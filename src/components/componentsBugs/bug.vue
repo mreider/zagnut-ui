@@ -156,41 +156,41 @@
 </template>
 
 <script>
-import _get from "lodash/get";
-import _ from "lodash";
-import Connections from "../common/connections.vue";
-import Comments from "../common/comments.vue";
-import { username } from "@/utils";
-import SubscribersList from "../common/SubscribersList";
-import SubscribersListDialog from "../common/SubscribersListDialog";
-import DeleteItemDialog from "../common/DeleteItemDialog";
+import _get from 'lodash/get';
+import _ from 'lodash';
+import Connections from '../common/connections.vue';
+import Comments from '../common/comments.vue';
+import { username } from '@/utils';
+import SubscribersList from '../common/SubscribersList';
+import SubscribersListDialog from '../common/SubscribersListDialog';
+import DeleteItemDialog from '../common/DeleteItemDialog';
 
 export default {
-  name: "bug",
+  name: 'bug',
   data() {
     return {
       dialogDeleteBug: false,
       toConnectionData: {
-        name: "bug",
+        name: 'bug',
         id: this.$route.query.bugId,
-        connects: ["initiative", "item"]
+        connects: ['initiative', 'item']
       },
       toCommentsData: {
-        name: "bugs",
+        name: 'bugs',
         id: this.$route.query.bugId,
         admin: false
       },
       objStatuses: [],
-      severityArray: ["P0", "P1", "P2", "P3"],
+      severityArray: ['P0', 'P1', 'P2', 'P3'],
       users: [],
-      reportedBy: { userId: "" },
-      assignee: { userId: "" },
-      status: { name: "None", id: 0 },
+      reportedBy: { userId: '' },
+      assignee: { userId: '' },
+      status: { name: 'None', id: 0 },
       form: {
-        title: "",
-        description: "",
-        severity: "",
-        status: { name: "None", id: 0 },
+        title: '',
+        description: '',
+        severity: '',
+        status: { name: 'None', id: 0 },
         reportedBy: {},
         assignee: {}
       },
@@ -212,14 +212,14 @@ export default {
         let response = await this.axios.delete(
           `/api/bugs/${this.$store.state.organization.id}/${bugId}`
         );
-        let success = _get(response, "data.success");
+        let success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to delete bug.`);
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
         this.$notify({
-          group: "app",
-          type: "success",
+          group: 'app',
+          type: 'success',
           text: `Bug ${this.form.title} was deleted`
         });
         this.$router.go(-1);
@@ -234,22 +234,22 @@ export default {
         const orgId = this.$route.query.orgId;
         const bugId = this.$route.query.bugId;
         const response = await this.axios.get(
-          `/api/bugs/` + orgId + "/" + bugId
+          `/api/bugs/` + orgId + '/' + bugId
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load bugs's.`);
-        let bug = _get(response, "data.bug");
+        let bug = _get(response, 'data.bug');
         if (bug.archived === 0) {
           bug.archived = false;
         } else {
           bug.archived = true;
         }
         bug.status = _.find(this.objStatuses, { id: bug.statusId });
-        this.toCommentsData.admin = _get(response, "data.admin");
+        this.toCommentsData.admin = _get(response, 'data.admin');
         if (bug.statusId) {
           bug.status = _.find(this.objStatuses, { id: bug.statusId });
         } else {
-          bug.status = { name: "None", id: 0 };
+          bug.status = { name: 'None', id: 0 };
         }
         this.reportedBy.userId = bug.reportedBy.id;
         this.assignee.userId = bug.assignee.id;
@@ -298,20 +298,20 @@ export default {
           `/api/bugs/edit/${orgId}/${bugId}`,
           data
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update bug.`);
         this.subscribeUsers();
-        const newComment = this.$refs["comments_ref"].newComment;
+        const newComment = this.$refs['comments_ref'].newComment;
         if (newComment) {
-          this.$refs["comments_ref"].handleNewComment(
-            this.$refs["comments_ref"].newComment
+          this.$refs['comments_ref'].handleNewComment(
+            this.$refs['comments_ref'].newComment
           );
         }
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
         this.$router.go(-1);
-        this.$notify({ group: "app", type: "success", text: "Bug updated" });
+        this.$notify({ group: 'app', type: 'success', text: 'Bug updated' });
       }
     },
     handleUsername(element) {
@@ -322,9 +322,9 @@ export default {
         this.$loading(true);
         const orgId = this.$store.state.organization.id;
         const response = await this.axios.get(`/api/statuses/bugs/${orgId}`);
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-        this.objStatuses = _get(response, "data.statuses");
+        this.objStatuses = _get(response, 'data.statuses');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -336,9 +336,9 @@ export default {
         const orgId = this.$store.state.organization.id;
         this.$loading(true);
         const response = await this.axios.get(`/api/org/${orgId}/users`);
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-        const users = _get(response, "data.users");
+        const users = _get(response, 'data.users');
         this.users = users;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -347,7 +347,7 @@ export default {
       }
     },
     loadSubscribers(ownerId) {
-      const ownerTable = this.$route.name.toLowerCase() + "s";
+      const ownerTable = this.$route.name.toLowerCase() + 's';
       this.axios
         .get(`/api/subscribers/${ownerTable}/${ownerId}`)
         .then(response => {
@@ -359,29 +359,29 @@ export default {
         });
     },
     checkText(e) {
-      if (e.key === "@") this.dialogUserList = true;
+      if (e.key === '@') this.dialogUserList = true;
     },
     selectChip($event) {
       this.dialogUserList = false;
       const userId = Number($event.target.parentNode.id);
       let textArray;
-      textArray = this.form.description.trim().split(" ");
-      const foundUser = this.users.find((item) => item.userId === userId);
+      textArray = this.form.description.trim().split(' ');
+      const foundUser = this.users.find(item => item.userId === userId);
       if (foundUser) {
         for (let [index, word] of textArray.entries()) {
-          if (word === "@") {
+          if (word === '@') {
             textArray[index] = `@${foundUser.firstName + foundUser.lastName}`;
           }
         }
-        this.form.description = textArray.join(" ");
-        if (!this.subscribedUsers.find((item) => item.id === userId)) {
+        this.form.description = textArray.join(' ');
+        if (!this.subscribedUsers.find(item => item.id === userId)) {
           foundUser.id = userId;
           this.subscribedUsers.push(foundUser);
         }
       }
     },
     subscribeUsers() {
-      const ownerTable = this.$route.name.toLowerCase() + "s";
+      const ownerTable = this.$route.name.toLowerCase() + 's';
       const ownerId = this.$route.query.bugId;
       let usersIds = [];
       for (let item of this.subscribedUsers) {
@@ -400,9 +400,11 @@ export default {
         });
     },
     removeSubscribedUser(item) {
-      const itemIndex = this.subscribedUsers.findIndex(chipUser => chipUser.id === item.id);
+      const itemIndex = this.subscribedUsers.findIndex(
+        chipUser => chipUser.id === item.id
+      );
       if (itemIndex >= 0) {
-        const ownerTable = this.$route.name.toLowerCase() + "s";
+        const ownerTable = this.$route.name.toLowerCase() + 's';
         const ownerId = this.$route.query.bugId;
         let usersIds = [];
         usersIds.push(String(item.id));

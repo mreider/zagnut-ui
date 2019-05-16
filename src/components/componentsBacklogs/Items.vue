@@ -242,37 +242,24 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-dialog v-model="dialogDeleteItem" max-width="250">
-      <v-card>
-        <v-card-text
-          class="text-xs-center subheading"
-        >Wait. Are you sure you want to delete this permanently?</v-card-text>
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            flat="flat"
-            outline
-            @click="dialogDeleteBackLog = false"
-            small
-          >Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="error" flat="flat" outline @click="handleItemDelete(currentItem)" small>Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DeleteItemDialog
+        :dialogDeleteItem="dialogDeleteItem"
+        @deleteItem="handleItemDelete(currentItem)"
+        @closeDialog="closeDeleteDialog"
+    />
   </v-container>
 </template>
 
 <script>
-import _get from "lodash/get";
-import _ from "lodash";
-import Item from "../componentsBacklogs/item.vue";
-import { username } from "@/utils";
-import draggable from "vuedraggable";
+import _get from 'lodash/get';
+import _ from 'lodash';
+import Item from '../componentsBacklogs/item.vue';
+import DeleteItemDialog from '../common/DeleteItemDialog';
+import { username } from '@/utils';
+import draggable from 'vuedraggable';
 
 export default {
-  name: "Items",
+  name: 'Items',
   data() {
     return {
       dialogNewItem: false,
@@ -282,8 +269,8 @@ export default {
       initialFilteredItems: null,
       filteredItems: null,
       objStatuses: [],
-      groupByList: ["Status", "Stategic initiative"],
-      currentGroupBy: "Status",
+      groupByList: ['Status', 'Stategic initiative'],
+      currentGroupBy: 'Status',
       selected: [],
       initialSelected: [],
       initialFilteredSelected: null,
@@ -291,25 +278,25 @@ export default {
       options: [],
       users: [],
       newItem: {
-        title: "",
-        description: "",
+        title: '',
+        description: '',
         points: 0,
-        status: { id: 1, name: "Unplaned" },
+        status: { id: 1, name: 'Unplaned' },
         assignee: {}
       },
       items: [],
-      pointsVar: ["0", "1", "2", "3", "5", "8", "13", "21"],
-      itemsFields: ["title", "author"],
-      newNameOldItem: "",
-      currentItem: "",
+      pointsVar: ['0', '1', '2', '3', '5', '8', '13', '21'],
+      itemsFields: ['title', 'author'],
+      newNameOldItem: '',
+      currentItem: '',
       filter: null,
       perPage: 5,
-      title: "backlog title",
+      title: 'backlog title',
       showArchived: false,
       dragging: false,
       draggedContext: {},
       relatedContext: {},
-      objSelecBox: ""
+      objSelecBox: ''
     };
   },
   async mounted() {
@@ -348,10 +335,10 @@ export default {
           fullSelect: false
         });
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load backlog info`);
 
-        const backlogs = _get(response, "data.backlogs");
+        const backlogs = _get(response, 'data.backlogs');
 
         if (backlogs.length !== 0) this.title = backlogs[0].title;
       } catch (error) {
@@ -369,10 +356,10 @@ export default {
           `/api/statuses/items/${this.$store.state.organization.id}`
         );
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        let objStatuses = _get(response, "data.statuses");
+        let objStatuses = _get(response, 'data.statuses');
 
         this.objStatuses = objStatuses;
         this.objStatuses.forEach(element => {
@@ -428,10 +415,10 @@ export default {
         this.$loading(true);
         const response = await this.axios.get(`/api/org/${orgId}/users`);
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        const users = _get(response, "data.users");
+        const users = _get(response, 'data.users');
 
         this.users = users;
       } catch (error) {
@@ -449,10 +436,10 @@ export default {
           `/api/items/${this.showArchived}/backlogs/${orgId}/${backlogid}`
         );
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        const items = _get(response, "data.items");
+        const items = _get(response, 'data.items');
         items.forEach(element => {
           element.author = username(element);
         });
@@ -473,9 +460,9 @@ export default {
     async handleItemEditTitle(element, newNameOldItem) {
       if (!newNameOldItem) {
         return this.$notify({
-          group: "error",
-          type: "err",
-          text: "Empty item title field"
+          group: 'error',
+          type: 'err',
+          text: 'Empty item title field'
         });
       }
       try {
@@ -486,18 +473,18 @@ export default {
           { title: newNameOldItem }
         );
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         this.dialogItemEdit = false;
         if (!success) throw new Error(`Unable to update item.`);
 
-        this.$notify({ group: "app", type: "success", text: "Saved" });
+        this.$notify({ group: 'app', type: 'success', text: 'Saved' });
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
         this.loadOrgStatuses(false);
         this.$loading(false);
-        this.newNameOldItem = "";
-        this.currentItem = "";
+        this.newNameOldItem = '';
+        this.currentItem = '';
       }
     },
     async handleItemDelete(item) {
@@ -509,7 +496,7 @@ export default {
         let response = await this.axios.delete(
           `/api/items/${this.$store.state.organization.id}/${item.id}`
         );
-        let success = _get(response, "data.success");
+        let success = _get(response, 'data.success');
         this.dialogDeleteItem = false;
         if (!success) throw new Error(`Unable to delete item.`);
       } catch (error) {
@@ -517,15 +504,18 @@ export default {
       } finally {
         this.loadOrgStatuses(false);
         this.$notify({
-          group: "app",
-          type: "success",
+          group: 'app',
+          type: 'success',
           text: `Item ${item.title} was deleted`
         });
-        this.currentItem = "";
+        this.currentItem = '';
       }
     },
+    closeDeleteDialog() {
+      this.dialogDeleteItem = false;
+    },
     async handleNewItem(go) {
-      this.objSelecBox = "";
+      this.objSelecBox = '';
       try {
         let data = {};
         data.assignee = String(this.newItem.assignee.userId);
@@ -533,16 +523,16 @@ export default {
         data.points = String(this.newItem.points);
         data.description = this.newItem.description;
         data.title = this.newItem.title;
-        data.ownerTable = "backlogs";
+        data.ownerTable = 'backlogs';
         data.ownerId = this.$route.query.backlogid;
         // if (data.assignee === String(this.$store.state.user.id)) delete data.assignee;
         await this.axios
           .post(`/api/items/new/${this.$store.state.organization.id}`, data)
           .then(response => {
-            const newItem = _get(response, "data.item");
+            const newItem = _get(response, 'data.item');
             if (go === true) {
               this.$router.push({
-                name: "item",
+                name: 'item',
                 query: {
                   orgId: this.$store.state.organization.id,
                   itemId: newItem.id
@@ -559,11 +549,11 @@ export default {
         if (!go) {
           this.loadOrgStatuses(false);
           this.newItem = {
-            title: "",
-            description: "",
+            title: '',
+            description: '',
             points: 0,
-            status: { id: 1, name: "Unplaned" },
-            assignee: ""
+            status: { id: 1, name: 'Unplaned' },
+            assignee: ''
           };
           this.setCurrentUser();
         }
@@ -586,12 +576,12 @@ export default {
         JSON.stringify(this.initialSelected.slice())
       );
 
-      if (typeof clickParam === "string") {
+      if (typeof clickParam === 'string') {
         filterInputValue = clickParam;
       } else {
         filterInputValue = this.filter;
       }
-      let filterKeys = ["title", "author"];
+      let filterKeys = ['title', 'author'];
       for (let i = 0, len = items.length; i < len; i++) {
         let filteredItems = items[i].filteredItems.filter(obj => {
           return filterKeys.some(function(key) {
@@ -606,7 +596,7 @@ export default {
       }
     },
     clearItemsFilter() {
-      this.filterItems("");
+      this.filterItems('');
     },
     onMove({ relatedContext, draggedContext }) {
       this.draggedContext = draggedContext;
@@ -667,7 +657,8 @@ export default {
   },
   components: {
     item: Item,
-    draggable
+    draggable,
+    DeleteItemDialog
   }
 };
 </script>

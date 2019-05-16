@@ -322,32 +322,25 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-dialog v-model="dialogDeleteBug" max-width="250">
-      <v-card>
-        <v-card-text
-          class="text-xs-center subheading"
-        >Wait. Are you sure you want to delete this permanently?</v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" flat="flat" outline @click="dialogDeleteBug = false" small>Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="error" flat="flat" outline @click="handleBugDelete(currentBug)" small>Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DeleteItemDialog
+        :dialogDeleteItem="dialogDeleteBug"
+        @deleteItem="handleBugDelete(currentBug)"
+        @closeDialog="closeDeleteDialog"
+    />
   </v-container>
 </template>
 
 <script>
-import _get from "lodash/get";
-import _ from "lodash";
-import { username } from "@/utils";
+import _get from 'lodash/get';
+import _ from 'lodash';
+import { username } from '@/utils';
+import DeleteItemDialog from '../components/common/DeleteItemDialog';
 export default {
-  name: "Bugs",
+  name: 'Bugs',
   data() {
     return {
       bugs: [],
-      activatedButton: "",
+      activatedButton: '',
       initialBugs: [],
       initialBugsForSorting: [],
       initialFilteredBugs: null,
@@ -358,22 +351,22 @@ export default {
       totalPages: 1,
       perPage: 8,
       newBug: {
-        title: "",
-        description: "",
-        severity: "P2",
-        status: { name: "None", id: 0 },
+        title: '',
+        description: '',
+        severity: 'P2',
+        status: { name: 'None', id: 0 },
         reportedBy: {},
         assignee: {}
       },
       // newBug: { title: '', description: '', status: { id: 10, name: 'Should have' }, horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) }, vote: null },
       show: false,
-      currentBug: "",
+      currentBug: '',
       admin: false,
       severityArray: [
-        { severity: "P0" },
-        { severity: "P1" },
-        { severity: "P2" },
-        { severity: "P3" }
+        { severity: 'P0' },
+        { severity: 'P1' },
+        { severity: 'P2' },
+        { severity: 'P3' }
       ],
       users: [],
       showArchived: false,
@@ -428,10 +421,10 @@ export default {
 
         const response = await this.axios.get(`/api/statuses/bugs/${orgId}`);
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        this.objStatuses = _get(response, "data.statuses");
+        this.objStatuses = _get(response, 'data.statuses');
       } catch (error) {
         this.oading === false;
         return this.$errorMessage.show(error);
@@ -444,10 +437,10 @@ export default {
         const orgId = this.$store.state.organization.id;
         const response = await this.axios.get(`/api/org/${orgId}/users`);
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        const users = _get(response, "data.users");
+        const users = _get(response, 'data.users');
 
         this.users = users;
         this.loading = false;
@@ -473,13 +466,13 @@ export default {
         // if (data.assignee === String(this.$store.state.user.id)) delete data.assignee;
 
         const response = await this.axios.post(`/api/bugs/new/${orgId}`, data);
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (success) {
-          const createdBug = _get(response, "data.bugs");
+          const createdBug = _get(response, 'data.bugs');
           this.dialogNewBug = false;
           if (go === true) {
             this.$router.push({
-              name: "bug",
+              name: 'bug',
               query: { orgId: orgId, bugId: createdBug.id }
             });
           }
@@ -491,10 +484,10 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.newBug = {
-          title: "",
-          description: "",
-          severity: "P2",
-          status: { name: "None", id: 0 },
+          title: '',
+          description: '',
+          severity: 'P2',
+          status: { name: 'None', id: 0 },
           reportedBy: {},
           assignee: {}
         };
@@ -511,7 +504,7 @@ export default {
         let response = await this.axios.delete(
           `/api/bugs/${this.$store.state.organization.id}/${bug.id}`
         );
-        let success = _get(response, "data.success");
+        let success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to delete bug.`);
         this.dialogDeleteBug = false;
         this.loading = false;
@@ -521,26 +514,29 @@ export default {
       } finally {
         this.loadOrgBugs();
         this.$notify({
-          group: "app",
-          type: "success",
+          group: 'app',
+          type: 'success',
           text: `Item ${bug.title} was deleted`
         });
-        this.currentBug = "";
+        this.currentBug = '';
       }
     },
+    closeDeleteDialog() {
+      this.dialogDeleteBug = false;
+    },
     handleNewBugSetField(element, name) {
-      if (element.hasOwnProperty("severity")) {
-        name = "severity";
+      if (element.hasOwnProperty('severity')) {
+        name = 'severity';
         element = element[name];
       }
-      if (element.hasOwnProperty("name")) {
-        name = "status";
+      if (element.hasOwnProperty('name')) {
+        name = 'status';
       }
-      if (element.hasOwnProperty("firstName") && this.assignedTo === null) {
-        name = "reportedBy";
+      if (element.hasOwnProperty('firstName') && this.assignedTo === null) {
+        name = 'reportedBy';
       }
       if (this.assignedTo !== null) {
-        name = "assignee";
+        name = 'assignee';
         this.assignedTo = null;
       }
       this.newBug[name] = element;
@@ -551,12 +547,12 @@ export default {
         const response = await this.axios.get(
           `/api/bugs/full/${this.showArchived}/${
             this.$store.state.organization.id
-          }` + "/false"
+          }` + '/false'
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
 
-        const bugs = _get(response, "data.bugs");
+        const bugs = _get(response, 'data.bugs');
 
         bugs.forEach(element => {
           element.reportedBy = username(element.reportedByData);
@@ -564,7 +560,7 @@ export default {
           if (element.statusId) {
             element.status = _.find(this.objStatuses, { id: element.statusId });
           } else {
-            element.status = { name: "None", id: 0 };
+            element.status = { name: 'None', id: 0 };
           }
           element.createdAt = new Date(element.createdAt).toLocaleString();
         });
@@ -574,7 +570,7 @@ export default {
         this.initialBugsForSorting = bugs.slice();
         this.bugs = this.initialBugs.slice(0, this.perPage);
 
-        this.admin = _get(response, "data.admin");
+        this.admin = _get(response, 'data.admin');
         this.paginationFunction(this.page > this.totalPages ? 1 : this.page);
         this.loading = false;
       } catch (error) {
@@ -589,9 +585,9 @@ export default {
       function sortFunction(a, b) {
         let aParam;
         let bParam;
-        if (param === "status") {
-          aParam = a[param]["name"].replace(/\s/g, "X").toLowerCase();
-          bParam = b[param]["name"].replace(/\s/g, "X").toLowerCase();
+        if (param === 'status') {
+          aParam = a[param]['name'].replace(/\s/g, 'X').toLowerCase();
+          bParam = b[param]['name'].replace(/\s/g, 'X').toLowerCase();
           if (aParam > bParam) {
             return -1;
           }
@@ -601,12 +597,12 @@ export default {
           return 0;
         } else {
           aParam =
-            typeof a[param] === "string"
-              ? a[param].replace(/\s/g, "X").toLowerCase()
+            typeof a[param] === 'string'
+              ? a[param].replace(/\s/g, 'X').toLowerCase()
               : a[param];
           bParam =
-            typeof b[param] === "string"
-              ? b[param].replace(/\s/g, "X").toLowerCase()
+            typeof b[param] === 'string'
+              ? b[param].replace(/\s/g, 'X').toLowerCase()
               : b[param];
           if (aParam < bParam) {
             return -1;
@@ -640,40 +636,40 @@ export default {
           this.bugs = this.initialBugs.slice(0, this.perPage);
         }
 
-        this.activatedButton = "";
+        this.activatedButton = '';
       }
     },
     filterBugs(clickParam) {
-      this.activatedButton = "";
+      this.activatedButton = '';
       this.page = 1;
       let bugs = this.initialBugs;
 
       let filterInputValue;
 
-      if (typeof clickParam === "string") {
+      if (typeof clickParam === 'string') {
         filterInputValue = clickParam;
       } else {
         filterInputValue = this.filter;
       }
 
       let filterKeys = [
-        "title",
-        "severity",
-        "status",
-        "reportedBy",
-        "assignedTo",
-        "createdAt"
+        'title',
+        'severity',
+        'status',
+        'reportedBy',
+        'assignedTo',
+        'createdAt'
       ];
       this.filteredBugs = bugs.filter(function(obj) {
         return filterKeys.some(function(key) {
-          if (typeof obj[key] === "string" || typeof obj[key] === "number") {
+          if (typeof obj[key] === 'string' || typeof obj[key] === 'number') {
             return obj[key]
               .toString()
               .toLowerCase()
               .includes(filterInputValue.toLowerCase());
           }
-          if (typeof obj[key] === "object") {
-            return obj[key]["name"]
+          if (typeof obj[key] === 'object') {
+            return obj[key]['name']
               .toLowerCase()
               .includes(filterInputValue.toLowerCase());
           }
@@ -691,7 +687,7 @@ export default {
       let sliceFrom = (event - 1) * this.perPage;
       this.page = event;
       let paginatedArray;
-      if (this.activatedButton === "") {
+      if (this.activatedButton === '') {
         if (this.filteredBugs !== null) {
           paginatedArray = this.initialFilteredBugs.slice(
             sliceFrom,
@@ -722,8 +718,9 @@ export default {
       }
     }
   },
-
-  components: {}
+  components: {
+    DeleteItemDialog
+  }
 };
 </script>
 

@@ -177,32 +177,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-dialog v-model="dialogDeleteBackLog" max-width="250">
-      <v-card>
-        <v-card-text
-          class="text-xs-center subheading"
-        >Wait. Are you sure you want to delete this permanently?</v-card-text>
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            flat="flat"
-            outline
-            @click="dialogDeleteBackLog = false"
-            small
-          >Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="error"
-            flat="flat"
-            outline
-            @click="handleBacklogDelete(currentBacklog)"
-            small
-          >Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
+    <DeleteItemDialog
+        :dialogDeleteItem="dialogDeleteBackLog"
+        @deleteItem="handleBacklogDelete(currentBacklog)"
+        @closeDialog="closeDeleteDialog"
+    />
     <v-dialog v-model="dialogBacklogEdit" max-width="450">
       <v-card>
         <v-layout row container wrap align-center>
@@ -241,21 +220,22 @@
 </template>
 
 <script>
-import _get from "lodash/get";
-import { username } from "@/utils";
+import _get from 'lodash/get';
+import { username } from '@/utils';
+import DeleteItemDialog from '../components/common/DeleteItemDialog';
 export default {
-  name: "Backlogs",
+  name: 'Backlogs',
   data() {
     return {
-      newBacklog: { title: "" },
+      newBacklog: { title: '' },
       backlogs: [],
-      activatedButton: "",
+      activatedButton: '',
       initialBacklogs: [],
       initialBacklogsForSorting: [],
       initialFilteredBacklogs: null,
       filteredBacklogs: null,
-      newNameOldBacklog: "",
-      currentBacklog: "",
+      newNameOldBacklog: '',
+      currentBacklog: '',
       filter: null,
       page: 1,
       totalPages: 4,
@@ -298,10 +278,10 @@ export default {
           }`
         );
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's backlogs.`);
 
-        const backlogs = _get(response, "data.backlogs");
+        const backlogs = _get(response, 'data.backlogs');
         backlogs.forEach(element => {
           element.author = username(element);
           if (element.archived === 1) {
@@ -352,13 +332,13 @@ export default {
           data
         );
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update backlog.`);
 
         this.$notify({
-          group: "app",
-          type: "success",
-          text: "Backlog updated"
+          group: 'app',
+          type: 'success',
+          text: 'Backlog updated'
         });
         this.dialogEditBacklog;
         this.loading = false;
@@ -370,8 +350,8 @@ export default {
         this.loading = true;
         await this.loadOrgBacklogs();
         this.$loading(false);
-        this.newNameOldBacklog = "";
-        this.currentBacklog = "";
+        this.newNameOldBacklog = '';
+        this.currentBacklog = '';
       }
     },
     async handleBacklogDelete(backLog) {
@@ -383,7 +363,7 @@ export default {
         const response = await this.axios.delete(
           `/api/backlogs/${this.$store.state.organization.id}/${backLog.id}`
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         this.loading = false;
         this.dialogDeleteBackLog = false;
         if (!success) throw new Error(`Unable to create new organization.`);
@@ -393,13 +373,16 @@ export default {
       } finally {
         this.loading = false;
         this.$notify({
-          group: "app",
-          type: "success",
+          group: 'app',
+          type: 'success',
           text: `Backlog ${backLog.title} was deleted`
         });
-        this.currentBacklog = "";
+        this.currentBacklog = '';
         await this.loadOrgBacklogs();
       }
+    },
+    closeDeleteDialog() {
+      this.dialogDeleteBackLog = false;
     },
     async handleNewBacklog() {
       this.loading = true;
@@ -410,7 +393,7 @@ export default {
           `/api/backlogs/new/${this.$store.state.organization.id}`,
           data
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         this.loading = false;
         this.dialogNewBackLog = false;
         if (!success) throw new Error(`Unable to create new backlog.`);
@@ -419,7 +402,7 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.loading = false;
-        this.newBacklog = { title: "" };
+        this.newBacklog = { title: '' };
         await this.loadOrgBacklogs();
       }
     },
@@ -431,9 +414,9 @@ export default {
       function sortFunction(a, b) {
         let aParam;
         let bParam;
-        if (param === "horizon") {
-          aParam = a[param][param].replace(/\s/g, "X").toLowerCase();
-          bParam = b[param][param].replace(/\s/g, "X").toLowerCase();
+        if (param === 'horizon') {
+          aParam = a[param][param].replace(/\s/g, 'X').toLowerCase();
+          bParam = b[param][param].replace(/\s/g, 'X').toLowerCase();
           if (aParam > bParam) {
             return -1;
           }
@@ -443,12 +426,12 @@ export default {
           return 0;
         } else {
           aParam =
-            typeof a[param] === "string"
-              ? a[param].replace(/\s/g, "X").toLowerCase()
+            typeof a[param] === 'string'
+              ? a[param].replace(/\s/g, 'X').toLowerCase()
               : a[param];
           bParam =
-            typeof b[param] === "string"
-              ? b[param].replace(/\s/g, "X").toLowerCase()
+            typeof b[param] === 'string'
+              ? b[param].replace(/\s/g, 'X').toLowerCase()
               : b[param];
           if (aParam < bParam) {
             return -1;
@@ -481,33 +464,33 @@ export default {
           this.page = 1;
           this.backlogs = this.initialBacklogs.slice(0, this.perPage);
         }
-        this.activatedButton = "";
+        this.activatedButton = '';
       }
     },
     filterBacklogs(clickParam) {
-      this.activatedButton = "";
+      this.activatedButton = '';
       this.page = 1;
       let backlogs = this.initialBacklogs;
 
       let filterInputValue;
 
-      if (typeof clickParam === "string") {
+      if (typeof clickParam === 'string') {
         filterInputValue = clickParam;
       } else {
         filterInputValue = this.filter;
       }
 
-      let filterKeys = ["title", "author"];
+      let filterKeys = ['title', 'author'];
       this.filteredBacklogs = backlogs.filter(function(obj) {
         return filterKeys.some(function(key) {
-          if (typeof obj[key] === "string" || typeof obj[key] === "number") {
+          if (typeof obj[key] === 'string' || typeof obj[key] === 'number') {
             return obj[key]
               .toString()
               .toLowerCase()
               .includes(filterInputValue.toLowerCase());
           }
-          if (typeof obj[key] === "object") {
-            return obj[key]["horizon"]
+          if (typeof obj[key] === 'object') {
+            return obj[key]['horizon']
               .toLowerCase()
               .includes(filterInputValue.toLowerCase());
           }
@@ -525,7 +508,7 @@ export default {
       let sliceFrom = (event - 1) * this.perPage;
       this.page = event;
       let paginatedArray;
-      if (this.activatedButton === "") {
+      if (this.activatedButton === '') {
         if (this.filteredBacklogs !== null) {
           paginatedArray = this.initialFilteredBacklogs.slice(
             sliceFrom,
@@ -556,7 +539,7 @@ export default {
     }
   },
   watch: {},
-  components: {}
+  components: { DeleteItemDialog }
 };
 </script>
 
