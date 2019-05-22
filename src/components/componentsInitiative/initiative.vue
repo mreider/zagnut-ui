@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <v-container fluid>
+    <v-layout row wrap justify-center>
+      <v-flex  xs12 sm10>
     <v-card class="initiative-card">
       <v-card-text>
         <v-container grid-list-md>
@@ -118,47 +120,50 @@
         @closeDialog="closeDeleteDialog"
     />
     <SubscribersListDialog :users="users" :dialogUserList="dialogUserList" @selectUser="selectChip"/>
-  </div>
+      </v-flex >
+    </v-layout>
+  </v-container>
+
 </template>
 
 <script>
-import _get from "lodash/get";
-import _ from "lodash";
-import Connections from "../common/connections.vue";
-import Comments from "../common/comments.vue";
-import SubscribersList from "../common/SubscribersList";
-import SubscribersListDialog from "../common/SubscribersListDialog";
-import DeleteItemDialog from "../common/DeleteItemDialog";
+import _get from 'lodash/get';
+import _ from 'lodash';
+import Connections from '../common/connections.vue';
+import Comments from '../common/comments.vue';
+import SubscribersList from '../common/SubscribersList';
+import SubscribersListDialog from '../common/SubscribersListDialog';
+import DeleteItemDialog from '../common/DeleteItemDialog';
 export default {
-  name: "Initiative",
+  name: 'Initiative',
   data() {
     return {
       toConnectionData: {
-        name: "initiative",
+        name: 'initiative',
         id: this.$route.query.initiativeid,
-        connects: ["item", "bug"]
+        connects: ['item', 'bug']
       },
       toCommentsData: {
-        name: "initiatives",
+        name: 'initiatives',
         id: this.$route.query.initiativeid,
         admin: false
       },
       objStatuses: [],
       horizonList: [],
-      vote: "",
-      btntrue: "",
-      btnfalse: "",
+      vote: '',
+      btntrue: '',
+      btnfalse: '',
       form: {
-        title: "",
-        description: "",
-        status: { id: 10, name: "Should have" },
+        title: '',
+        description: '',
+        status: { id: 10, name: 'Should have' },
         horizon: { date: new Date(), horizon: this.getHorizonName(new Date()) },
         vote: null,
         archived: false
       },
       admin: false,
       dialogDeleteInitiative: false,
-      currentStatus: "",
+      currentStatus: '',
       users: [],
       dialogUserList: false,
       subscribedUsers: []
@@ -185,7 +190,7 @@ export default {
             initiative.id
           }`
         );
-        let success = _get(response, "data.success");
+        let success = _get(response, 'data.success');
         this.dialogDeleteInitiative = false;
         if (!success) throw new Error(`Unable delete initiative.`);
       } catch (error) {
@@ -193,8 +198,8 @@ export default {
         return this.$errorMessage.show(error);
       } finally {
         this.$notify({
-          group: "app",
-          type: "success",
+          group: 'app',
+          type: 'success',
           text: `Item ${initiative.title} was deleted`
         });
         this.$router.go(-1);
@@ -210,9 +215,9 @@ export default {
         const response = await this.axios.get(
           `/api/statuses/initiatives/${orgId}`
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-        this.objStatuses = _get(response, "data.statuses");
+        this.objStatuses = _get(response, 'data.statuses');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -221,14 +226,14 @@ export default {
     },
     async handleInitiativeSetField(element, name) {
       this.form[name] = element;
-      if (name === "vote") {
+      if (name === 'vote') {
         this.vote = element;
         if (element === true) {
-          this.btntrue = "voteUp";
-          this.btnfalse = "";
+          this.btntrue = 'voteUp';
+          this.btnfalse = '';
         } else {
-          this.btntrue = "";
-          this.btnfalse = "voteDown";
+          this.btntrue = '';
+          this.btnfalse = 'voteDown';
         }
         await this.doVote(element);
         //  this.$nextTick();
@@ -285,13 +290,13 @@ export default {
       } else if (month < 12) {
         quarter = 4;
       }
-      return "Q" + quarter + year;
+      return 'Q' + quarter + year;
     },
     formatDate(d) {
       const month = d.getMonth() + 1;
       const year = d.getFullYear();
       const day = d.getDate();
-      return year + "-" + month + "-" + day;
+      return year + '-' + month + '-' + day;
     },
     async loadOrgInitiative() {
       try {
@@ -299,11 +304,11 @@ export default {
         const orgId = this.$route.query.orgId;
         const initiativeId = this.$route.query.initiativeid;
         const response = await this.axios.get(
-          `/api/initiatives/` + orgId + "/" + initiativeId
+          `/api/initiatives/` + orgId + '/' + initiativeId
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-        let initiative = _get(response, "data.initiative");
+        let initiative = _get(response, 'data.initiative');
         initiative.status = _.find(this.objStatuses, {
           id: initiative.statusId
         });
@@ -312,7 +317,7 @@ export default {
           horizon: this.getHorizonName(new Date(initiative.horizon))
         };
         initiative.horizon.date.setMonth(initiative.horizon.date.getMonth());
-        this.toCommentsData.admin = _get(response, "data.admin");
+        this.toCommentsData.admin = _get(response, 'data.admin');
         if (initiative.archived === 0) {
           initiative.archived = false;
         } else {
@@ -332,12 +337,12 @@ export default {
         const orgId = this.$route.query.orgId;
         const initiativeId = this.$route.query.initiativeid;
         let data = JSON.parse(JSON.stringify(this.form));
-        delete data["createdAt"];
-        delete data["updatedAt"];
-        delete data["createdBy"];
-        delete data["popularity"];
-        delete data["author"];
-        delete data["id"];
+        delete data['createdAt'];
+        delete data['updatedAt'];
+        delete data['createdBy'];
+        delete data['popularity'];
+        delete data['author'];
+        delete data['id'];
         delete data.vote;
         data.horizon = this.formatDate(new Date(data.horizon.date));
         data.statusId = String(data.status.id);
@@ -348,14 +353,14 @@ export default {
           `/api/initiatives/edit/${orgId}/${initiativeId}`,
           data
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to update initiative.`);
         // this.$notify({group: 'app', type: 'success', text: 'Item updated'});
         this.subscribeUsers();
-        const newComment = this.$refs["comments_ref"].newComment;
+        const newComment = this.$refs['comments_ref'].newComment;
         if (newComment.length > 0) {
-          this.$refs["comments_ref"].handleNewComment(
-            this.$refs["comments_ref"].newComment
+          this.$refs['comments_ref'].handleNewComment(
+            this.$refs['comments_ref'].newComment
           );
         }
       } catch (error) {
@@ -363,9 +368,9 @@ export default {
       } finally {
         this.$router.go(-1);
         this.$notify({
-          group: "app",
-          type: "success",
-          text: "Initiative updated"
+          group: 'app',
+          type: 'success',
+          text: 'Initiative updated'
         });
       }
     },
@@ -374,11 +379,11 @@ export default {
         // this.$loading(true);
         const initiativeId = this.$route.query.initiativeid;
         const response = await this.axios.post(
-          `/api/votes/initiatives/` + initiativeId + "/" + String(result)
+          `/api/votes/initiatives/` + initiativeId + '/' + String(result)
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to vote.`);
-        let vote = _get(response, "data.votes");
+        let vote = _get(response, 'data.votes');
         this.vote = vote;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -393,12 +398,12 @@ export default {
         const response = await this.axios.get(
           `/api/votes/initiatives/` + initiativeId
         );
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable load votes.`);
-        let vote = _get(response, "data.votes");
+        let vote = _get(response, 'data.votes');
         this.vote = vote;
-        let myVote = _get(response, "data.myVote");
-        if (myVote !== 0) this.handleInitiativeSetField(myVote, "vote");
+        let myVote = _get(response, 'data.myVote');
+        if (myVote !== 0) this.handleInitiativeSetField(myVote, 'vote');
       } catch (error) {
         return this.$errorMessage.show(error);
       } finally {
@@ -411,9 +416,9 @@ export default {
         this.$loading(true);
         const response = await this.axios.get(`/api/org/${orgId}/users`);
 
-        const success = _get(response, "data.success");
+        const success = _get(response, 'data.success');
         if (!success) throw new Error(`Unable to load user's organizations.`);
-        const users = _get(response, "data.users");
+        const users = _get(response, 'data.users');
         this.users = users;
       } catch (error) {
         return this.$errorMessage.show(error);
@@ -422,7 +427,7 @@ export default {
       }
     },
     loadSubscribers(ownerId) {
-      const ownerTable = this.$route.name.toLowerCase() + "s";
+      const ownerTable = this.$route.name.toLowerCase() + 's';
       this.axios
         .get(`/api/subscribers/${ownerTable}/${ownerId}`)
         .then(response => {
@@ -434,29 +439,29 @@ export default {
         });
     },
     checkText(e) {
-      if (e.key === "@") this.dialogUserList = true;
+      if (e.key === '@') this.dialogUserList = true;
     },
     selectChip($event) {
       this.dialogUserList = false;
       const userId = Number($event.target.parentNode.id);
       let textArray;
-      textArray = this.form.description.trim().split(" ");
-      const foundUser = this.users.find((item) => item.userId === userId);
+      textArray = this.form.description.trim().split(' ');
+      const foundUser = this.users.find(item => item.userId === userId);
       if (foundUser) {
         for (let [index, word] of textArray.entries()) {
-          if (word === "@") {
+          if (word === '@') {
             textArray[index] = `@${foundUser.firstName + foundUser.lastName}`;
           }
         }
-        this.form.description = textArray.join(" ");
-        if (!this.subscribedUsers.find((item) => item.id === userId)) {
+        this.form.description = textArray.join(' ');
+        if (!this.subscribedUsers.find(item => item.id === userId)) {
           foundUser.id = userId;
           this.subscribedUsers.push(foundUser);
         }
       }
     },
     subscribeUsers() {
-      const ownerTable = this.$route.name.toLowerCase() + "s";
+      const ownerTable = this.$route.name.toLowerCase() + 's';
       const ownerId = this.$route.query.initiativeid;
       let usersIds = [];
       for (let item of this.subscribedUsers) {
