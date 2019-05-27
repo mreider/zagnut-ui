@@ -4,7 +4,7 @@
       <loading-indication></loading-indication>
     </div>
     <v-layout row wrap>
-      <ItemsCardsToolbar
+      <CardsToolbar
           :showArchived="showArchivedFunction"
           :buttons="toolbarButtons"
           :sortItems="sortInitiaiveCards"
@@ -268,7 +268,7 @@ import _ from 'lodash';
 import { username } from '@/utils';
 import draggable from 'vuedraggable';
 import DeleteItemDialog from '../components/common/DeleteItemDialog';
-import ItemsCardsToolbar from '../components/common/ItemsCardsToolbar';
+import CardsToolbar from '../components/common/CardsToolbar';
 export default {
   name: 'Initiatives',
   data() {
@@ -663,7 +663,6 @@ export default {
       }
     },
     filterInitiatives(param) {
-      console.log(param);
       this.activatedButton = '';
       this.page = 1;
       let initiatives = this.initialInitiatives;
@@ -783,7 +782,7 @@ export default {
   components: {
     draggable,
     DeleteItemDialog,
-    ItemsCardsToolbar
+    CardsToolbar
   }
 };
 </script>

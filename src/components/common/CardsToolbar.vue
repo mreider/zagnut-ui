@@ -41,7 +41,7 @@
 
 <script>
 export default {
-  name: 'ItemsCardsToolbar',
+  name: 'CardsToolbar',
   data() {
     return {
       filter2: ''
