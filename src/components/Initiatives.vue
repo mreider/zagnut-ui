@@ -14,71 +14,16 @@
           :clearFilter="clearInitiativesFilter"
           :filter="filter"
       />
-      <!--toolbar for mobile sizes-->
-      <v-layout row wrap justify-center>
-        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-btn small outline color="success" @click="dialogNewInitiative = true">New</v-btn>
-          <v-checkbox
-            label="Show archived"
-            class="checkbox pl-2 pr-2"
-            v-model="showArchived"
-            @change="reload"
-          ></v-checkbox>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('title')"
-            :class="{'v-btn--active': this.activatedButton === 'initiative' }"
-          >Initiative</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('popularity')"
-            :class="{'v-btn--active': this.activatedButton === 'popularity' }"
-          >Popularity</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('importance')"
-            :class="{'v-btn--active': this.activatedButton === 'importance' }"
-          >Importance</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('horizon')"
-            :class="{'v-btn--active': this.activatedButton === 'horizon' }"
-          >horizon</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('author')"
-            :class="{'v-btn--active': this.activatedButton === 'author' }"
-          >Author</v-btn>
-        </v-flex>
-
-        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-text-field
-            label="Filter"
-            @keyup="filterInitiatives"
-            single-line
-            class="pt-0 pl-2 pr-2"
-            v-model="filter"
-          ></v-text-field>
-          <v-btn
-            small
-            outline
-            class="pt-0 mt-0 clear-filter-botton"
-            @click="filter = '', clearInitiativesFilter()"
-          >Clear</v-btn>
-        </v-flex>
-      </v-layout>
-      <!--cards section-->
-
+      <CardsToolbarMobile
+          :showArchived="showArchivedFunction"
+          :buttons="toolbarButtons"
+          :sortItems="sortInitiaiveCards"
+          :activeButton="activatedButton"
+          :openDialog="openNewItemDialog"
+          :filterItems="filterInitiatives"
+          :clearFilter="clearInitiativesFilter"
+          :filter="filter"
+      />
       <draggable
         :list="intiativeCards"
         @start="draging=true"
@@ -269,6 +214,7 @@ import { username } from '@/utils';
 import draggable from 'vuedraggable';
 import DeleteItemDialog from '../components/common/DeleteItemDialog';
 import CardsToolbar from '../components/common/CardsToolbar';
+import CardsToolbarMobile from '../components/common/CardsToolbarMobile';
 export default {
   name: 'Initiatives',
   data() {
@@ -782,7 +728,8 @@ export default {
   components: {
     draggable,
     DeleteItemDialog,
-    CardsToolbar
+    CardsToolbar,
+    CardsToolbarMobile
   }
 };
 </script>
