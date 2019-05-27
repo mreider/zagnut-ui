@@ -4,65 +4,16 @@
       <loading-indication></loading-indication>
     </div>
     <v-layout row wrap>
-      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
-        <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
-        <div>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('initiative')"
-            :class="{'v-btn--active': this.activatedButton === 'initiative' }"
-          >Initiative</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('popularity')"
-            :class="{'v-btn--active': this.activatedButton === 'popularity' }"
-          >Popularity</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('importance')"
-            :class="{'v-btn--active': this.activatedButton === 'importance' }"
-          >Importance</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('horizon')"
-            :class="{'v-btn--active': this.activatedButton === 'horizon' }"
-          >horizon</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortInitiaiveCards('author')"
-            :class="{'v-btn--active': this.activatedButton === 'author' }"
-          >Author</v-btn>
-        </div>
-        <v-spacer class="hidden-md-and-down"></v-spacer>
-        <v-btn small outline color="success" @click="dialogNewInitiative = true">New</v-btn>
-      </v-toolbar>
-      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
-        <v-spacer></v-spacer>
-        <v-spacer></v-spacer>
-        <v-text-field
-          label="Filter"
-          v-model="filter"
-          single-line
-          class="pt-0"
-          @keyup="filterInitiatives"
-        ></v-text-field>
-        <v-btn
-          small
-          outline
-          class="pt-0 mt-0 clear-filter-botton"
-          @click="filter = '', clearInitiativesFilter()"
-        >Clear</v-btn>
-      </v-toolbar>
+      <ItemsCardsToolbar
+          :showArchived="showArchivedFunction"
+          :buttons="toolbarButtons"
+          :sortItems="sortInitiaiveCards"
+          :activeButton="activatedButton"
+          :openDialog="openNewItemDialog"
+          :filterItems="filterInitiatives"
+          :clearFilter="clearInitiativesFilter"
+          :filter="filter"
+      />
       <!--toolbar for mobile sizes-->
       <v-layout row wrap justify-center>
         <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
@@ -77,7 +28,7 @@
             small
             color="primary"
             outline
-            @click="sortInitiaiveCards('initiative')"
+            @click="sortInitiaiveCards('title')"
             :class="{'v-btn--active': this.activatedButton === 'initiative' }"
           >Initiative</v-btn>
           <v-btn
@@ -317,6 +268,7 @@ import _ from 'lodash';
 import { username } from '@/utils';
 import draggable from 'vuedraggable';
 import DeleteItemDialog from '../components/common/DeleteItemDialog';
+import ItemsCardsToolbar from '../components/common/ItemsCardsToolbar';
 export default {
   name: 'Initiatives',
   data() {
@@ -355,7 +307,24 @@ export default {
       paramForNewCard: null,
       dragging: false,
       draggedContext: {},
-      relatedContext: {}
+      relatedContext: {},
+      toolbarButtons: [
+        {
+          name: 'initiative'
+        },
+        {
+          name: 'popularity'
+        },
+        {
+          name: 'importance'
+        },
+        {
+          name: 'horizon'
+        },
+        {
+          name: 'author'
+        }
+      ]
     };
   },
 
@@ -376,9 +345,16 @@ export default {
     close() {
       this.dialogNewInitiative = false;
     },
+    openNewItemDialog() {
+      this.dialogNewInitiative = true;
+    },
     async reload(checked) {
       this.showArchived = checked;
       await this.loadOrgInitiatives();
+    },
+    showArchivedFunction() {
+      this.showArchived = !this.showArchived;
+      this.reload(this.showArchived);
     },
     setCurrentInitiative(element) {
       this.currentInitiative = element;
@@ -632,48 +608,29 @@ export default {
     },
     sortInitiaiveCards(initiativeName) {
       let param = initiativeName.toLowerCase();
+      if (param === 'initiative') {
+        param = 'title';
+      }
+      const convertParam = param => {
+        return param
+          .toString()
+          .replace(/\s/g, 'X')
+          .toLowerCase();
+      };
       function sortFunction(a, b) {
-        if (param === 'initiative') {
-          param = 'title';
-        }
         let aParam;
         let bParam;
         if (param === 'horizon') {
-          aParam = a[param][param].replace(/\s/g, 'X').toLowerCase();
-          bParam = b[param][param].replace(/\s/g, 'X').toLowerCase();
-          if (aParam > bParam) {
-            return -1;
-          }
-          if (aParam === bParam) {
-            return 1;
-          }
-          return 0;
+          aParam = convertParam(a[param][param]);
+          bParam = convertParam(b[param][param]);
         } else {
-          aParam =
-            typeof a[param] === 'string'
-              ? a[param].replace(/\s/g, 'X').toLowerCase()
-              : a[param];
-          bParam =
-            typeof b[param] === 'string'
-              ? b[param].replace(/\s/g, 'X').toLowerCase()
-              : b[param];
-          if (param === 'popularity') {
-            if (aParam > bParam) {
-              return -1;
-            }
-            if (aParam === bParam) {
-              return 1;
-            }
-          } else {
-            if (aParam < bParam) {
-              return -1;
-            }
-            if (aParam === bParam) {
-              return 1;
-            }
-          }
-
-          return 0;
+          aParam = convertParam(a[param]);
+          bParam = convertParam(b[param]);
+        }
+        if (param === 'popularity') {
+          return aParam > bParam ? -1 : 1;
+        } else {
+          return aParam < bParam ? -1 : 1;
         }
       }
 
@@ -705,15 +662,18 @@ export default {
         this.activatedButton = '';
       }
     },
-    filterInitiatives(clickParam) {
+    filterInitiatives(param) {
+      console.log(param);
       this.activatedButton = '';
       this.page = 1;
       let initiatives = this.initialInitiatives;
 
       let filterInputValue;
 
-      if (typeof clickParam === 'string') {
-        filterInputValue = clickParam;
+      if (typeof param === 'string') {
+        filterInputValue = param;
+      } else if (typeof param === 'object') {
+        filterInputValue = param.target.value;
       } else {
         filterInputValue = this.filter;
       }
@@ -747,6 +707,8 @@ export default {
       this.initialFilteredInitiatives = this.filteredInitiatives.slice();
     },
     clearInitiativesFilter() {
+      console.log('hello');
+      this.filter = '';
       this.filteredInitiatives = null;
       this.totalPages = Math.ceil(
         this.initialInitiatives.length / this.perPage
@@ -820,7 +782,8 @@ export default {
   },
   components: {
     draggable,
-    DeleteItemDialog
+    DeleteItemDialog,
+    ItemsCardsToolbar
   }
 };
 </script>
