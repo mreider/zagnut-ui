@@ -3,113 +3,27 @@
     <div v-if="loading === true">
       <loading-indication></loading-indication>
     </div>
-
     <v-layout row wrap>
-      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
-        <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
-        <div>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBugCards('title')"
-            :class="{'v-btn--active': this.activatedButton === 'title' }"
-          >Bug</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBugCards('severity')"
-            :class="{'v-btn--active': this.activatedButton === 'severity' }"
-          >Severity</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBugCards('status')"
-            :class="{'v-btn--active': this.activatedButton === 'status' }"
-          >Status</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBugCards('createdAt')"
-            :class="{'v-btn--active': this.activatedButton === 'createdAt' }"
-          >Created</v-btn>
-        </div>
-        <v-spacer class="hidden-md-and-down"></v-spacer>
-        <v-btn small outline color="success" @click="dialogNewBug = true">New</v-btn>
-      </v-toolbar>
-
-      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
-        <v-spacer></v-spacer>
-        <v-spacer></v-spacer>
-        <v-text-field label="Filter" v-model="filter" single-line class="pt-0" @keyup="filterBugs"></v-text-field>
-        <v-btn
-          small
-          outline
-          class="pt-0 mt-0 clear-filter-botton"
-          @click="filter = '', clearBugsFilter()"
-        >Clear</v-btn>
-      </v-toolbar>
-
-      <!--toolbar for mobile sizes-->
-      <v-layout row wrap justify-center>
-        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-btn small outline color="success" @click="dialogNewBug = true">New</v-btn>
-          <v-checkbox
-            label="Show archived"
-            class="checkbox pl-2 pr-2"
-            v-model="showArchived"
-            @change="reload"
-          ></v-checkbox>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBugCards('title')"
-            :class="{'v-btn--active': this.activatedButton === 'title' }"
-          >Bug</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBugCards('severity')"
-            :class="{'v-btn--active': this.activatedButton === 'severity' }"
-          >Severity</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBugCards('status')"
-            :class="{'v-btn--active': this.activatedButton === 'status' }"
-          >Status</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBugCards('createdAt')"
-            :class="{'v-btn--active': this.activatedButton === 'createdAt' }"
-          >Created</v-btn>
-        </v-flex>
-
-        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-text-field
-            label="Filter"
-            v-model="filter"
-            single-line
-            class="pt-0"
-            @keyup="filterBugs"
-          ></v-text-field>
-          <v-btn
-            small
-            outline
-            class="pt-0 mt-0 clear-filter-botton"
-            @click="filter = '', clearBugsFilter()"
-          >Clear</v-btn>
-        </v-flex>
-      </v-layout>
-
+       <CardsToolbar
+          :showArchived="showArchivedFunction"
+          :buttons="toolbarButtons"
+          :sortItems="sortBugCards"
+          :activeButton="activatedButton"
+          :openDialog="openNewItemDialog"
+          :filterItems="filterBugs"
+          :clearFilter="clearBugsFilter"
+          :filter="filter"
+      />
+      <CardsToolbarMobile
+          :showArchived="showArchivedFunction"
+          :buttons="toolbarButtons"
+          :sortItems="sortBugCards"
+          :activeButton="activatedButton"
+          :openDialog="openNewItemDialog"
+          :filterItems="filterBugs"
+          :clearFilter="clearBugsFilter"
+          :filter="filter"
+      />
       <!--cards section-->
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in bugCards" :key="item.id">
         <v-card>
@@ -335,11 +249,27 @@ import _get from 'lodash/get';
 import _ from 'lodash';
 import { username } from '@/utils';
 import DeleteItemDialog from '../components/common/DeleteItemDialog';
+import CardsToolbar from '../components/common/CardsToolbar';
+import CardsToolbarMobile from '../components/common/CardsToolbarMobile';
 export default {
   name: 'Bugs',
   data() {
     return {
       bugs: [],
+      toolbarButtons: [
+        {
+          name: 'title'
+        },
+        {
+          name: 'severity'
+        },
+        {
+          name: 'status'
+        },
+        {
+          name: 'created at'
+        }
+      ],
       activatedButton: '',
       initialBugs: [],
       initialBugsForSorting: [],
@@ -398,9 +328,16 @@ export default {
     close() {
       this.dialogNewbug = false;
     },
+    openNewItemDialog() {
+      this.dialogNewBug = true;
+    },
     async reload(checked) {
       this.showArchived = checked;
       await this.loadOrgBugs();
+    },
+    showArchivedFunction() {
+      this.showArchived = !this.showArchived;
+      this.reload(this.showArchived);
     },
     setCurrentUser() {
       this.newBug.reportedBy = this.$store.state.user;
@@ -581,37 +518,26 @@ export default {
     },
     sortBugCards(bugName) {
       let param = bugName.toLowerCase();
-
+      const convertParam = param => {
+        return param
+          .toString()
+          .replace(/\s/g, '')
+          .toLowerCase();
+      };
       function sortFunction(a, b) {
         let aParam;
         let bParam;
         if (param === 'status') {
-          aParam = a[param]['name'].replace(/\s/g, 'X').toLowerCase();
-          bParam = b[param]['name'].replace(/\s/g, 'X').toLowerCase();
-          if (aParam > bParam) {
-            return -1;
-          }
-          if (aParam === bParam) {
-            return 1;
-          }
-          return 0;
+          aParam = convertParam(a[param]['name']);
+          bParam = convertParam(b[param]['name']);
+        } else if (param === 'created at') {
+          aParam = convertParam(a['createdAt']);
+          bParam = convertParam(b['createdAt']);
         } else {
-          aParam =
-            typeof a[param] === 'string'
-              ? a[param].replace(/\s/g, 'X').toLowerCase()
-              : a[param];
-          bParam =
-            typeof b[param] === 'string'
-              ? b[param].replace(/\s/g, 'X').toLowerCase()
-              : b[param];
-          if (aParam < bParam) {
-            return -1;
-          }
-          if (aParam === bParam) {
-            return 1;
-          }
-          return 0;
+          aParam = convertParam(a[param]);
+          bParam = convertParam(b[param]);
         }
+        return aParam < bParam ? -1 : 1;
       }
 
       if (this.activatedButton !== bugName) {
@@ -639,15 +565,17 @@ export default {
         this.activatedButton = '';
       }
     },
-    filterBugs(clickParam) {
+    filterBugs(param) {
       this.activatedButton = '';
       this.page = 1;
       let bugs = this.initialBugs;
 
       let filterInputValue;
 
-      if (typeof clickParam === 'string') {
-        filterInputValue = clickParam;
+      if (typeof param === 'string') {
+        filterInputValue = param;
+      } else if (typeof param === 'object') {
+        filterInputValue = param.target.value;
       } else {
         filterInputValue = this.filter;
       }
@@ -680,6 +608,7 @@ export default {
       this.initialFilteredBugs = this.filteredBugs.slice();
     },
     clearBugsFilter() {
+      this.filter = '';
       this.filteredBugs = null;
       this.totalPages = Math.ceil(this.initialBugs.length / this.perPage);
     },
@@ -719,7 +648,9 @@ export default {
     }
   },
   components: {
-    DeleteItemDialog
+    DeleteItemDialog,
+    CardsToolbar,
+    CardsToolbarMobile
   }
 };
 </script>

@@ -560,7 +560,7 @@ export default {
       const convertParam = param => {
         return param
           .toString()
-          .replace(/\s/g, 'X')
+          .replace(/\s/g, '')
           .toLowerCase();
       };
       function sortFunction(a, b) {
@@ -652,7 +652,6 @@ export default {
       this.initialFilteredInitiatives = this.filteredInitiatives.slice();
     },
     clearInitiativesFilter() {
-      console.log('hello');
       this.filter = '';
       this.filteredInitiatives = null;
       this.totalPages = Math.ceil(
