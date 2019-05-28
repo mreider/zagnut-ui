@@ -4,88 +4,26 @@
       <loading-indication></loading-indication>
     </div>
     <v-layout row wrap>
-      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
-        <v-checkbox label="Show archived" class="checkbox" v-model="showArchived" @change="reload"></v-checkbox>
-        <div>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBacklogsCards('title')"
-            :class="{'v-btn--active': this.activatedButton === 'title' }"
-          >Backlog</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBacklogsCards('autor')"
-            :class="{'v-btn--active': this.activatedButton === 'autor' }"
-          >Author</v-btn>
-        </div>
-        <v-spacer class="hidden-md-and-down"></v-spacer>
-        <v-btn small outline color="success" @click="dialogNewBackLog = true">New</v-btn>
-      </v-toolbar>
-      <v-toolbar card prominent align-center class="cards-toolbar hidden-sm-and-down">
-        <v-spacer></v-spacer>
-        <v-spacer></v-spacer>
-        <v-text-field
-          label="Filter"
-          v-model="filter"
-          single-line
-          class="pt-0"
-          @keyup="filterBacklogs"
-        ></v-text-field>
-        <v-btn
-          small
-          outline
-          class="pt-0 mt-0 clear-filter-botton"
-          @click="filter = '', clearBacklogsFilter()"
-        >Clear</v-btn>
-      </v-toolbar>
-      <!--toolbar for mobile sizes-->
-      <v-layout row wrap justify-center>
-        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <!--new initiative dialog-->
-          <v-btn small outline color="success" @click="dialogNewBackLog = true">New</v-btn>
-
-          <v-checkbox
-            label="Show archived"
-            class="checkbox pl-2 pr-2"
-            v-model="showArchived"
-            @change="reload"
-          ></v-checkbox>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBacklogsCards('title')"
-            :class="{'v-btn--active': this.activatedButton === 'initiative' }"
-          >Backlog</v-btn>
-          <v-btn
-            small
-            color="primary"
-            outline
-            @click="sortBacklogsCards('autor')"
-            :class="{'v-btn--active': this.activatedButton === 'autor'}"
-          >Author</v-btn>
-        </v-flex>
-
-        <v-flex xs12 pl-3 pr-3 class="cards-toolbar-mobile hidden-md-and-up">
-          <v-text-field
-            label="Filter"
-            @keyup="filterBacklogs"
-            single-line
-            class="pt-0 pl-2 pr-2"
-            v-model="filter"
-          ></v-text-field>
-          <v-btn
-            small
-            outline
-            class="pt-0 mt-0 clear-filter-botton"
-            @click="filter = '', clearBacklogsFilter()"
-          >Clear</v-btn>
-        </v-flex>
-      </v-layout>
+      <CardsToolbar
+          :showArchived="showArchivedFunction"
+          :buttons="toolbarButtons"
+          :sortItems="sortBacklogsCards"
+          :activeButton="activatedButton"
+          :openDialog="openNewItemDialog"
+          :filterItems="filterBacklogs"
+          :clearFilter="clearBacklogsFilter"
+          :filter="filter"
+      />
+      <CardsToolbarMobile
+          :showArchived="showArchivedFunction"
+          :buttons="toolbarButtons"
+          :sortItems="sortBacklogsCards"
+          :activeButton="activatedButton"
+          :openDialog="openNewItemDialog"
+          :filterItems="filterBacklogs"
+          :clearFilter="clearBacklogsFilter"
+          :filter="filter"
+      />
       <!--cards section-->
       <v-flex xs12 sm6 md4 lg3 pl-1 pr-1 pt-3 v-for="item in backlogsCards" :key="item.id">
         <v-card>
@@ -223,12 +161,15 @@
 import _get from 'lodash/get';
 import { username } from '@/utils';
 import DeleteItemDialog from '../components/common/DeleteItemDialog';
+import CardsToolbar from '../components/common/CardsToolbar';
+import CardsToolbarMobile from '../components/common/CardsToolbarMobile';
 export default {
   name: 'Backlogs',
   data() {
     return {
       newBacklog: { title: '' },
       backlogs: [],
+      toolbarButtons: [{ name: 'title' }, { name: 'author' }],
       activatedButton: '',
       initialBacklogs: [],
       initialBacklogsForSorting: [],
@@ -265,9 +206,16 @@ export default {
     close() {
       this.dialogNewBackLog = false;
     },
+    openNewItemDialog() {
+      this.dialogNewBackLog = true;
+    },
     async reload(checked) {
       this.showArchived = checked;
       await this.loadOrgBacklogs();
+    },
+    showArchivedFunction() {
+      this.showArchived = !this.showArchived;
+      this.reload(this.showArchived);
     },
     async loadOrgBacklogs() {
       this.loading = true;
@@ -411,38 +359,25 @@ export default {
     },
     sortBacklogsCards(backlogName) {
       let param = backlogName.toLowerCase();
+      const convertParam = param => {
+        return param.replace(/\s/g, '').toLowerCase();
+      };
       function sortFunction(a, b) {
         let aParam;
         let bParam;
         if (param === 'horizon') {
-          aParam = a[param][param].replace(/\s/g, 'X').toLowerCase();
-          bParam = b[param][param].replace(/\s/g, 'X').toLowerCase();
-          if (aParam > bParam) {
-            return -1;
-          }
-          if (aParam === bParam) {
-            return 1;
-          }
-          return 0;
+          aParam = convertParam(a[param][param]);
+          bParam = convertParam(b[param][param]);
         } else {
-          aParam =
-            typeof a[param] === 'string'
-              ? a[param].replace(/\s/g, 'X').toLowerCase()
-              : a[param];
-          bParam =
-            typeof b[param] === 'string'
-              ? b[param].replace(/\s/g, 'X').toLowerCase()
-              : b[param];
-          if (aParam < bParam) {
-            return -1;
-          }
-          if (aParam === bParam) {
-            return 1;
-          }
-          return 0;
+          aParam = convertParam(a[param]);
+          bParam = convertParam(b[param]);
+        }
+        if (param === 'popularity') {
+          return aParam > bParam ? -1 : 1;
+        } else {
+          return aParam < bParam ? -1 : 1;
         }
       }
-
       if (this.activatedButton !== backlogName) {
         // Check if initiatives was filtered by filter input, if true, sorting filtered initiatives
         if (this.filteredBacklogs !== null) {
@@ -467,15 +402,17 @@ export default {
         this.activatedButton = '';
       }
     },
-    filterBacklogs(clickParam) {
+    filterBacklogs(param) {
       this.activatedButton = '';
       this.page = 1;
       let backlogs = this.initialBacklogs;
 
       let filterInputValue;
 
-      if (typeof clickParam === 'string') {
-        filterInputValue = clickParam;
+      if (typeof param === 'string') {
+        filterInputValue = param;
+      } else if (typeof param === 'object') {
+        filterInputValue = param.target.value;
       } else {
         filterInputValue = this.filter;
       }
@@ -501,6 +438,7 @@ export default {
       this.initialFilteredBacklogs = this.filteredBacklogs.slice();
     },
     clearBacklogsFilter() {
+      this.filter = '';
       this.filteredBacklogs = null;
       this.totalPages = Math.ceil(this.initialBacklogs.length / this.perPage);
     },
@@ -539,7 +477,7 @@ export default {
     }
   },
   watch: {},
-  components: { DeleteItemDialog }
+  components: { DeleteItemDialog, CardsToolbar, CardsToolbarMobile }
 };
 </script>
 
